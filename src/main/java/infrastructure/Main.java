@@ -3,18 +3,19 @@ package infrastructure;
 import static spark.Spark.after;
 import static spark.Spark.post;
 import static spark.Spark.get;
+import static spark.Spark.setPort;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
 import com.google.gson.JsonParser;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class Main {
 
 	 public static void main(String[] args) {
+		 setPort(Integer.valueOf(System.getenv("PORT")));
+		 
 		 get(new Route("/hello") {
              @Override
              public Object handle(Request request, Response response) { 
