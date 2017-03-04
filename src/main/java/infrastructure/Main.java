@@ -18,7 +18,6 @@ public class Main {
 		 get(new Route("/hello") {
              @Override
              public Object handle(Request request, Response response) { 
-            	 System.out.println("HELOOOO");
     			return "Hello World!";
              }
  });	 
