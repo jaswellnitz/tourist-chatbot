@@ -2,12 +2,12 @@ package infrastructure;
 
 // https://docs.api.ai/docs/webhook
 
-public class AgentResponse {
+public class Fulfillment {
 	private String speech;
-	private String displayText;
 	private String source;
+	private String displayText;
 
-	public AgentResponse(String speech, String displayText, String source) {
+	public Fulfillment(String speech, String displayText, String source) {
 		super();
 		this.speech = speech;
 		this.source = source;
