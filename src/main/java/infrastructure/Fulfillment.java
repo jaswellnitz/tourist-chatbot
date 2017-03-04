@@ -6,12 +6,17 @@ public class Fulfillment {
 	private String speech;
 	private String source;
 	private String displayText;
+	private Object data;
+	private Object contextOut[];
 
 	public Fulfillment(String speech, String displayText, String source) {
 		super();
 		this.speech = speech;
 		this.source = source;
 		this.displayText = displayText;
+		this.data = "";
+		this.contextOut = new Object[1];
+		
 	}
 	
 	public String getSpeech() {
