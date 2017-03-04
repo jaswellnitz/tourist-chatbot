@@ -13,6 +13,7 @@ import spark.Route;
 import com.google.gson.JsonParser;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import spark.ResponseTransformer;
 
 public class Main {
 
@@ -30,7 +31,7 @@ public class Main {
              @Override
              public Object handle(Request request, Response response) {
      			Fulfillment fulfillment = new Fulfillment("Hello Speech", "Hello Display Test!", "touristbot test");
-     			return new Gson().toJson(fulfillment);
+     			return JsonUtil.toJson(fulfillment);
              }
  });	
 		
@@ -41,7 +42,7 @@ public class Main {
 //     			JsonObject result = new JsonParser().parse(jsonRequest).getAsJsonObject().get("result").getAsJsonObject();
 //     			String action = result.get("action").getAsString();
      			Fulfillment fulfillment = new Fulfillment("Hello Speech", "Hello Display Test!", "touristbot test");
-     			return new Gson().toJson(fulfillment);
+     			return JsonUtil.toJson(fulfillment);
              }
  });	 
 		after(new spark.Filter() {
@@ -55,4 +56,16 @@ public class Main {
 	 
 	 }
 	 
+}
+
+class JsonUtil {
+
+	public static String toJson(Object object) {
+		return new Gson().toJson(object);
+	}
+
+	public static ResponseTransformer json() {
+		return JsonUtil::toJson;
+	}
+
 }
