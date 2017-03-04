@@ -1,1 +1,1 @@
-web: java -jar target/touristbot.jar
+web: java $JAVA_OPTS -Dserver.port=$PORT -jar target/touristbot.jar
