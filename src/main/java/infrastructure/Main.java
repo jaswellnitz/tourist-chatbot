@@ -4,6 +4,9 @@ import static spark.Spark.after;
 import static spark.Spark.post;
 import static spark.Spark.get;
 import static spark.Spark.setPort;
+
+import javax.annotation.PostConstruct;
+
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -22,14 +25,22 @@ public class Main {
     			return "Hello World!";
              }
  });	 
+		 
+		 post(new Route("/test") {
+             @Override
+             public Object handle(Request request, Response response) {
+     			Fulfillment fulfillment = new Fulfillment("Hello Speech", "Hello Display Test!", "touristbot test");
+     			return new Gson().toJson(fulfillment);
+             }
+ });	
 		
 		 post(new Route("/webhook") {
              @Override
              public Object handle(Request request, Response response) {
-     			String jsonRequest = request.body().toString();
-     			JsonObject result = new JsonParser().parse(jsonRequest).getAsJsonObject().get("result").getAsJsonObject();
-     			String action = result.get("action").getAsString();
-     			Fulfillment fulfillment = new Fulfillment("Hello Speech", "Hello Display Test!, action: " + action, "touristbot test");
+//     			String jsonRequest = request.body().toString();
+//     			JsonObject result = new JsonParser().parse(jsonRequest).getAsJsonObject().get("result").getAsJsonObject();
+//     			String action = result.get("action").getAsString();
+     			Fulfillment fulfillment = new Fulfillment("Hello Speech", "Hello Display Test!", "touristbot test");
      			return new Gson().toJson(fulfillment);
              }
  });	 
@@ -41,5 +52,7 @@ public class Main {
 				
 			}
 		});
+	 
 	 }
+	 
 }
