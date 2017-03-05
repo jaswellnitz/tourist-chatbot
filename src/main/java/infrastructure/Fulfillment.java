@@ -9,11 +9,11 @@ public class Fulfillment {
 	private Object data;
 	private Object contextOut[];
 
-	public Fulfillment(String speech, String displayText, String source) {
+	public Fulfillment(String speech, String displayText) {
 		super();
 		this.speech = speech;
-		this.source = source;
 		this.displayText = displayText;
+		this.source = "touristbot test";
 		this.data = "";
 		this.contextOut = new Object[1];
 		

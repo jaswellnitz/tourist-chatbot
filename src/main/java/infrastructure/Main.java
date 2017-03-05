@@ -7,8 +7,11 @@ import static spark.Spark.port;
 
 
 import com.google.gson.Gson;
-import spark.ResponseTransformer;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import spark.ResponseTransformer;
+//test
 public class Main {
 
 	 public static void main(String[] args) {
@@ -19,16 +22,16 @@ public class Main {
 		
 		 
 		 post("/test",(req,res)-> {
-     			Fulfillment fulfillment = new Fulfillment("Hello Speech", "Hello Display Test!", "touristbot test");
+     			Fulfillment fulfillment = new Fulfillment("This is a test", "This is a test!");
      			return JsonUtil.toJson(fulfillment);
              }
  );	
 		 
 		 post("/webhook",(req,res)-> {
-//				String jsonRequest = request.body().toString();
-//     			JsonObject result = new JsonParser().parse(jsonRequest).getAsJsonObject().get("result").getAsJsonObject();
-//     			String action = result.get("action").getAsString();
-  			Fulfillment fulfillment = new Fulfillment("Hello Speech", "Hello Display Test!", "touristbot test");
+				String jsonRequest = req.body().toString();
+     			JsonObject result = new JsonParser().parse(jsonRequest).getAsJsonObject().get("result").getAsJsonObject();
+     			String action = result.get("action").getAsString();
+  			Fulfillment fulfillment = new Fulfillment("This is a test. Asked action: " + action, "This is a test.");
   			return JsonUtil.toJson(fulfillment);
           }
 );	
