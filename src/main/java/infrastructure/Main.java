@@ -30,8 +30,9 @@ public class Main {
 		 post("/webhook",(req,res)-> {
 				String jsonRequest = req.body().toString();
      			JsonObject result = new JsonParser().parse(jsonRequest).getAsJsonObject().get("result").getAsJsonObject();
+     			String resolvedQuery = result.get("resolvedQuery").getAsString();
      			String action = result.get("action").getAsString();
-  			Fulfillment fulfillment = new Fulfillment("This is a test. Asked action: " + action, "This is a test.");
+  			Fulfillment fulfillment = new Fulfillment("This is a test. Asked query" + resolvedQuery + ", asked action: " + action, "This is a test.");
   			return JsonUtil.toJson(fulfillment);
           }
 );	
