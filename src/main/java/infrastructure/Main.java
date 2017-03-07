@@ -12,8 +12,7 @@ import com.pengrad.telegrambot.request.SetWebhook;
 public class Main {
 
 	public static void main(String[] args) {
-		 	ipAddress(args[0]);
-	        port(Integer.parseInt(args[1]));
+			port(Integer.valueOf(System.getenv("PORT")));
 
 	        get("/hello", (req, res) -> "Hello World");
 	        post("/test", (req, res) -> "Post Test");
