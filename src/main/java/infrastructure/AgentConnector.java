@@ -33,14 +33,13 @@ public class AgentConnector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(jsonResponse);
 		String answer = JsonUtil.parseToJson(jsonResponse).get("result").getAsJsonObject().get("fulfillment").getAsJsonObject().get("speech").getAsString();
 		return answer;
 	}
 	
 	private String buildQuery(String text){
 		HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.api.ai/v1/query").newBuilder();
-		urlBuilder.addQueryParameter("query", "text");
+		urlBuilder.addQueryParameter("query", text);
 		urlBuilder.addQueryParameter("v", "20150910");
 		urlBuilder.addQueryParameter("lang", "en");
 		urlBuilder.addQueryParameter("sessionId", "1234567890");
