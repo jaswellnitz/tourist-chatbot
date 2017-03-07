@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+// Loads properties from config.properties
 public class PropertyLoader {
 
 	private static Properties properties;

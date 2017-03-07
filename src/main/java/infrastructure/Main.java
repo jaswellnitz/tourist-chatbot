@@ -9,7 +9,7 @@ import com.pengrad.telegrambot.request.SetWebhook;
 
 import util.PropertyLoader;
 
-
+// Entry Point: enables Telegram webhook
 public class Main {
 
 	public static void main(String[] args) {

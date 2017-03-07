@@ -13,6 +13,7 @@ import util.PropertyLoader;
 import com.pengrad.telegrambot.TelegramBotAdapter;
 import com.pengrad.telegrambot.request.SendMessage;
 
+// Receives Updates from Telegram and passes text messages to api.ai
 public class TestBotHandler implements Route {
 
 	private final String token;

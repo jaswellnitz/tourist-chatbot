@@ -9,6 +9,7 @@ import okhttp3.Response;
 import util.JsonUtil;
 import util.PropertyLoader;
 
+// Sends requests to api.ai agent via its http api 
 public class AgentConnector {
 	
 	private OkHttpClient client;
