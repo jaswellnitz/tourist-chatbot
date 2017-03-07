@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 
 import spark.ResponseTransformer;
 
+// Utitily class to convert from and to JSON using Gson
 public class JsonUtil {
 
 	public static String toJson(Object object) {
@@ -16,8 +17,6 @@ public class JsonUtil {
 		return new JsonParser().parse(text).getAsJsonObject();
 	}
 	
-	
-
 	public static ResponseTransformer json() {
 		return JsonUtil::toJson;
 	}
