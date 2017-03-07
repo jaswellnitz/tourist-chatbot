@@ -21,7 +21,6 @@ public class Main {
 	        TestBotHandler botHandler = new TestBotHandler();
 	        post("/" + botHandler.getToken(), botHandler);
 
-	        String appSite = System.getenv("OPENSHIFT_APP_DNS");
-	        botHandler.getBot().execute(new SetWebhook().url(appSite + "/" + botHandler.getToken()));
+	        botHandler.getBot().execute(new SetWebhook().url("https://safe-ridge-54902.herokuapp.com/" + botHandler.getToken()));
 	}
 }

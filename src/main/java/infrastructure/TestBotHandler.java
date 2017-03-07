@@ -39,6 +39,8 @@ public class TestBotHandler implements Route {
 
 
     private void onWebhookUpdate(Update update) {
+    	System.out.println("onWebhookUpdate called");
+    	System.out.println("user: " + update.message().from().username());
         bot.execute(new SendMessage(update.message().chat().id(), "TestBotHandler: method onWebhookUpdate."));
     }
     
@@ -47,6 +49,7 @@ public class TestBotHandler implements Route {
     }
 
     public TelegramBot getBot() {
+    	System.out.println("getBot called");
         return bot;
     }
   
