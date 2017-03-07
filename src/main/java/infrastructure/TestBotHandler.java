@@ -35,16 +35,16 @@ public class TestBotHandler implements Route {
 			sendMessage(update.message().chat().id(), "Testbot: Hello " + firstName + ". Your id: " + message.from().id());
 		} else {
 			System.out.println(message);
-			String text = "TestBot: ";
+			String text = "";
 			if(message.text() != null){
-				String agentAnswer = agentConnector.sendQuery(text);
-				text += "Agent answers: " + agentAnswer; 
+				String agentAnswer = agentConnector.sendQuery(message.text());
+				text += "Agent answers: " + agentAnswer + " "; 
 			}
 			Location location = message.location();
 			if (location != null) {
 				float lat = location.latitude();
 				float lon = location.longitude();
-				text += "Your location: latitude " + lat + ", longitude " + lon;
+				text += "TestBot: Your location - latitude " + lat + ", longitude " + lon;
 			}
 			sendMessage(message.chat().id(), text);
 		}
