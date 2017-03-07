@@ -8,28 +8,21 @@ import com.pengrad.telegrambot.model.Update;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import util.PropertyLoader;
+
 import com.pengrad.telegrambot.TelegramBotAdapter;
 import com.pengrad.telegrambot.request.SendMessage;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 
 public class TestBotHandler implements Route {
 
 	private final String token;
 	private final TelegramBot bot;
+	private final AgentConnector agentConnector;
 
 	public TestBotHandler() {
-		Properties properties = new Properties();
-		try {
-			properties.load(new FileInputStream("config.properties"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		token = properties.getProperty("token");
-		System.out.println("TOKEN " + token);
+		token = PropertyLoader.getProperty("telegramToken");
 		bot = TelegramBotAdapter.buildDebug(token);
+		agentConnector =  new AgentConnector();
 	}
 
 	@Override
@@ -44,13 +37,14 @@ public class TestBotHandler implements Route {
 			System.out.println(message);
 			String text = "TestBot: ";
 			if(message.text() != null){
-				text += "Your message: " + message.text(); 
+				String agentAnswer = agentConnector.sendQuery(text);
+				text += "Agent answers: " + agentAnswer; 
 			}
 			Location location = message.location();
 			if (location != null) {
 				float lat = location.latitude();
 				float lon = location.longitude();
-				text += "Your location: latitude - " + lat + ", longitude -" + lon;
+				text += "Your location: latitude " + lat + ", longitude " + lon;
 			}
 			sendMessage(message.chat().id(), text);
 		}
@@ -59,12 +53,6 @@ public class TestBotHandler implements Route {
 
 	private void sendMessage(Long chatId, String message) {
 		bot.execute(new SendMessage(chatId, message));
-	}
-
-	private void onWebhookUpdate(Update update) {
-		System.out.println("onWebhookUpdate called");
-		System.out.println("user: " + update.message().from().username());
-		bot.execute(new SendMessage(update.message().chat().id(), "TestBotHandler: method onWebhookUpdate."));
 	}
 
 	public String getToken() {
