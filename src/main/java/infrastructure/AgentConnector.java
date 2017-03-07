@@ -33,6 +33,7 @@ public class AgentConnector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println(jsonResponse);
 		String answer = JsonUtil.parseToJson(jsonResponse).get("result").getAsJsonObject().get("fulfillment").getAsJsonObject().get("speech").getAsString();
 		return answer;
 	}

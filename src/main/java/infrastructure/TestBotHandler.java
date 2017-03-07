@@ -37,8 +37,9 @@ public class TestBotHandler implements Route {
 			System.out.println(message);
 			String text = "";
 			if(message.text() != null){
+				System.out.println(message.text());
 				String agentAnswer = agentConnector.sendQuery(message.text());
-				text += "Agent answers: " + agentAnswer + " "; 
+				text += agentAnswer + " "; 
 			}
 			Location location = message.location();
 			if (location != null) {
