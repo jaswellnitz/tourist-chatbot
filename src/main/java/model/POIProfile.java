@@ -5,6 +5,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+enum Preference{
+	TRUE,FALSE,NOT_RATED
+}
+
 public class POIProfile{
 
 	private final boolean  culture;

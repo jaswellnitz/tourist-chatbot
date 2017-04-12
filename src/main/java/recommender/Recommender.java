@@ -14,17 +14,25 @@ import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
-import data_acces.PointConverter;
+import data_access.PointConverter;
+import data_access.UserProfileHandler;
 import model.POIDataModel;
 import model.PointOfInterest;
+import model.ProfileItem;
+import model.User;
 
 public class Recommender {
 
 	public static void main(String... args) throws Exception {
 		PointConverter pointConverter = new PointConverter();
+		UserProfileHandler userProfileHandler = new UserProfileHandler();
 		List<PointOfInterest> pois =  pointConverter.getPOIInRadius("9.991636", "53.550090");
-		DataModel dm = new POIDataModel(pois);
-		long id = dm.getUserIDs().next();
+		User user = userProfileHandler.getUser(1001); 
+		List<ProfileItem> items= new ArrayList<>();
+		items.addAll(pois);
+		items.add(user);
+		DataModel dm = new POIDataModel(items);
+		long id = user.getId();
 		UserSimilarity similarity = new MySimilarity(dm);
 		UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.5, similarity, dm);
 		UserBasedRecommender rec = new GenericUserBasedRecommender(dm,neighborhood,similarity);

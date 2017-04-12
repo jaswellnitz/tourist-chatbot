@@ -30,22 +30,22 @@ public class POIDataModel extends AbstractDataModel implements DataModel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private final List<PointOfInterest> pois;
+	private final List<ProfileItem> profileItems;
 	private DataModel delegate;
 
-	public POIDataModel(List<PointOfInterest> pois) throws IOException {
-		this.pois = pois;
+	public POIDataModel(List<ProfileItem> profileItems) throws IOException {
+		this.profileItems = profileItems;
 
-		processFile(pois);
+		processFile(profileItems);
 
 	}
 
-	private void processFile(List<PointOfInterest> poiList) throws IOException {
+	private void processFile(List<ProfileItem> profileItems) throws IOException {
 
 		FastByIDMap<PreferenceArray> data = new FastByIDMap<>();
-		for(PointOfInterest poi: poiList){
-			POIProfile profile = poi.getProfile();
-			long  id = poi.getId();
+		for(ProfileItem profileItem: profileItems){
+			POIProfile profile = profileItem.getProfile();
+			long  id = profileItem.getId();
 			PreferenceArray newPrefs = new GenericUserPreferenceArray(POIProfile.CATEGORY_COUNT);
 			List<Boolean> categories = profile.getAllCategories();
 			for(int i = 0; i < categories.size(); i++){
