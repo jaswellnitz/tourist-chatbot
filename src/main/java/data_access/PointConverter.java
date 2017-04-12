@@ -1,4 +1,4 @@
-package data_acces;
+package data_access;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -29,8 +29,8 @@ public class PointConverter {
 	// TODO: implement for table nodes too
 	private String getPOIInRadiusQuery(String lat, String lon, int radius) {
 		return "SELECT ways.id, ways.tags-> 'name' as _name, ways.tags-> 'tourism' as tourism, ways.tags-> 'amenity' as amenity, ways.tags-> 'leisure' as leisure,ways.tags-> 'cuisine' as cuisine, "
-				+ "ways.tags-> 'addr:street' as street, ways.tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("+lat+", "+lon+")), 4326)) as distance "
-				+ "FROM ways inner join nodes on ways.nodes[1]=nodes.id "
+				+ "ways.tags-> 'addr:street' as street, ways.tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
+				+ lat + ", " + lon + ")), 4326)) as distance " + "FROM ways inner join nodes on ways.nodes[1]=nodes.id "
 				+ "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + lat + ", " + lon
 				+ ")), 4326), " + radius + ") and "
 				+ "ways.tags ? 'name' and (ways.tags ? 'tourism' or ways.tags ? 'amenity' or ways.tags ? 'leisure' or ways.tags ? 'cuisine')";
@@ -57,7 +57,7 @@ public class PointConverter {
 
 				POIProfile profile = mapTagsToCategories(resultSet);
 				if (profile.isPOI()) {
-					int id = resultSet.getInt("id");
+					long id = resultSet.getLong("id");
 					String name = resultSet.getString("_name");
 					String street = resultSet.getString("street");
 					String houseNumber = resultSet.getString("housenumber");

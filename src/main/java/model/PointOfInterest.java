@@ -1,6 +1,6 @@
 package model;
 
-public class PointOfInterest {
+public class PointOfInterest implements ProfileItem {
 
 	private final long id;
 	private final String name;
@@ -8,7 +8,7 @@ public class PointOfInterest {
 	private final int distance;
 	private final POIProfile profile;
 	
-	public PointOfInterest(int id, String name, String streetName, String houseNumber, int distance, POIProfile profile) {
+	public PointOfInterest(long id, String name, String streetName, String houseNumber, int distance, POIProfile profile) {
 		this.id = id;
 		this.name = name;
 		// Handling null values?
