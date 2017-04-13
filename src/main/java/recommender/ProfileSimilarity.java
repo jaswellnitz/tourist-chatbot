@@ -14,15 +14,15 @@ import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 import org.apache.mahout.cf.taste.similarity.PreferenceInferrer;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
-public class MySimilarity implements UserSimilarity{
+public class ProfileSimilarity implements UserSimilarity{
 
 	private DataModel dataModel;
   /**
-   * Creates new {@link MySimilarity}
+   * Creates new {@link ProfileSimilarity}
    * 
    * @param dataModel
    */
-    public MySimilarity(DataModel dataModel) {
+    public ProfileSimilarity(DataModel dataModel) {
     	this.dataModel = dataModel;
     }
 

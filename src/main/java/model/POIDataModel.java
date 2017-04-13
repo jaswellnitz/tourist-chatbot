@@ -1,8 +1,5 @@
 package model;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -12,16 +9,12 @@ import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.cf.taste.impl.common.LongPrimitiveIterator;
 import org.apache.mahout.cf.taste.impl.model.AbstractDataModel;
-import org.apache.mahout.cf.taste.impl.model.BooleanPreference;
 import org.apache.mahout.cf.taste.impl.model.GenericDataModel;
-import org.apache.mahout.cf.taste.impl.model.GenericItemPreferenceArray;
 import org.apache.mahout.cf.taste.impl.model.GenericPreference;
 import org.apache.mahout.cf.taste.impl.model.GenericUserPreferenceArray;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.mahout.cf.taste.model.PreferenceArray;
-import org.apache.mahout.common.iterator.FileLineIterator;
-
 
 // TODO: implement all methods and constructors
 public class POIDataModel extends AbstractDataModel implements DataModel {
@@ -33,26 +26,28 @@ public class POIDataModel extends AbstractDataModel implements DataModel {
 	private final List<ProfileItem> profileItems;
 	private DataModel delegate;
 
-	public POIDataModel(List<ProfileItem> profileItems) throws IOException {
-		this.profileItems = profileItems;
+	public POIDataModel(List<ProfileItem> profItems){
+		this.profileItems = profItems;
 
 		processFile(profileItems);
 
 	}
 
-	private void processFile(List<ProfileItem> profileItems) throws IOException {
+	private void processFile(List<ProfileItem> profileItems) {
 
 		FastByIDMap<PreferenceArray> data = new FastByIDMap<>();
-		for(ProfileItem profileItem: profileItems){
+		for (ProfileItem profileItem : profileItems) {
 			POIProfile profile = profileItem.getProfile();
-			long  id = profileItem.getId();
+			long id = profileItem.getId();
 			PreferenceArray newPrefs = new GenericUserPreferenceArray(POIProfile.CATEGORY_COUNT);
-			List<Boolean> categories = profile.getAllCategories();
-			for(int i = 0; i < categories.size(); i++){
-				int value = categories.get(i) ? 1 : 0;
-				newPrefs.setValue(i, value);
-				Preference pref = new GenericPreference(id, i, value);
-				newPrefs.set(i, pref);
+			List<model.Preference> categories = profile.getAllCategories();
+			for (int i = 0; i < categories.size(); i++) {
+				if (categories.get(i) != model.Preference.NOT_RATED) {
+					int value = categories.get(i).getValue();
+					newPrefs.setValue(i, value);
+					Preference pref = new GenericPreference(id, i, value);
+					newPrefs.set(i, pref);
+				}
 			}
 			data.put(id, newPrefs);
 		}

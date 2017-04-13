@@ -11,7 +11,7 @@ public class PointOfInterest implements ProfileItem {
 	public PointOfInterest(long id, String name, String streetName, String houseNumber, int distance, POIProfile profile) {
 		this.id = id;
 		this.name = name;
-		// Handling null values?
+		// TODO: Handling null values?
 		String s = streetName!=null&&!streetName.equals("null")?streetName + " ":"-";
 		String h = houseNumber!=null&&!houseNumber.equals("null")?houseNumber:"";
 		this.address =  s + h;
