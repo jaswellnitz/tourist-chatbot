@@ -5,78 +5,116 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-enum Preference{
-	TRUE,FALSE,NOT_RATED
-}
+public class POIProfile {
 
-public class POIProfile{
-
-	private final boolean  culture;
-	private final boolean sightseeing;
-	private final boolean food;
-	private final boolean nightlife;
-	private final boolean nature;
-	private final boolean sports;
-	private final List<Boolean> categories;
+	private final Preference culture;
+	private final Preference sightseeing;
+	private final Preference food;
+	private final Preference nightlife;
+	private final Preference nature;
+	private final Preference sports;
+	private final List<Preference> categories;
 	public static final int CATEGORY_COUNT = 6;
-	
-	public POIProfile(boolean culture, boolean sightseeing, boolean food, boolean nightlife, boolean nature,
-			boolean sports) {
+
+	public POIProfile(Preference culture, Preference sightseeing, Preference food, Preference nightlife,
+			Preference nature, Preference sports) {
 		this.culture = culture;
-		this.nightlife = nightlife;
 		this.sightseeing = sightseeing;
-		this.sports = sports;
 		this.food = food;
+		this.nightlife = nightlife;
 		this.nature = nature;
+		this.sports = sports;
 		categories = new ArrayList<>();
-		categories.addAll(Arrays.asList(culture,nightlife,sightseeing,sports,food,nature));
+		categories.addAll(Arrays.asList(culture, sightseeing, food, nightlife,nature, sports));
 	}
 
-	public boolean isPOI(){
-		return culture || sightseeing || food || nightlife || nature || sports;
+	public boolean isPOI() {
+		for (Preference category : categories) {
+			if (category == Preference.TRUE) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-
-	public boolean hasCulture() {
+	public Preference hasCulture() {
 		return culture;
 	}
 
-
-	public boolean hasNightlife() {
+	public Preference hasNightlife() {
 		return nightlife;
 	}
 
-
-	public boolean hasSightseeing() {
+	public Preference hasSightseeing() {
 		return sightseeing;
 	}
 
-
-	public boolean hasSports() {
+	public Preference hasSports() {
 		return sports;
 	}
 
-
-	public boolean hasFood() {
+	public Preference hasFood() {
 		return food;
 	}
 
-
-	public boolean hasNature() {
+	public Preference hasNature() {
 		return nature;
 	}
-	
-	public List<Boolean> getAllCategories(){
+
+	public List<Preference> getAllCategories() {
 		return categories;
 	}
+
+	public String toString() {
+		String result = "";
+		for (Preference category : categories) {
+			result += category.getFieldName() + ",";
+		}
+		result = result.substring(0, result.length() - 1);
+		return result;
+	}
 	
-	public String toString(){
-		String  cultureString = culture ? "1" : "0";
-		String  sightseeingString  = sightseeing ? "1" : "0";
-		String  foodString  = food ? "1" : "0";
-		String  nightlifeString  = nightlife ? "1" :"0";
-		String  natureString  = nature ? "1" : "0";
-		String  sportsString  = sports ? "1" : "0";
-		return cultureString+","+sightseeingString+","+foodString+","+nightlifeString+","+natureString+","+sportsString;
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((categories == null) ? 0 : categories.hashCode());
+		result = prime * result + ((culture == null) ? 0 : culture.hashCode());
+		result = prime * result + ((food == null) ? 0 : food.hashCode());
+		result = prime * result + ((nature == null) ? 0 : nature.hashCode());
+		result = prime * result + ((nightlife == null) ? 0 : nightlife.hashCode());
+		result = prime * result + ((sightseeing == null) ? 0 : sightseeing.hashCode());
+		result = prime * result + ((sports == null) ? 0 : sports.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		POIProfile other = (POIProfile) obj;
+		if (categories == null) {
+			if (other.categories != null)
+				return false;
+		} else if (!categories.equals(other.categories))
+			return false;
+		if (culture != other.culture)
+			return false;
+		if (food != other.food)
+			return false;
+		if (nature != other.nature)
+			return false;
+		if (nightlife != other.nightlife)
+			return false;
+		if (sightseeing != other.sightseeing)
+			return false;
+		if (sports != other.sports)
+			return false;
+		return true;
 	}
 }
