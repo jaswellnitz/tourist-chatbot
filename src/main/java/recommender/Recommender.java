@@ -3,6 +3,7 @@ package recommender;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -34,6 +35,8 @@ public class Recommender {
 	private PointConverter pointConverter;
 	private UserDataHandler userDataHandler;
 	private static final String RATING_PATH = "src/main/resources/ratings.csv";
+	private static final int NUM_RECOMMENDATIONS = 4;
+	private static final int DEFAULT_RADIUS = 3000;
 
 	public Recommender(PointConverter pointConverter, UserDataHandler userDataHandler) {
 		this.pointConverter = pointConverter;
@@ -43,37 +46,45 @@ public class Recommender {
 	public static void main(String... args) {
 		PointConverter pointConverter = new PointConverter();
 		UserDataHandler userDataHandler = new UserDataHandler();
-		
+
 		Recommender rec = new Recommender(pointConverter, userDataHandler);
 		long userId = 1001;
-		PointOfInterest recommendedItem = rec.recommend(userId, "9.991636", "53.550090");
-		System.out.println("Recommended item for user "+ userId + ": " + recommendedItem);
-		// User rates recommendation with a 2
-		Rating newRating = Rating._4;
-		userDataHandler.saveRating(userId, recommendedItem.getId(),newRating);
-	}
-	
-
-	public PointOfInterest recommend(long userId, String lat, String lon){
-		PointOfInterest recommendedItem = recommendCollaborative(userId,lat, lon);
-		if (recommendedItem == null) {
-			System.out.println("No result found from user ratings. Content based recommendation...");
-			recommendedItem = recommendContentBased(userId, lat,lon);
+//		List<PointOfInterest> recommendedItems = rec.recommend(userId, "9.991636", "53.550090");
+		List<PointOfInterest> recommendedItems = rec.recommendCollaborative(userId, "9.991636", "53.550090");
+		
+		
+		for (PointOfInterest recommendedPOI : recommendedItems) {
+			System.out.println("Recommended item for user " + userId + ": " + recommendedPOI);
 		}
-		return recommendedItem;
+		// User rates recommendation with a 2
+		
+		// Rating newRating = Rating._4;
+		// userDataHandler.saveRating(userId,
+		// recommendedItem.getId(),newRating);
 	}
 
-	private PointOfInterest recommendCollaborative(long userId,String latitude, String longitude) {
-		PointOfInterest recommendedPOI = null;
+	public List<PointOfInterest> recommend(long userId, String lat, String lon){
+		List<PointOfInterest> recommendedItems = recommendCollaborative(userId,lat, lon);
+		if(recommendedItems.size() < NUM_RECOMMENDATIONS){
+			System.out.println(recommendedItems.size() + " result found from user ratings.");
+			System.out.println("Content based recommendation...");
+			recommendedItems.addAll(recommendContentBased(userId, lat, lon, NUM_RECOMMENDATIONS-recommendedItems.size()));
+		}
+		return recommendedItems;
+	}
+
+	public List<PointOfInterest> recommendCollaborative(long userId, String latitude, String longitude) {
+		List<PointOfInterest> recommendedPOI = new ArrayList<>();
 		try {
 			DataModel model = new FileDataModel(new File(RATING_PATH));
 			UserSimilarity similarity = new LogLikelihoodSimilarity(model);
 			UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.1, similarity, model);
 			UserBasedRecommender recommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
-			List<RecommendedItem> recommendations = recommender.recommend(userId, 3);
-			if (!recommendations.isEmpty()) {
-				long itemId = recommendations.get(0).getItemID();
-				recommendedPOI = pointConverter.getPOIForId(latitude, longitude, itemId);
+			List<RecommendedItem> recommendations = recommender.recommend(userId, NUM_RECOMMENDATIONS);
+			for (RecommendedItem recommendation : recommendations) {
+				long itemId = recommendation.getItemID();
+				System.out.println(itemId + ", " + recommendation.getValue());
+				recommendedPOI.addAll(pointConverter.getPOIForId(latitude, longitude, itemId,DEFAULT_RADIUS));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -81,8 +92,9 @@ public class Recommender {
 		return recommendedPOI;
 	}
 
-	private PointOfInterest recommendContentBased(long userId,String latitude, String longitude) {
-		List<PointOfInterest> pois = pointConverter.getPOIInRadius(latitude, longitude);
+	public List<PointOfInterest> recommendContentBased(long userId, String latitude, String longitude,
+			int numRecommendations) {
+		List<PointOfInterest> pois = pointConverter.getPOIInRadius(latitude, longitude, DEFAULT_RADIUS);
 		User user = userDataHandler.getUserFromProfile(userId);
 		List<ProfileItem> items = new ArrayList<>();
 		items.addAll(pois);
@@ -95,15 +107,14 @@ public class Recommender {
 		List<Long> userIds = new ArrayList<>();
 
 		try {
-			userIds = LongStream.of(rec.mostSimilarUserIDs(id, 5)).boxed().collect(Collectors.toList());
+			userIds = LongStream.of(rec.mostSimilarUserIDs(id, numRecommendations)).boxed()
+					.collect(Collectors.toList());
 		} catch (TasteException e) {
 			e.printStackTrace();
 		}
 		final List<Long> mostSimilarUserIDs = userIds;
-//		System.out.println("Ids similar to " + id + " :" + mostSimilarUserIDs);
 		List<PointOfInterest> result = pois.stream().filter(t -> mostSimilarUserIDs.contains(t.getId()))
 				.collect(Collectors.toList());
-//		System.out.println(result);
-		return result.get(0);
+		return result;
 	}
 }
