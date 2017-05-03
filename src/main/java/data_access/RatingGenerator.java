@@ -99,7 +99,7 @@ public class RatingGenerator {
 		Map<Long, boolean[]> users = new HashMap<>();
 		long currentId = 1017l;
 		
-		// Sightseer (1017), Culture (1018), Nature (1019), Shopaholic (1020), MedFood, AsFood,VegFood
+		// add user for each tourist category
 		for(int i = 0; i < categorySize; i++){
 			boolean[] userPref = new boolean[categorySize];
 			userPref[i] = true;
@@ -130,7 +130,7 @@ public class RatingGenerator {
 	}
 
 	public static void main(String... args) {
-		UserDataHandler userDataHandler = new UserDataHandler("", "src/main/resources/ratingsTest.csv");
+		UserDataHandler userDataHandler = new UserDataHandler("", "src/main/resources/generatedRatings.csv");
 		List<List<Long>> categories = createPOICategories();
 
 		Map<Long, boolean[]> users = createUsers(categories.size());

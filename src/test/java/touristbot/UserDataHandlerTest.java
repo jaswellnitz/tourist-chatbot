@@ -86,7 +86,7 @@ public class UserDataHandlerTest {
 		Files.copy(new File(PROFILE_PATH), testFile);
 		
 		// Action
-		User resultUser = userDataHandler.getUserFromProfile(user.getId());
+		User resultUser = userDataHandler.getProfileForUser(user.getId());
 
 		// Check
 		assertEquals(resultUser, user);

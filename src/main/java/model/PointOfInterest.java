@@ -12,19 +12,19 @@ public class PointOfInterest implements ProfileItem {
 	public PointOfInterest(long id, String name, String streetName, String houseNumber, int distance,
 			String openingHours, POIProfile profile) {
 		this.id = id;
-		this.name = name;
+		this.name = name != null? name: "";
 		this.address = parseAddress(streetName, houseNumber);
 		this.distance = distance;
-		this.openingHours = openingHours;
+		this.openingHours = openingHours != null? openingHours: "";
 		this.profile = profile;
 	}
 
 	public final String parseAddress(String streetName, String houseNumber) {
 		String s = "";
 		String h = "";
-		if (!streetName.equals("")) {
+		if (streetName != null && !streetName.equals("")) {
 			s = streetName;
-			if (!houseNumber.equals("")) {
+			if (houseNumber != null && !houseNumber.equals("")) {
 				h = " " + houseNumber;
 			}
 		}
