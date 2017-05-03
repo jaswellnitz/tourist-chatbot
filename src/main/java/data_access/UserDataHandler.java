@@ -39,7 +39,7 @@ public class UserDataHandler {
 		appendToFile(profilePath, line);
 	}
 	
-	public User getUserFromProfile(long id) {
+	public User getProfileForUser(long id) {
 		String[] fields = null;
 		try {
 			fields = searchUserInProfile(id);

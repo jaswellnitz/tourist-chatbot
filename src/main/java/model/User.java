@@ -3,12 +3,23 @@ package model;
 public class User implements ProfileItem {
 
 	private final long id;
+	
+	private int prefRecommendationRadius;
+	private static final int DEFAULT_RECOMMENDATION_RADIUS = 3000;
 
 	private final POIProfile profile;
 
+	public User(long id){
+		this(id, new POIProfile());
+	}
 	public User(long id, POIProfile profile) {
+		this(id,profile,DEFAULT_RECOMMENDATION_RADIUS);
+	}
+	
+	public User(long id, POIProfile profile, int radius){
 		this.id = id;
 		this.profile = profile;
+		this.prefRecommendationRadius = radius;
 	}
 	
 	public long getId() {
@@ -50,5 +61,13 @@ public class User implements ProfileItem {
 		} else if (!profile.equals(other.profile))
 			return false;
 		return true;
+	}
+
+	public int getPrefRecommendationRadius() {
+		return prefRecommendationRadius;
+	}
+
+	public void setPrefRecommendationRadius(int prefRecommendationRadius) {
+		this.prefRecommendationRadius = prefRecommendationRadius;
 	}
 }

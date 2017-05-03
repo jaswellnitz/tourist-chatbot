@@ -12,20 +12,23 @@ public class POIProfile {
 	private final Preference food;
 	private final Preference nightlife;
 	private final Preference nature;
-	private final Preference sports;
+	private final Preference shopping;
 	private final List<Preference> categories;
 	public static final int CATEGORY_COUNT = 6;
 
+	public POIProfile(){
+		this(Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED);
+	}
 	public POIProfile(Preference culture, Preference sightseeing, Preference food, Preference nightlife,
-			Preference nature, Preference sports) {
+			Preference nature, Preference shopping) {
 		this.culture = culture;
 		this.sightseeing = sightseeing;
 		this.food = food;
 		this.nightlife = nightlife;
 		this.nature = nature;
-		this.sports = sports;
+		this.shopping = shopping;
 		categories = new ArrayList<>();
-		categories.addAll(Arrays.asList(culture, sightseeing, food, nightlife,nature, sports));
+		categories.addAll(Arrays.asList(culture, sightseeing, food, nightlife,nature, shopping));
 	}
 
 	public boolean isPOI() {
@@ -49,8 +52,8 @@ public class POIProfile {
 		return sightseeing;
 	}
 
-	public Preference hasSports() {
-		return sports;
+	public Preference hasShopping() {
+		return shopping;
 	}
 
 	public Preference hasFood() {
@@ -85,7 +88,7 @@ public class POIProfile {
 		result = prime * result + ((nature == null) ? 0 : nature.hashCode());
 		result = prime * result + ((nightlife == null) ? 0 : nightlife.hashCode());
 		result = prime * result + ((sightseeing == null) ? 0 : sightseeing.hashCode());
-		result = prime * result + ((sports == null) ? 0 : sports.hashCode());
+		result = prime * result + ((shopping == null) ? 0 : shopping.hashCode());
 		return result;
 	}
 
@@ -113,7 +116,7 @@ public class POIProfile {
 			return false;
 		if (sightseeing != other.sightseeing)
 			return false;
-		if (sports != other.sports)
+		if (shopping != other.shopping)
 			return false;
 		return true;
 	}

@@ -15,8 +15,8 @@ public class PointOfInterestTest {
 		PointOfInterest poi = new PointOfInterest(100, null, null, null, 0, null,null);
 		
 		// Check
-		assertEquals(poi.getAddress(), "");
-		assertEquals(poi.getName(), "");		
+		assertEquals("", poi.getAddress());
+		assertEquals("", poi.getName());		
 	}
 	
 	

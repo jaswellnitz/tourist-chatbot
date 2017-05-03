@@ -33,24 +33,28 @@ import model.User;
 
 public class Recommender {
 	private PointConverter pointConverter;
-	private UserDataHandler userDataHandler;
-	private static final String RATING_PATH = "src/main/resources/ratings.csv";
+	private static final String DEFAULT_RATING_PATH = "src/main/resources/ratings.csv";
+	private final String ratingPath;
 	private static final int NUM_RECOMMENDATIONS = 4;
-	private static final int DEFAULT_RADIUS = 3000;
 
-	public Recommender(PointConverter pointConverter, UserDataHandler userDataHandler) {
+	public Recommender(PointConverter pointConverter) {
+		this(pointConverter,DEFAULT_RATING_PATH);
+	}
+	
+	public Recommender(PointConverter pointConverter, String ratingPath){
 		this.pointConverter = pointConverter;
-		this.userDataHandler = userDataHandler;
+		this.ratingPath = ratingPath;
 	}
 
 	public static void main(String... args) {
 		PointConverter pointConverter = new PointConverter();
 		UserDataHandler userDataHandler = new UserDataHandler();
 
-		Recommender rec = new Recommender(pointConverter, userDataHandler);
+		Recommender rec = new Recommender(pointConverter);
 		long userId = 1001;
+		User user = userDataHandler.getProfileForUser(userId);
 //		List<PointOfInterest> recommendedItems = rec.recommend(userId, "9.991636", "53.550090");
-		List<PointOfInterest> recommendedItems = rec.recommendCollaborative(userId, "9.991636", "53.550090");
+		List<PointOfInterest> recommendedItems = rec.recommendCollaborative(user, "9.991636", "53.550090");
 		
 		
 		for (PointOfInterest recommendedPOI : recommendedItems) {
@@ -63,28 +67,29 @@ public class Recommender {
 		// recommendedItem.getId(),newRating);
 	}
 
-	public List<PointOfInterest> recommend(long userId, String lat, String lon){
-		List<PointOfInterest> recommendedItems = recommendCollaborative(userId,lat, lon);
+	public List<PointOfInterest> recommend(User user, String lat, String lon){
+		List<PointOfInterest> recommendedItems = recommendCollaborative(user,lat, lon);
 		if(recommendedItems.size() < NUM_RECOMMENDATIONS){
 			System.out.println(recommendedItems.size() + " result found from user ratings.");
 			System.out.println("Content based recommendation...");
-			recommendedItems.addAll(recommendContentBased(userId, lat, lon, NUM_RECOMMENDATIONS-recommendedItems.size()));
+			recommendedItems.addAll(recommendContentBased(user, lat, lon, NUM_RECOMMENDATIONS-recommendedItems.size()));
 		}
 		return recommendedItems;
 	}
 
-	public List<PointOfInterest> recommendCollaborative(long userId, String latitude, String longitude) {
+	public List<PointOfInterest> recommendCollaborative(User user, String latitude, String longitude) {
 		List<PointOfInterest> recommendedPOI = new ArrayList<>();
 		try {
-			DataModel model = new FileDataModel(new File(RATING_PATH));
+			DataModel model = new FileDataModel(new File(ratingPath));
 			UserSimilarity similarity = new LogLikelihoodSimilarity(model);
 			UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.1, similarity, model);
 			UserBasedRecommender recommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
-			List<RecommendedItem> recommendations = recommender.recommend(userId, NUM_RECOMMENDATIONS);
+			List<RecommendedItem> recommendations = recommender.recommend(user.getId(), NUM_RECOMMENDATIONS);
 			for (RecommendedItem recommendation : recommendations) {
 				long itemId = recommendation.getItemID();
 				System.out.println(itemId + ", " + recommendation.getValue());
-				recommendedPOI.addAll(pointConverter.getPOIForId(latitude, longitude, itemId,DEFAULT_RADIUS));
+				recommendedPOI.addAll(pointConverter.getPOIForId(latitude, longitude, itemId,user.getPrefRecommendationRadius()));
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -92,10 +97,9 @@ public class Recommender {
 		return recommendedPOI;
 	}
 
-	public List<PointOfInterest> recommendContentBased(long userId, String latitude, String longitude,
+	public List<PointOfInterest> recommendContentBased(User user, String latitude, String longitude,
 			int numRecommendations) {
-		List<PointOfInterest> pois = pointConverter.getPOIInRadius(latitude, longitude, DEFAULT_RADIUS);
-		User user = userDataHandler.getUserFromProfile(userId);
+		List<PointOfInterest> pois = pointConverter.getPOIInRadius(latitude, longitude, user.getPrefRecommendationRadius());
 		List<ProfileItem> items = new ArrayList<>();
 		items.addAll(pois);
 		items.add(user);
