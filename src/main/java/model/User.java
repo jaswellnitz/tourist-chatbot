@@ -4,22 +4,23 @@ public class User implements ProfileItem {
 
 	private final long id;
 	
+	private POIProfile profile;
 	private int prefRecommendationRadius;
 	private static final int DEFAULT_RECOMMENDATION_RADIUS = 3000;
-
-	private final POIProfile profile;
+	private Location currentLocation;
 
 	public User(long id){
 		this(id, new POIProfile());
 	}
 	public User(long id, POIProfile profile) {
-		this(id,profile,DEFAULT_RECOMMENDATION_RADIUS);
+		this(id,profile,DEFAULT_RECOMMENDATION_RADIUS, null);
 	}
 	
-	public User(long id, POIProfile profile, int radius){
+	public User(long id, POIProfile profile, int radius, Location location){
 		this.id = id;
 		this.profile = profile;
 		this.prefRecommendationRadius = radius;
+		this.currentLocation = location;
 	}
 	
 	public long getId() {
@@ -29,21 +30,38 @@ public class User implements ProfileItem {
 	public POIProfile getProfile() {
 		return profile;
 	}
+	
+	public void setProfile(POIProfile profile) {
+		assert profile != null: "Precondition failed: profile != null";
+		this.profile = profile;
+	}
 
-	public String toString(){
-		return "User:("+id+", " + profile+")";
+	public Location getCurrentLocation() {
+		assert currentLocation != null: "Precondition failed: currentLocation != null";
+		
+		return currentLocation;
 	}
 	
+	public void setCurrentLocation(Location currentLocation) {
+		assert currentLocation != null: "Precondition failed: currentLocation != null";
+		
+		this.currentLocation = currentLocation;
+	}
+
+	public String toString(){
+		return "User:("+id+", " + profile+", " + prefRecommendationRadius +", " + currentLocation +")";
+	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((currentLocation == null) ? 0 : currentLocation.hashCode());
 		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + prefRecommendationRadius;
 		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
 		return result;
 	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -53,7 +71,14 @@ public class User implements ProfileItem {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
+		if (currentLocation == null) {
+			if (other.currentLocation != null)
+				return false;
+		} else if (!currentLocation.equals(other.currentLocation))
+			return false;
 		if (id != other.id)
+			return false;
+		if (prefRecommendationRadius != other.prefRecommendationRadius)
 			return false;
 		if (profile == null) {
 			if (other.profile != null)
@@ -62,7 +87,7 @@ public class User implements ProfileItem {
 			return false;
 		return true;
 	}
-
+	
 	public int getPrefRecommendationRadius() {
 		return prefRecommendationRadius;
 	}

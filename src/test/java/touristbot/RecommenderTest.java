@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import data_access.PointConverter;
+import model.Location;
 import model.PointOfInterest;
 import model.Preference;
 import model.User;
@@ -30,11 +31,12 @@ public class RecommenderTest {
 		// Prepare
 		long userId = 999; // test user who liked Casa Battló
 		User user = new User(userId); 
-		String lat = "41.4034984";
-		String lon = "2.1740598";
+		Location location = new Location(41.4034984,2.1740598);
+		user.setCurrentLocation(location);
+		
 		long recommendedId =  359086841; // Sagrada familia
 		// Action
-		List<PointOfInterest> recommendations = recommender.recommendCollaborative(user, lat, lon);
+		List<PointOfInterest> recommendations = recommender.recommendCollaborative(user);
 		
 		// Check
 		assertFalse(recommendations.isEmpty());
@@ -50,11 +52,11 @@ public class RecommenderTest {
 		// Prepare
 		long userId = 998; // test user - one restaurant rating
 		User user = new User(userId); 
-		String lat = "41.4034984";
-		String lon = "2.1740598";
+		Location location = new Location(41.4034984,2.1740598);
+		user.setCurrentLocation(location);
 		
 		// Action
-		List<PointOfInterest> recommendations = recommender.recommendCollaborative(user, lat, lon);
+		List<PointOfInterest> recommendations = recommender.recommendCollaborative(user);
 		
 		// Check
 		assertFalse(recommendations.isEmpty());
@@ -68,12 +70,12 @@ public class RecommenderTest {
 		// dropped rating from original data 1011,66713401,4
 		long userId = 1011;
 		User user = new User(userId);
-		String lat = "41.4034984";
-		String lon = "2.1740598";
+		Location location = new Location(41.4034984,2.1740598);
+		user.setCurrentLocation(location);
 		long droppedId = 66713401;
 
 		// Action
-		List<PointOfInterest> recommendations = recommender.recommendCollaborative(user, lat, lon);
+		List<PointOfInterest> recommendations = recommender.recommendCollaborative(user);
 		
 		// Check
 		assertFalse(recommendations.isEmpty());
@@ -84,4 +86,11 @@ public class RecommenderTest {
 		}
 		assertTrue(ids.contains(droppedId));
 	}
+	
+	@Test
+	public void testRecommendContentBased(){
+		
+	}
+	
+	
 }

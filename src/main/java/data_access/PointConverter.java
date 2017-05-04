@@ -26,12 +26,12 @@ public class PointConverter {
 	}
 
 	// TODO better return Set instead of List because order is not important
-	public List<PointOfInterest> getPOIInRadius(String lat, String lon, int radius) {
+	public List<PointOfInterest> getPOIInRadius(double latitude, double longitude, int radius) {
 		// Flip coordinates for PostGis, see:
 		// http://postgis.net/2013/08/18/tip_lon_lat/
-		String x = lon;
-		String y = lat;
-
+		String x = String.valueOf(longitude);
+		String y = String.valueOf(latitude);
+		
 		String query = "SELECT ways.id, ways.tags-> 'name' as _name, ways.tags-> 'tourism' as tourism, ways.tags-> 'amenity' as amenity, ways.tags-> 'leisure' as leisure,"
 				+ "ways.tags-> 'cuisine' as cuisine, ways.tags-> 'historic' as historic, ways.tags-> 'shop' as shop,"
 				+ "ways.tags-> 'addr:street' as street,  ways.tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
@@ -52,11 +52,11 @@ public class PointConverter {
 		return getPOIForQuery(query);
 	}
 
-	public List<PointOfInterest> getPOIForId(String lat, String lon, long itemId, int radius) {
+	public List<PointOfInterest> getPOIForId(long itemId, double latitude, double longitude, int radius) {
 		// Flip coordinates for PostGis, see:
 		// http://postgis.net/2013/08/18/tip_lon_lat/
-		String x = lon;
-		String y = lat;
+		String x = String.valueOf(longitude);
+		String y = String.valueOf(latitude);
 
 		String query = "SELECT ways.id as id, ways.tags-> 'name' as _name, ways.tags-> 'tourism' as tourism, ways.tags-> 'amenity' as amenity, "
 				+ "ways.tags-> 'leisure' as leisure,ways.tags-> 'cuisine' as cuisine, ways.tags-> 'historic' as historic, ways.tags-> 'shop' as shop,"
