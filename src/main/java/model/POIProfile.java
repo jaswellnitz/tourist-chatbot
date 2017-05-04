@@ -5,10 +5,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+
 public class POIProfile {
 
-	private final Preference culture;
 	private final Preference sightseeing;
+	private final Preference culture;
 	private final Preference food;
 	private final Preference nightlife;
 	private final Preference nature;
@@ -16,9 +17,11 @@ public class POIProfile {
 	private final List<Preference> categories;
 	public static final int CATEGORY_COUNT = 6;
 
-	public POIProfile(){
-		this(Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED);
+	public POIProfile() {
+		this(Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED,
+				Preference.NOT_RATED, Preference.NOT_RATED);
 	}
+
 	public POIProfile(Preference sightseeing, Preference culture, Preference food, Preference nightlife,
 			Preference nature, Preference shopping) {
 		this.sightseeing = sightseeing;
@@ -28,7 +31,7 @@ public class POIProfile {
 		this.nature = nature;
 		this.shopping = shopping;
 		categories = new ArrayList<>();
-		categories.addAll(Arrays.asList(sightseeing, culture, food, nightlife,nature, shopping));
+		categories.addAll(Arrays.asList(sightseeing, culture, food, nightlife, nature, shopping));
 	}
 
 	public boolean isPOI() {
@@ -68,6 +71,18 @@ public class POIProfile {
 		return categories;
 	}
 
+	public static POIProfile getProfileForCategoryIndex(int categoryIndex) {
+		Preference[] preference = new Preference[CATEGORY_COUNT];
+		for (int i = 0; i < preference.length; i++) {
+			if (i == categoryIndex) {
+				preference[i] = Preference.TRUE;
+			} else {
+				preference[i] = Preference.NOT_RATED;
+			}
+		}
+		return new POIProfile(preference[0], preference[1], preference[2], preference[3], preference[4], preference[5]);
+	}
+
 	public String toString() {
 		String result = "";
 		for (Preference category : categories) {
@@ -76,7 +91,6 @@ public class POIProfile {
 		result = result.substring(0, result.length() - 1);
 		return result;
 	}
-	
 
 	@Override
 	public int hashCode() {

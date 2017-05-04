@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import model.PointOfInterest;
+import model.RecommendedPointOfInterest;
 
 public class PointOfInterestTest {
 
@@ -12,7 +12,7 @@ public class PointOfInterestTest {
 	public void testPOIEmptyConstructor() {
 		
 		// Action
-		PointOfInterest poi = new PointOfInterest(100, null, null, null, 0, null,null);
+		RecommendedPointOfInterest poi = new RecommendedPointOfInterest(100, null, null, null, 0, null,null);
 		
 		// Check
 		assertEquals("", poi.getAddress());
