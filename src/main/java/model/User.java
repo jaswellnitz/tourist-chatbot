@@ -12,10 +12,19 @@ public class User implements ProfileItem {
 	public User(long id){
 		this(id, new POIProfile());
 	}
+	
+	public User(long id, Location location){
+		this(id, new POIProfile(), location);
+	}
+	
+	public User(long id, POIProfile profile, Location location) {
+		this(id,profile,DEFAULT_RECOMMENDATION_RADIUS, location);
+	}
+	
 	public User(long id, POIProfile profile) {
 		this(id,profile,DEFAULT_RECOMMENDATION_RADIUS, null);
 	}
-	
+
 	public User(long id, POIProfile profile, int radius, Location location){
 		this.id = id;
 		this.profile = profile;

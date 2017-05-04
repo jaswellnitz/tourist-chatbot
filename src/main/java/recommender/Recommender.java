@@ -121,7 +121,8 @@ public class Recommender {
 		List<Long> userIds = new ArrayList<>();
 
 		try {
-			userIds = LongStream.of(rec.mostSimilarUserIDs(id, numRecommendations)).boxed()
+			long[] mostSimilarUserIDs = rec.mostSimilarUserIDs(id, numRecommendations);
+			userIds = LongStream.of(mostSimilarUserIDs).boxed()
 					.collect(Collectors.toList());
 		} catch (TasteException e) {
 			e.printStackTrace();
