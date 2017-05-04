@@ -2,6 +2,7 @@ package recommender;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -22,23 +23,26 @@ import data_access.UserDataHandler;
 import model.Location;
 import model.POIDataModel;
 import model.POIProfile;
-import model.PointOfInterest;
+import model.Preference;
+import model.RecommendedPointOfInterest;
 import model.ProfileItem;
 import model.User;
 
 public class Recommender {
 	private PointConverter pointConverter;
-	private static final String DEFAULT_RATING_PATH = "src/main/resources/ratings.csv";
 	private final String ratingPath;
-	private static final int NUM_RECOMMENDATIONS = 4;
+	public final int numRecommendations;
+	private static final String DEFAULT_RATING_PATH = "src/main/resources/ratings.csv";
+	private static final int DEFAULT_NUM_RECOMMENDATIONS = 4;
 
 	public Recommender(PointConverter pointConverter) {
-		this(pointConverter,DEFAULT_RATING_PATH);
+		this(pointConverter, DEFAULT_RATING_PATH, DEFAULT_NUM_RECOMMENDATIONS);
 	}
-	
-	public Recommender(PointConverter pointConverter, String ratingPath){
+
+	public Recommender(PointConverter pointConverter, String ratingPath, int numRecommendations) {
 		this.pointConverter = pointConverter;
 		this.ratingPath = ratingPath;
+		this.numRecommendations = numRecommendations;
 	}
 
 	public static void main(String... args) {
@@ -48,88 +52,123 @@ public class Recommender {
 		Recommender rec = new Recommender(pointConverter);
 		long userId = 1001;
 		User user = userDataHandler.getProfileForUser(userId);
-		Location location = new Location(9.991636,53.550090);
-		
+		Location location = new Location(9.991636, 53.550090);
+
 		user.setCurrentLocation(location);
-//		List<PointOfInterest> recommendedItems = rec.recommend(userId, "9.991636", "53.550090");
-		List<PointOfInterest> recommendedItems = rec.recommendCollaborative(user);
-		
-		
-		for (PointOfInterest recommendedPOI : recommendedItems) {
+		// List<PointOfInterest> recommendedItems = rec.recommend(userId,
+		// "9.991636", "53.550090");
+		List<RecommendedPointOfInterest> recommendedItems = rec.recommendCollaborative(user);
+
+		for (RecommendedPointOfInterest recommendedPOI : recommendedItems) {
 			System.out.println("Recommended item for user " + userId + ": " + recommendedPOI);
 		}
 		// User rates recommendation with a 2
-		
+
 		// Rating newRating = Rating._4;
 		// userDataHandler.saveRating(userId,
 		// recommendedItem.getId(),newRating);
 	}
-	
-	public List<PointOfInterest> recommendCategory(User user, POIProfile profile){
+
+	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex){
 		POIProfile originalProfile = user.getProfile();
-		user.setProfile(profile);
-		List<PointOfInterest> recommendedItems = recommendCollaborative(user);
+		POIProfile categoryProfile = POIProfile.getProfileForCategoryIndex(categoryIndex);
+		user.setProfile(categoryProfile);
 		
-		recommendContentBased(user, NUM_RECOMMENDATIONS);
-		// TODO implement
-		return null;
+		List<RecommendedPointOfInterest> recommendations = recommendCollaborative(user);
+		List<RecommendedPointOfInterest> toRemove = filterRecommendationsForCategory(recommendations, categoryIndex);
+		recommendations.removeAll(toRemove);
+		
+		recommendations.addAll(recommendContentBased(user,recommendations));
+		
+		user.setProfile(originalProfile);
+		return recommendations;
 	}
 
-	public List<PointOfInterest> recommend(User user){
-		List<PointOfInterest> recommendedItems = recommendCollaborative(user);
-		if(recommendedItems.size() < NUM_RECOMMENDATIONS){
-			System.out.println(recommendedItems.size() + " result found from user ratings.");
-			System.out.println("Content based recommendation...");
-			recommendedItems.addAll(recommendContentBased(user, NUM_RECOMMENDATIONS-recommendedItems.size()));
+	private List<RecommendedPointOfInterest> filterRecommendationsForCategory(
+			List<RecommendedPointOfInterest> recommendations, int categoryIndex) {
+		List<RecommendedPointOfInterest> toRemove = new ArrayList<>();
+		for (RecommendedPointOfInterest recommendedPointOfInterest : recommendations) {
+			POIProfile poi = recommendedPointOfInterest.getProfile();
+			if (poi.getAllCategories().get(categoryIndex) != Preference.TRUE) {
+				toRemove.add(recommendedPointOfInterest);
+			}
 		}
+		return toRemove;
+	}
+
+	public List<RecommendedPointOfInterest> recommend(User user) {
+		List<RecommendedPointOfInterest> recommendedItems = recommendCollaborative(user);
+		recommendedItems.addAll(recommendContentBased(user, recommendedItems));
 		return recommendedItems;
 	}
 
-	public List<PointOfInterest> recommendCollaborative(User user) {
-		List<PointOfInterest> recommendedPOI = new ArrayList<>();
+	public List<RecommendedPointOfInterest> recommendCollaborative(User user) {
+		List<RecommendedPointOfInterest> recommendedPOI = new ArrayList<>();
 		Location location = user.getCurrentLocation();
 		try {
 			DataModel model = new FileDataModel(new File(ratingPath));
 			UserSimilarity similarity = new LogLikelihoodSimilarity(model);
 			UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.1, similarity, model);
 			UserBasedRecommender recommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
-			List<RecommendedItem> recommendations = recommender.recommend(user.getId(), NUM_RECOMMENDATIONS);
+			List<RecommendedItem> recommendations = recommender.recommend(user.getId(), numRecommendations);
 			for (RecommendedItem recommendation : recommendations) {
 				long itemId = recommendation.getItemID();
-				System.out.println(itemId + ", " + recommendation.getValue());
-				recommendedPOI.addAll(pointConverter.getPOIForId(itemId,location.getLatitude(), location.getLongitude(), user.getPrefRecommendationRadius()));
-				
+				List<RecommendedPointOfInterest> pois = pointConverter.getPOIForId(itemId, location.getLatitude(),
+						location.getLongitude(), user.getPrefRecommendationRadius());
+				for (RecommendedPointOfInterest poi : pois) {
+					poi.setRecommendationValue(recommendation.getValue());
+					recommendedPOI.add(poi);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return recommendedPOI;
 	}
-	
-	public List<PointOfInterest> recommendContentBased(User user,
-			int numRecommendations) {
-		Location location = user.getCurrentLocation();
-		List<PointOfInterest> pois = pointConverter.getPOIInRadius(location.getLatitude(), location.getLongitude(), user.getPrefRecommendationRadius());
-		List<ProfileItem> items = new ArrayList<>();
-		items.addAll(pois);
-		items.add(user);
-		DataModel dm = new POIDataModel(items);
-		long id = user.getId();
-		UserSimilarity similarity = new ProfileSimilarity(dm);
-		UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.5, similarity, dm);
-		UserBasedRecommender rec = new GenericUserBasedRecommender(dm, neighborhood, similarity);
-		List<Long> userIds = new ArrayList<>();
 
-		try {
-			long[] mostSimilarUserIDs = rec.mostSimilarUserIDs(id, numRecommendations);
-			userIds = LongStream.of(mostSimilarUserIDs).boxed()
-					.collect(Collectors.toList());
-		} catch (TasteException e) {
-			e.printStackTrace();
+	public List<RecommendedPointOfInterest> recommendContentBased(User user) {
+		return recommendContentBased(user, new ArrayList<>());
+	}
+
+	private List<RecommendedPointOfInterest> recommendContentBased(User user,
+			List<RecommendedPointOfInterest> alreadyRecommendedPOIs) {
+		
+		List<RecommendedPointOfInterest> result = new ArrayList<>();
+		
+		if (alreadyRecommendedPOIs.size() < numRecommendations) {
+			Location location = user.getCurrentLocation();
+			List<RecommendedPointOfInterest> pois = pointConverter.getPOIInRadius(location.getLatitude(),
+					location.getLongitude(), user.getPrefRecommendationRadius());
+
+			// do not evaluate already recommended POIs again
+			for (RecommendedPointOfInterest alreadyRecommendedPointOfInterest : alreadyRecommendedPOIs) {
+				if (pois.contains(alreadyRecommendedPointOfInterest)) {
+					pois.remove(alreadyRecommendedPointOfInterest);
+				}
+			}
+
+			List<ProfileItem> items = new ArrayList<>();
+			items.addAll(pois);
+			items.add(user);
+			DataModel dm = new POIDataModel(items);
+			long id = user.getId();
+			UserSimilarity similarity = new ProfileSimilarity(dm);
+			UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.5, similarity, dm);
+			UserBasedRecommender rec = new GenericUserBasedRecommender(dm, neighborhood, similarity);
+			List<Long> userIds = new ArrayList<>();
+
+			try {
+				long[] mostSimilarUserIDs = rec.mostSimilarUserIDs(id, numRecommendations-alreadyRecommendedPOIs.size());
+				userIds = LongStream.of(mostSimilarUserIDs).boxed().collect(Collectors.toList());
+			} catch (TasteException e) {
+				e.printStackTrace();
+			}
+
+			final List<Long> mostSimilarUserIDs = userIds;
+			result.addAll(
+					pois.stream().filter(t -> mostSimilarUserIDs.contains(t.getId())).collect(Collectors.toList()));
 		}
-		final List<Long> mostSimilarUserIDs = userIds;
-		List<PointOfInterest> result = pois.stream().filter(t -> mostSimilarUserIDs.contains(t.getId()))
-				.collect(Collectors.toList());
+		
 		return result;
 	}
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.POIProfile;
-import model.PointOfInterest;
+import model.RecommendedPointOfInterest;
 import model.Preference;
 import util.PropertyLoader;
 
@@ -26,7 +26,7 @@ public class PointConverter {
 	}
 
 	// TODO better return Set instead of List because order is not important
-	public List<PointOfInterest> getPOIInRadius(double latitude, double longitude, int radius) {
+	public List<RecommendedPointOfInterest> getPOIInRadius(double latitude, double longitude, int radius) {
 		// Flip coordinates for PostGis, see:
 		// http://postgis.net/2013/08/18/tip_lon_lat/
 		String x = String.valueOf(longitude);
@@ -52,7 +52,7 @@ public class PointConverter {
 		return getPOIForQuery(query);
 	}
 
-	public List<PointOfInterest> getPOIForId(long itemId, double latitude, double longitude, int radius) {
+	public List<RecommendedPointOfInterest> getPOIForId(long itemId, double latitude, double longitude, int radius) {
 		// Flip coordinates for PostGis, see:
 		// http://postgis.net/2013/08/18/tip_lon_lat/
 		String x = String.valueOf(longitude);
@@ -72,14 +72,14 @@ public class PointConverter {
 				+ "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
 				+ ")), 4326), " + radius + ") and nodes.id=" + itemId + ";";
 
-		List<PointOfInterest> pois = getPOIForQuery(query);
+		List<RecommendedPointOfInterest> pois = getPOIForQuery(query);
 		assert pois.size() <= 1 : "Postcondition failed: Multiple Items with same id found.";
 		return pois;
 	}
 
-	private List<PointOfInterest> getPOIForQuery(String query) {
+	private List<RecommendedPointOfInterest> getPOIForQuery(String query) {
 		ResultSet resultSet = databaseAccess.sendQuery(query);
-		List<PointOfInterest> pois = new ArrayList<>();
+		List<RecommendedPointOfInterest> pois = new ArrayList<>();
 
 		if (resultSet == null) {
 			return pois;
@@ -100,7 +100,7 @@ public class PointConverter {
 					int distance = (int) Math.round(resultSet.getDouble("distance"));
 					String openingHours = resultSet.getString("openingHours");
 					openingHours = openingHours == null ? "" : openingHours;
-					pois.add(new PointOfInterest(id, name, street, houseNumber, distance, openingHours, profile));
+					pois.add(new RecommendedPointOfInterest(id, name, street, houseNumber, distance, openingHours, profile));
 				}
 			}
 			databaseAccess.close();

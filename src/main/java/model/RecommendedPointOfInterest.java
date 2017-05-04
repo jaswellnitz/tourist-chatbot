@@ -1,22 +1,31 @@
 package model;
 
-public class PointOfInterest implements ProfileItem {
+// Recommended Point of Interest
+public class RecommendedPointOfInterest implements ProfileItem {
 
 	private final long id;
 	private final String name;
 	private final String address;
-	private final int distance;
 	private final String openingHours;
 	private final POIProfile profile;
+	private final int distanceToUser;
+	private float recommendationValue;
+	private final static int UNSET_RECOMMENDATION_VALUE = 0;
+	
+	public RecommendedPointOfInterest(long id, String name, String streetName, String houseNumber, int distance,
+			String openingHours, POIProfile profile){
+		this(id,name,streetName,houseNumber,distance,openingHours, profile,UNSET_RECOMMENDATION_VALUE);
+	}
 
-	public PointOfInterest(long id, String name, String streetName, String houseNumber, int distance,
-			String openingHours, POIProfile profile) {
+	public RecommendedPointOfInterest(long id, String name, String streetName, String houseNumber, int distance,
+			String openingHours, POIProfile profile, int recommendationValue) {
 		this.id = id;
 		this.name = name != null? name: "";
 		this.address = parseAddress(streetName, houseNumber);
-		this.distance = distance;
+		this.distanceToUser = distance;
 		this.openingHours = openingHours != null? openingHours: "";
 		this.profile = profile;
+		this.recommendationValue = recommendationValue;
 	}
 
 	public final String parseAddress(String streetName, String houseNumber) {
@@ -48,7 +57,7 @@ public class PointOfInterest implements ProfileItem {
 	}
 
 	public int getDistance() {
-		return distance;
+		return distanceToUser;
 	}
 
 	public String getOpeningHours() {
@@ -60,7 +69,7 @@ public class PointOfInterest implements ProfileItem {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
-		result = prime * result + distance;
+		result = prime * result + distanceToUser;
 		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
@@ -76,13 +85,13 @@ public class PointOfInterest implements ProfileItem {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PointOfInterest other = (PointOfInterest) obj;
+		RecommendedPointOfInterest other = (RecommendedPointOfInterest) obj;
 		if (address == null) {
 			if (other.address != null)
 				return false;
 		} else if (!address.equals(other.address))
 			return false;
-		if (distance != other.distance)
+		if (distanceToUser != other.distanceToUser)
 			return false;
 		if (id != other.id)
 			return false;
@@ -105,7 +114,15 @@ public class PointOfInterest implements ProfileItem {
 
 	@Override
 	public String toString() {
-		return id + "(: " + name + ", " + address + ", " + distance + ", " + openingHours +")";
+		return id + "(: " + name + ", " + address + ", " + distanceToUser + ", " + openingHours +")";
+	}
+
+	public float getRecommendationValue() {
+		return recommendationValue;
+	}
+
+	public void setRecommendationValue(float recommendationValue) {
+		this.recommendationValue = recommendationValue;
 	}
 
 }
