@@ -19,16 +19,16 @@ public class POIProfile {
 	public POIProfile(){
 		this(Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED);
 	}
-	public POIProfile(Preference culture, Preference sightseeing, Preference food, Preference nightlife,
+	public POIProfile(Preference sightseeing, Preference culture, Preference food, Preference nightlife,
 			Preference nature, Preference shopping) {
-		this.culture = culture;
 		this.sightseeing = sightseeing;
+		this.culture = culture;
 		this.food = food;
 		this.nightlife = nightlife;
 		this.nature = nature;
 		this.shopping = shopping;
 		categories = new ArrayList<>();
-		categories.addAll(Arrays.asList(culture, sightseeing, food, nightlife,nature, shopping));
+		categories.addAll(Arrays.asList(sightseeing, culture, food, nightlife,nature, shopping));
 	}
 
 	public boolean isPOI() {

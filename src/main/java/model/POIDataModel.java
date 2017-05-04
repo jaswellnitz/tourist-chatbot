@@ -42,12 +42,10 @@ public class POIDataModel extends AbstractDataModel implements DataModel {
 			PreferenceArray newPrefs = new GenericUserPreferenceArray(POIProfile.CATEGORY_COUNT);
 			List<model.Preference> categories = profile.getAllCategories();
 			for (int i = 0; i < categories.size(); i++) {
-				if (categories.get(i) != model.Preference.NOT_RATED) {
 					int value = categories.get(i).getValue();
 					newPrefs.setValue(i, value);
 					Preference pref = new GenericPreference(id, i, value);
 					newPrefs.set(i, pref);
-				}
 			}
 			data.put(id, newPrefs);
 		}

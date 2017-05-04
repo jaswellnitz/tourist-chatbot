@@ -14,22 +14,17 @@ import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 import org.apache.mahout.cf.taste.similarity.PreferenceInferrer;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
-public class ProfileSimilarity implements UserSimilarity{
+public class ProfileSimilarity implements UserSimilarity {
 
 	private DataModel dataModel;
-  /**
-   * Creates new {@link ProfileSimilarity}
-   * 
-   * @param dataModel
-   */
-    public ProfileSimilarity(DataModel dataModel) {
-    	this.dataModel = dataModel;
-    }
 
-	@Override
-	public void refresh(Collection<Refreshable> alreadyRefreshed) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * Creates new {@link ProfileSimilarity}
+	 * 
+	 * @param dataModel
+	 */
+	public ProfileSimilarity(DataModel dataModel) {
+		this.dataModel = dataModel;
 	}
 
 	@Override
@@ -40,22 +35,28 @@ public class ProfileSimilarity implements UserSimilarity{
 		double similarity = 0.0;
 		Iterator<Preference> iterator = preferencesFromUser1.iterator();
 		Iterator<Preference> iterator2 = preferencesFromUser2.iterator();
-		while(iterator.hasNext()){
+		while (iterator.hasNext()) {
 			Preference pref1 = iterator.next();
 			Preference pref2 = iterator2.next();
-			if(pref1.getValue() == 1 && pref1.getValue() == pref2.getValue()){
-				similarity += 0.3;
-			}
-			else if (pref1.getValue() == 0 && pref1.getValue() == pref2.getValue()){
-				similarity += 0.05;
+			if (pref1.getValue() != model.Preference.NOT_RATED.getValue()
+					&& pref2.getValue() != model.Preference.NOT_RATED.getValue()) {
+				if (pref1.getValue() == model.Preference.TRUE.getValue() && pref1.getValue() == pref2.getValue()) {
+					similarity += 0.3;
+				} else if (pref1.getValue() == model.Preference.FALSE.getValue()
+						&& pref1.getValue() == pref2.getValue()) {
+					similarity += 0.05;
+				}
 			}
 		}
 		return similarity;
 	}
 
 	@Override
+	public void refresh(Collection<Refreshable> alreadyRefreshed) {
+	}
+
+	@Override
 	public void setPreferenceInferrer(PreferenceInferrer inferrer) {
-		// TODO Auto-generated method stub
-		
+
 	}
 }

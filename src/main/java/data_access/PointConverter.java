@@ -204,6 +204,6 @@ public class PointConverter {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return new POIProfile(culture, sightseeing, food, nightlife, nature, shopping);
+		return new POIProfile(sightseeing, culture, food, nightlife, nature, shopping);
 	}
 }
