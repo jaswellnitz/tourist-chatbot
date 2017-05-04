@@ -27,13 +27,13 @@ public class PointConverterTest {
 		// Prepare
 		int radius = 50;
 		long itemId = 359086841;
-		String lat = "41.4034984";
-		String lon = "2.1740598";
+		double lat = 41.4034984;
+		double lon = 2.1740598;
 		POIProfile profile = new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE);
 		PointOfInterest sagradaFamilia = new PointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",profile);
 		
 		// Action
-		List<PointOfInterest> poi = pointConverter.getPOIForId(lat, lon, itemId, radius);
+		List<PointOfInterest> poi = pointConverter.getPOIForId(itemId, lat, lon, radius);
 		
 		// Check
 		assertEquals(poi.size(),1);
@@ -45,11 +45,11 @@ public class PointConverterTest {
 		// Prepare
 		int radius = 30;
 		long itemId = 359086841;
-		String lat = "41.4031157";
-		String lon = "2.1742518";
+		double lat = 41.4031157;
+		double lon = 2.1742518;
 		
 		// Action
-		List<PointOfInterest> poi = pointConverter.getPOIForId(lat, lon, itemId, radius);
+		List<PointOfInterest> poi = pointConverter.getPOIForId(itemId,lat, lon, radius);
 		
 		// Check
 		assertEquals(poi.size(),0);
@@ -59,8 +59,8 @@ public class PointConverterTest {
 	public void getPOIInRadius(){
 		// Prepare
 		int radius = 50;
-		String lat = "41.4034984";
-		String lon = "2.1740598";
+		double lat = 41.4034984;
+		double lon = 2.1740598;
 		POIProfile profile = new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE);
 		PointOfInterest sagradaFamilia = new PointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",profile);
 		
