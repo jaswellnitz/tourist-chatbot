@@ -1,4 +1,4 @@
-package touristbot;
+package poi_recommendation;
 
 import static org.junit.Assert.*;
 

@@ -21,7 +21,6 @@ import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 import data_access.PointConverter;
 import data_access.UserDataHandler;
 import model.Location;
-import model.POIDataModel;
 import model.POIProfile;
 import model.Preference;
 import model.RecommendedPointOfInterest;
