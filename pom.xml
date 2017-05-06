@@ -80,7 +80,7 @@
           <appendAssemblyId>false</appendAssemblyId>
           <archive>
             <manifest>
-              <mainClass>infrastructure.Main</mainClass>
+              <mainClass>chatbot.Main</mainClass>
             </manifest>
           </archive>
         </configuration>
