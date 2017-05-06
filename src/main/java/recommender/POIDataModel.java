@@ -1,4 +1,4 @@
-package model;
+package recommender;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +15,9 @@ import org.apache.mahout.cf.taste.impl.model.GenericUserPreferenceArray;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.mahout.cf.taste.model.PreferenceArray;
+
+import model.POIProfile;
+import model.ProfileItem;
 
 // TODO: implement all methods and constructors
 public class POIDataModel extends AbstractDataModel implements DataModel {

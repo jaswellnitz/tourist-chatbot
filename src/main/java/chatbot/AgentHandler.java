@@ -1,4 +1,4 @@
-package infrastructure;
+package chatbot;
 
 import java.io.IOException;
 
@@ -10,23 +10,23 @@ import util.JsonUtil;
 import util.PropertyLoader;
 
 // Sends requests to api.ai agent via its http api 
-public class AgentConnector {
+public class AgentHandler {
 	
 	private OkHttpClient client;
+	private String clientAccessToken;
 
-	public AgentConnector(){
+	public AgentHandler(String clientAccess){
 		this.client = new OkHttpClient();
-		
+		clientAccessToken = clientAccess;
 	}
 	
-	public String sendQuery(String text){
-		String url = buildQuery(text);
-
-		String clientAccessToken = PropertyLoader.getProperty("clientAccessToken");
+	
+	// TODO error handling
+	public AgentResult sendQuery(String userInput){
+		String url = buildQuery(userInput);
 		Request request = new Request.Builder().header("Authorization", "Bearer "+ clientAccessToken)
 				.url(url).build();
 		
-		// TODO: split into methods
 		String jsonResponse = null;
 		try {
 			Response response = client.newCall(request).execute();
@@ -34,16 +34,17 @@ public class AgentConnector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		String answer = JsonUtil.parseToJson(jsonResponse).get("result").getAsJsonObject().get("fulfillment").getAsJsonObject().get("speech").getAsString();
-		return answer;
+		
+		return AgentResult.fromJson(jsonResponse);
 	}
 	
+	// TODO check sessionId and metadata
 	private String buildQuery(String text){
 		HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.api.ai/v1/query").newBuilder();
 		urlBuilder.addQueryParameter("query", text);
 		urlBuilder.addQueryParameter("v", "20150910");
 		urlBuilder.addQueryParameter("lang", "en");
-		urlBuilder.addQueryParameter("sessionId", "1234567890");
+		urlBuilder.addQueryParameter("sessionId", "1234567890");  
 		return urlBuilder.build().toString();
 	}
 

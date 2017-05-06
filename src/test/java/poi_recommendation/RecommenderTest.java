@@ -1,4 +1,4 @@
-package touristbot;
+package poi_recommendation;
 
 import static org.junit.Assert.*;
 
@@ -43,9 +43,7 @@ public class RecommenderTest {
 		// Check
 		assertFalse(recommendations.isEmpty());
 		assertEquals(numRecommendations, recommendations.size());
-		for (RecommendedPointOfInterest recommendedPointOfInterest : recommendations) {
-			System.out.println(recommendedPointOfInterest);
-		}
+
 		// Recommendations are unique
 		Set<RecommendedPointOfInterest> s = new HashSet<>(recommendations);
 		assertEquals(s.size(), recommendations.size());
@@ -64,14 +62,14 @@ public class RecommenderTest {
 		// Check
 		assertFalse(recommendations.isEmpty());
 		assertEquals(numRecommendations, recommendations.size());
-		for (RecommendedPointOfInterest recommendation : recommendations) {
-			System.out.println(recommendation);
-			POIProfile profile = recommendation.getProfile();
-			assertEquals(Preference.TRUE, profile.getAllCategories().get(categoryIndex));
-		}
 		// Recommendations are unique
 		Set<RecommendedPointOfInterest> s = new HashSet<>(recommendations);
 		assertEquals(s.size(), recommendations.size());
+		
+		for (RecommendedPointOfInterest recommendation : recommendations) {
+			POIProfile profile = recommendation.getProfile();
+			assertEquals(Preference.TRUE, profile.getAllCategories().get(categoryIndex));
+		}
 	}
 
 	@Test
