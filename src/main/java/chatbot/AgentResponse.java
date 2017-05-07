@@ -14,19 +14,19 @@ import com.google.gson.JsonObject;
 import util.JsonUtil;
 
 // according to https://docs.api.ai/docs/query
-public class AgentResult {
+public class AgentResponse {
 	private final String source;
 	private final String resolvedQuery;
-	private final String action;
+	private final Action action;
 	private final String reply;
 	private final double score;
-	private final Map<String, String> parameters;
+	private final Map<String, Object> parameters;
 	private final List<Context> contexts;
 	// private boolean actionIncomplete;
 	// private Fulfillment fulfillment;
 	// private AgentMetaData metaData;
 
-	private AgentResult(String source, String resolvedQuery, String action, Map<String, String> parameters,
+	public AgentResponse(String source, String resolvedQuery, Action action, Map<String, Object> parameters,
 			List<Context> contexts, String reply, double score) {
 		this.source = source;
 		this.resolvedQuery = resolvedQuery;
@@ -37,7 +37,7 @@ public class AgentResult {
 		this.score = score;
 	}
 
-	public Map<String, String> getParameters() {
+	public Map<String, Object> getParameters() {
 		return parameters;
 	}
 
@@ -81,7 +81,7 @@ public class AgentResult {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AgentResult other = (AgentResult) obj;
+		AgentResponse other = (AgentResponse) obj;
 		if (action == null) {
 			if (other.action != null)
 				return false;
@@ -117,44 +117,11 @@ public class AgentResult {
 		return true;
 	}
 
-	public static AgentResult fromJson(String jsonResponse) {
-		JsonObject resultObject = JsonUtil.parseToJson(jsonResponse).get("result").getAsJsonObject();
-
-		String source = resultObject.get("source").getAsString();
-		String resolvedQuery = resultObject.get("resolvedQuery").getAsString();
-		String action = resultObject.get("action").getAsString();
-		String reply = resultObject.get("fulfillment").getAsJsonObject().get("speech").getAsString();
-		double score = resultObject.get("score").getAsDouble();
-		Map<String, String> parameters = new HashMap<>();
-		if (resultObject.has("parameters")) {
-			for (Entry<String, JsonElement> entry : resultObject.get("parameters").getAsJsonObject().entrySet()) {
-				parameters.put(entry.getKey(), entry.getValue().getAsString());
-			}
-		}
-
-		List<Context> contexts = new ArrayList<Context>();
-		if (resultObject.has("contexts")) {
-			JsonArray jsonArray = resultObject.get("contexts").getAsJsonArray();
-
-			for (int i = 0; i < jsonArray.size(); i++) {
-				JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
-				String name = jsonObject.get("name").getAsString();
-				Map<String, String> contextParameters = new HashMap<>();
-				for (Entry<String, JsonElement> entry : jsonObject.get("parameters").getAsJsonObject().entrySet()) {
-					contextParameters.put(entry.getKey(), entry.getValue().getAsString());
-				}
-				int lifespan = jsonObject.get("lifespan").getAsInt();
-				contexts.add(new Context(name, contextParameters, lifespan));
-			}
-		}
-		return new AgentResult(source, resolvedQuery, action, parameters, contexts, reply, score);
-	}
-
 	public List<Context> getContext() {
 		return contexts;
 	}
 
-	public String getAction() {
+	public Action getAction() {
 		return action;
 	}
 	
