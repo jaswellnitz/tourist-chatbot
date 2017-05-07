@@ -18,7 +18,7 @@ public class AgentResponseParser {
 		Map<String, Object> parameters = new HashMap<>();
 		if (resultObject.has("parameters")) {
 			for (Entry<String, JsonElement> entry : resultObject.get("parameters").getAsJsonObject().entrySet()) {
-				if (entry.getKey().equals("distance")) {
+				if (entry.getKey().equals("distance") && entry.getValue().isJsonObject()) {
 					int distance = parseDistance(entry.getValue());
 					parameters.put(entry.getKey(), distance);
 				} else {
