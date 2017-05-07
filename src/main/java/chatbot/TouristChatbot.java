@@ -60,8 +60,9 @@ public class TouristChatbot {
 	private String getAboutText(int recommendationRadius) {
 		String aboutText = "Hey there, I am your friendly tourist chatbot! I will try my best to recommend you cool places on your trip. "
 				+ "As I get to know you better, my recommendations are going to be more adjusted to your interests."
-				+ "\n" + "Currently, I am looking for recommendations in a distance of " + recommendationRadius
-				+ "from you. " + "You can change that distance anytime." + "\n"
+				+ "\n\n" + "Currently, I am looking for recommendations in a distance of " + recommendationRadius
+				+ "from you. " + "You can change that distance anytime."  
+				+"\n\n"
 				+ "If you already asked for recommendations, I can show them to you if you like."
 				+ " While doing so, you can also tell me how you liked them in order to improve my recommendations.";
 		return aboutText;
