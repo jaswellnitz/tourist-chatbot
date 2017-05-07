@@ -22,7 +22,7 @@ public class AgentHandler {
 	
 	
 	// TODO error handling
-	public AgentResult sendQuery(String userInput){
+	public AgentResponse sendQuery(String userInput){
 		String url = buildQuery(userInput);
 		Request request = new Request.Builder().header("Authorization", "Bearer "+ clientAccessToken)
 				.url(url).build();
@@ -35,7 +35,7 @@ public class AgentHandler {
 			e.printStackTrace();
 		}
 		
-		return AgentResult.fromJson(jsonResponse);
+		return AgentResponseParser.fromJson(jsonResponse);
 	}
 	
 	// TODO check sessionId and metadata

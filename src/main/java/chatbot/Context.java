@@ -5,10 +5,10 @@ import java.util.Map;
 public class Context {
 
 	private final String name;
-	private final Map<String, String> parameters;
+	private final Map<String, Object> parameters;
 	private final int lifespan;
 
-	public Context(String name, Map<String, String> parameters, int lifespan) {
+	public Context(String name, Map<String, Object> parameters, int lifespan) {
 		this.name = name;
 		this.parameters = parameters;
 		this.lifespan = lifespan;
@@ -18,7 +18,7 @@ public class Context {
 		return name;
 	}
 
-	public Map<String, String> getParameters() {
+	public Map<String, Object> getParameters() {
 		return parameters;
 	}
 

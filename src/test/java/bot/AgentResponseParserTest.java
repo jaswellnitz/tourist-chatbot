@@ -9,13 +9,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.google.gson.JsonObject;
-
-import chatbot.AgentResult;
+import chatbot.Action;
+import chatbot.AgentResponse;
+import chatbot.AgentResponseParser;
 import chatbot.Context;
-import util.JsonUtil;
 
-public class AgentResultTest {
+public class AgentResponseParserTest {
 
 	@Test
 	public void testFromJson() {
@@ -30,22 +29,22 @@ public class AgentResultTest {
 				+ "\"speech\": \"Hey there, I am your friendly tourist chatbot!\" } ] }, \"score\": 1 }, "
 				+ "\"status\": { \"code\": 200, \"errorType\": \"success\" }, \"sessionId\": \"9196295d-f6f3-4d41-9750-b19d61d5ea6a\" }";
 
-		Map<String,String> expectedParameters = new HashMap<>();
+		Map<String,Object> expectedParameters = new HashMap<>();
 		expectedParameters.put("bla","5");
 		expectedParameters.put("city", "hamburg");
 		List<Context> expectedContext = new ArrayList<>();
-		Map<String,String> expectedContextParameters = new HashMap<>(expectedParameters);
+		Map<String,Object> expectedContextParameters = new HashMap<>(expectedParameters);
 		expectedContextParameters.put("bla.original","");
 		expectedContextParameters.put("city.original","");
 		expectedContext.add(new Context("testcontext", expectedContextParameters, 5));
 		
 		// Action
-		AgentResult agentResult = AgentResult.fromJson(json);
+		AgentResponse agentResult = AgentResponseParser.fromJson(json);
 		
 		// Check
 		assertEquals("agent", agentResult.getSource());
 		assertEquals("who are you", agentResult.getResolvedQuery());
-		assertEquals("about", agentResult.getAction());
+		assertEquals(Action.ABOUT, agentResult.getAction());
 		assertEquals("Hey there, I am your friendly tourist chatbot!", agentResult.getReply());
 		assertTrue(agentResult.getScore() == 1.0);
 		assertEquals(expectedParameters, agentResult.getParameters());
@@ -65,16 +64,16 @@ public class AgentResultTest {
 				+ "[ { \"type\": 0, \"speech\": \"Sorry, can you say that again?\" } ] }, \"score\": 1 }, \"status\": "
 				+ "{ \"code\": 200, \"errorType\": \"success\" }, \"sessionId\": \"9196295d-f6f3-4d41-9750-b19d61d5ea6a\" }";
 		
-		Map<String,String> expectedParameters = new HashMap<>();
+		Map<String,Object> expectedParameters = new HashMap<>();
 		List<Context> expectedContext = new ArrayList<>();
 		
 		// Action
-		AgentResult agentResult = AgentResult.fromJson(json);
+		AgentResponse agentResult = AgentResponseParser.fromJson(json);
 		
 		// Check
 		assertEquals("agent", agentResult.getSource());
 		assertEquals("", agentResult.getResolvedQuery());
-		assertEquals("input.unknown", agentResult.getAction());
+		assertEquals(Action.NONE, agentResult.getAction());
 		assertEquals("I missed what you said. Say it again?", agentResult.getReply());
 		assertTrue(agentResult.getScore() == 1.0);
 		assertEquals(expectedParameters, agentResult.getParameters());
@@ -88,20 +87,42 @@ public class AgentResultTest {
 				+ "\"parameters\": { \"simplified\": \"hello\" }, \"metadata\": {}, \"fulfillment\": { \"speech\": \"Hey!\" }, "
 				+ "\"score\": 1 }, \"status\": { \"code\": 200, \"errorType\": \"success\" }, "
 				+ "\"sessionId\": \"9196295d-f6f3-4d41-9750-b19d61d5ea6a\" }";
-		Map<String,String> expectedParameters = new HashMap<>();
+		Map<String,Object> expectedParameters = new HashMap<>();
 		expectedParameters.put("simplified","hello");
 		List<Context> expectedContext = new ArrayList<>();
 		
 		// Action
-		AgentResult agentResult = AgentResult.fromJson(json);
+		AgentResponse agentResult = AgentResponseParser.fromJson(json);
 		
 		// Check
 		assertEquals("domains", agentResult.getSource());
 		assertEquals("Hello", agentResult.getResolvedQuery());
-		assertEquals("smalltalk.greetings", agentResult.getAction());
+		assertEquals(Action.NONE, agentResult.getAction());
 		assertEquals("Hey!", agentResult.getReply());
 		assertTrue(agentResult.getScore() == 1.0);
 		assertEquals(expectedParameters, agentResult.getParameters());
 		assertEquals(expectedContext,agentResult.getContext());
+	}
+	
+	@Test
+	public void testComplexParameters(){
+		String json = "{ \"id\": \"38155fd8-880a-4f49-9c28-d66abaa42f39\", \"timestamp\": \"2017-05-07T14:55:47.952Z\", "
+				+ "\"lang\": \"en\", \"result\": { \"source\": \"agent\", \"resolvedQuery\": \"500 m\", \"action\": \"save_radius\","
+				+ " \"actionIncomplete\": false, \"parameters\": { \"distance\": { \"amount\": 500, \"unit\": \"m\" } }, "
+				+ "\"contexts\": [], \"metadata\": { \"intentId\": \"2051a6dd-efd3-423b-9157-6148acf6b91f\", \"webhookUsed\": \"false\", "
+				+ "\"webhookForSlotFillingUsed\": \"false\", \"intentName\": \"change_distance\" }, \"fulfillment\": "
+				+ "{ \"speech\": \"Fine, I will only recommend you places in less than 500 m\", \"messages\": "
+				+ "[ { \"type\": 0, \"speech\": \"Fine, I will only recommend you places in less than 500 m\" } ] }, \"score\": 1 }, "
+				+ "\"status\": { \"code\": 200, \"errorType\": \"success\" }, \"sessionId\": \"9196295d-f6f3-4d41-9750-b19d61d5ea6a\" }";
+		Map<String,Object> expectedParameters = new HashMap<>();
+		expectedParameters.put("distance",500);
+		
+		// Action
+		AgentResponse agentResult = AgentResponseParser.fromJson(json);
+		
+		// Check
+		assertEquals(Action.SAVE_RADIUS, agentResult.getAction());
+		assertEquals(expectedParameters, agentResult.getParameters());
+		
 	}
 }

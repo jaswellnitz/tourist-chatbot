@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import chatbot.AgentHandler;
-import chatbot.AgentResult;
+import chatbot.AgentResponse;
 import util.PropertyLoader;
 
 public class AgentHandlerTest {
@@ -24,7 +24,7 @@ public class AgentHandlerTest {
 		String userInput = "Hello";
 
 		// Action
-		AgentResult agentResult = agentHandler.sendQuery(userInput);
+		AgentResponse agentResult = agentHandler.sendQuery(userInput);
 		
 		// Check
 		assertNotNull(agentResult);
