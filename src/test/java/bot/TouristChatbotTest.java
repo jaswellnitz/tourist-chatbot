@@ -16,14 +16,6 @@ public class TouristChatbotTest {
 	
 	@Before
 	public void setUp(){
-//		this.touristChatbot = new TouristChatbot(new AgentHandler(PropertyLoader.getProperty("clientAccessToken")));
-	}
-
-	@Test
-	public void testProcessStartMessage(){
-//		User user = new User(1l, "Testuser");
-//		String reply= touristChatbot.processStartMessage(user);
-		
-//		assertFalse(reply.isEmpty());
+		this.touristChatbot = new TouristChatbot(new AgentHandler(PropertyLoader.getProperty("clientAccessToken")));
 	}
 }
