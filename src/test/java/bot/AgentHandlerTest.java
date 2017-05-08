@@ -19,17 +19,33 @@ public class AgentHandlerTest {
 	}
 	
 	@Test
-	public void testSendQuery(){
+	public void testSendUserInput(){
 		// Prepare
 		String userInput = "Hello";
 
 		// Action
-		AgentResponse agentResult = agentHandler.sendQuery(userInput);
+		AgentResponse agentResult = agentHandler.sendUserInput(userInput);
 		
 		// Check
 		assertNotNull(agentResult);
 		assertEquals(userInput, agentResult.getResolvedQuery());
 		assertFalse(agentResult.getReply().isEmpty());
+	}
+	
+	
+	@Test
+	public void testSendWelcomeEvent(){
+		// Prepare
+		String welcomeEvent = "WELCOME";
+
+		// Action
+		AgentResponse agentResult = agentHandler.sendEvent(welcomeEvent);
+		
+		// Check
+		assertNotNull(agentResult);
+		assertFalse(agentResult.getReply().isEmpty());
+		assertEquals(1,agentResult.getContext().size());
+		assertEquals("welcome-followup",agentResult.getContext().get(0).getName());
 		System.out.println(agentResult);
 	}
 
