@@ -33,39 +33,20 @@ public class TelegramBotHandler implements Route {
 		Update update = BotUtils.parseUpdate(request.body());
 		Message message = update.message();
 		String answer = "";
-		User user = new User(message.from().id(), message.from().firstName());
+		User user = new User(message.from().id(), message.from().firstName());	// user handling
 		
 		if(message.location() != null){
 			user.setCurrentLocation(message.location().latitude(),message.location().longitude());
 		}
-	/*	if (isStartMessage(message)) {
+		
+		if (isStartMessage(message)) {
 			answer = touristChatbot.processStartMessage(user);
 		} else {
 			answer = touristChatbot.processInput(user, message.text());
-		}*/
-		answer = touristChatbot.processInput(user, message.text());
+		}
+	
 		sendMessage(message.chat().id(), answer);
 
-		// if (isStartMessage(message)) {
-		// String firstName = update.message().from().firstName();
-		// sendMessage(update.message().chat().id(), "Testbot: Hello " +
-		// firstName + ". Your id: " + message.from().id());
-		// } else {
-		//// System.out.println(message);
-		// String text = "";
-		// if(message.text() != null){
-		//// String agentAnswer = agentConnector.sendQuery(message.text());
-		//// text += agentAnswer + " ";
-		// }
-		// Location location = message.location();
-		// if (location != null) {
-		// float lat = location.latitude();
-		// float lon = location.longitude();
-		// text += "TestBot: Your location - latitude " + lat + ", longitude " +
-		// lon;
-		// }
-		// sendMessage(message.chat().id(), text);
-		// }
 		return "ok";
 	}
 

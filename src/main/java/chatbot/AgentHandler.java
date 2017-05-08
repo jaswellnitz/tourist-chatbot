@@ -11,22 +11,28 @@ import util.PropertyLoader;
 
 // Sends requests to api.ai agent via its http api 
 public class AgentHandler {
-	
+
 	private OkHttpClient client;
 	private String clientAccessToken;
 
-	public AgentHandler(String clientAccess){
+	public AgentHandler(String clientAccess) {
 		this.client = new OkHttpClient();
 		clientAccessToken = clientAccess;
 	}
+
 	
+	public AgentResponse sendEvent(String event){
+		return sendQuery(event, "");
+	}
 	
+	public AgentResponse sendUserInput(String userInput){
+		return sendQuery("", userInput);
+	}
 	// TODO error handling
-	public AgentResponse sendQuery(String userInput){
-		String url = buildQuery(userInput);
-		Request request = new Request.Builder().header("Authorization", "Bearer "+ clientAccessToken)
-				.url(url).build();
-		
+	private AgentResponse sendQuery(String event, String userInput) {
+		String url = buildQuery(event, userInput);
+		Request request = new Request.Builder().header("Authorization", "Bearer " + clientAccessToken).url(url).build();
+
 		String jsonResponse = null;
 		try {
 			Response response = client.newCall(request).execute();
@@ -34,17 +40,22 @@ public class AgentHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return AgentResponseParser.fromJson(jsonResponse);
 	}
-	
+
 	// TODO check sessionId and metadata
-	private String buildQuery(String text){
+	private String buildQuery(String event, String userInput) {
 		HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.api.ai/v1/query").newBuilder();
-		urlBuilder.addQueryParameter("query", text);
+		if (!event.isEmpty()) {
+			urlBuilder.addQueryParameter("e", event);
+		}
+		if (!userInput.isEmpty()) {
+			urlBuilder.addQueryParameter("query", userInput);
+		}
 		urlBuilder.addQueryParameter("v", "20150910");
 		urlBuilder.addQueryParameter("lang", "en");
-		urlBuilder.addQueryParameter("sessionId", "1234567890");  
+		urlBuilder.addQueryParameter("sessionId", "1234567890");
 		return urlBuilder.build().toString();
 	}
 

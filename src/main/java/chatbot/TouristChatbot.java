@@ -12,7 +12,7 @@ public class TouristChatbot {
 	}
 
 	public String processInput(User user, String userInput) {
-		AgentResponse response = agentHandler.sendQuery(userInput);
+		AgentResponse response = agentHandler.sendUserInput(userInput);
 		String answer = "";
 
 		switch (response.getAction()) {
@@ -46,6 +46,7 @@ public class TouristChatbot {
 		if (object instanceof Integer) {
 			int radius = (int) object;
 			if (radius > 0) {
+				// TODO user handling
 				user.setPrefRecommendationRadius(radius);
 				succesful = true;
 			}
@@ -61,7 +62,7 @@ public class TouristChatbot {
 		String aboutText = "Hey there, I am your friendly tourist chatbot! I will try my best to recommend you cool places on your trip. "
 				+ "As I get to know you better, my recommendations are going to be more adjusted to your interests."
 				+ "\n\n" + "Currently, I am looking for recommendations in a distance of " + recommendationRadius
-				+ "from you. " + "You can change that distance anytime."  
+				+ " m from you. " + "You can change that distance anytime."  
 				+"\n\n"
 				+ "If you already asked for recommendations, I can show them to you if you like."
 				+ " While doing so, you can also tell me how you liked them in order to improve my recommendations.";
