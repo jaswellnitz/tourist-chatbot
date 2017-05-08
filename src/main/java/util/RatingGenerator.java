@@ -1,4 +1,4 @@
-package data_access;
+package util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.math3.analysis.function.Add;
+
+import data_access.UserRatingHandler;
 
 import java.util.Random;
 
@@ -130,7 +132,7 @@ public class RatingGenerator {
 	}
 
 	public static void main(String... args) {
-		UserDataHandler userDataHandler = new UserDataHandler("", "src/main/resources/generatedRatings.csv");
+		UserRatingHandler userDataHandler = new UserRatingHandler("", "src/main/resources/generatedRatings.csv");
 		List<List<Long>> categories = createPOICategories();
 
 		Map<Long, boolean[]> users = createUsers(categories.size());

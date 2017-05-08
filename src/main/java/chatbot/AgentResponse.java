@@ -19,22 +19,21 @@ public class AgentResponse {
 	private final String resolvedQuery;
 	private final Action action;
 	private final String reply;
-	private final double score;
 	private final Map<String, Object> parameters;
 	private final List<Context> contexts;
-	// private boolean actionIncomplete;
-	// private Fulfillment fulfillment;
-	// private AgentMetaData metaData;
+	private final String sessionId;
+	private final boolean actionIncomplete;
 
 	public AgentResponse(String source, String resolvedQuery, Action action, Map<String, Object> parameters,
-			List<Context> contexts, String reply, double score) {
+			List<Context> contexts, String reply, String sessionId, boolean actionIncomplete) {
 		this.source = source;
 		this.resolvedQuery = resolvedQuery;
 		this.action = action;
 		this.parameters = parameters;
 		this.contexts = contexts;
 		this.reply = reply;
-		this.score = score;
+		this.sessionId = sessionId;
+		this.actionIncomplete = actionIncomplete;
 	}
 
 	public Map<String, Object> getParameters() {
@@ -43,10 +42,6 @@ public class AgentResponse {
 
 	public String getReply() {
 		return reply;
-	}
-
-	public double getScore() {
-		return score;
 	}
 
 	public String getSource() {
@@ -62,13 +57,12 @@ public class AgentResponse {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((action == null) ? 0 : action.hashCode());
+		result = prime * result + (actionIncomplete ? 1231 : 1237);
 		result = prime * result + ((contexts == null) ? 0 : contexts.hashCode());
 		result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
 		result = prime * result + ((reply == null) ? 0 : reply.hashCode());
 		result = prime * result + ((resolvedQuery == null) ? 0 : resolvedQuery.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(score);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((sessionId == null) ? 0 : sessionId.hashCode());
 		result = prime * result + ((source == null) ? 0 : source.hashCode());
 		return result;
 	}
@@ -82,10 +76,9 @@ public class AgentResponse {
 		if (getClass() != obj.getClass())
 			return false;
 		AgentResponse other = (AgentResponse) obj;
-		if (action == null) {
-			if (other.action != null)
-				return false;
-		} else if (!action.equals(other.action))
+		if (action != other.action)
+			return false;
+		if (actionIncomplete != other.actionIncomplete)
 			return false;
 		if (contexts == null) {
 			if (other.contexts != null)
@@ -107,7 +100,10 @@ public class AgentResponse {
 				return false;
 		} else if (!resolvedQuery.equals(other.resolvedQuery))
 			return false;
-		if (Double.doubleToLongBits(score) != Double.doubleToLongBits(other.score))
+		if (sessionId == null) {
+			if (other.sessionId != null)
+				return false;
+		} else if (!sessionId.equals(other.sessionId))
 			return false;
 		if (source == null) {
 			if (other.source != null)
@@ -117,16 +113,25 @@ public class AgentResponse {
 		return true;
 	}
 
-	public List<Context> getContext() {
+	public List<Context> getContexts() {
 		return contexts;
 	}
 
 	public Action getAction() {
 		return action;
 	}
-	
+
 	@Override
-	public String toString(){
-		return "source: "+source+", resolvedQuery: "+resolvedQuery +", action: " + action +", reply: " + reply;
+	public String toString() {
+		return "AgentResponse(source: " + source + ", action: " + action + ", actionIncomplete" + actionIncomplete
+				+ ", sessionId: " + sessionId + ", parameters: " + parameters + ", contexts: " + contexts + ")";
+	}
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public boolean isActionIncomplete() {
+		return actionIncomplete;
 	}
 }

@@ -35,6 +35,7 @@ public class Main {
 		 * PropertyLoader.getProperty("db_pw")); PointConverter pointConverter =
 		 * new PointConverter(dbAccess); Recommender recommender = new
 		 * Recommender(pointConverter);
+		UserDB userDB = new UserDB(dbAccess);
 		 */
 		String clientAccess = PropertyLoader.getProperty("clientAccessToken");
 		String telegramToken = PropertyLoader.getProperty("telegramToken");

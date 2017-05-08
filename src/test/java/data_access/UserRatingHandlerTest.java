@@ -1,4 +1,4 @@
-package poi_recommendation;
+package data_access;
 
 import static org.junit.Assert.*;
 
@@ -19,14 +19,14 @@ import org.junit.Test;
 
 import com.google.common.io.Files;
 
-import data_access.UserDataHandler;
+import data_access.UserRatingHandler;
 import model.POIProfile;
 import model.Preference;
 import model.Rating;
 import model.User;
 
-public class UserDataHandlerTest {
-	private UserDataHandler userDataHandler;
+public class UserRatingHandlerTest {
+	private UserRatingHandler userDataHandler;
 	private User user;
 	private static final String PROFILE_PATH = "src/test/resources/userProfile.csv";
 	private static final String RATING_PATH = "src/test/resources/ratings.csv";
@@ -36,7 +36,7 @@ public class UserDataHandlerTest {
 	@Before
 	public void setUp() throws Exception {
 		testFile = new File(TEST_PATH);
-		this.userDataHandler = new UserDataHandler(TEST_PATH, TEST_PATH);
+		this.userDataHandler = new UserRatingHandler(TEST_PATH, TEST_PATH);
 		long id = 1001;
 		POIProfile profile = new POIProfile(Preference.TRUE, Preference.FALSE, Preference.NOT_RATED,
 				Preference.NOT_RATED, Preference.FALSE, Preference.NOT_RATED);

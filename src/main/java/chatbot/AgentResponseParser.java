@@ -44,13 +44,24 @@ public class AgentResponseParser {
 	}
 
 	public static AgentResponse fromJson(String jsonResponse) {
-		JsonObject resultObject = JsonUtil.parseToJson(jsonResponse).get("result").getAsJsonObject();
+		assert jsonResponse != null : "Precondition failed: jsonResponse != null";
+		JsonObject responseObject = JsonUtil.parseToJson(jsonResponse).getAsJsonObject();
+		JsonObject resultObject = responseObject.get("result").getAsJsonObject();
 		Map<String, Object> parameters = parseParameters(resultObject);
+		boolean actionIncomplete = false;
+		
+		if (resultObject.has("actionIncomplete")) {
+			actionIncomplete = resultObject.get("actionIncomplete").getAsBoolean();
+		}
+
+		String sessionId = "";
+		if (responseObject.has("sessionId")) {
+			sessionId = responseObject.get("sessionId").getAsString();
+		}
 		String source = resultObject.get("source").getAsString();
 		String resolvedQuery = resultObject.get("resolvedQuery").getAsString();
 		Action action = Action.getEnum(resultObject.get("action").getAsString());
 		String reply = resultObject.get("fulfillment").getAsJsonObject().get("speech").getAsString();
-		double score = resultObject.get("score").getAsDouble();
 
 		List<Context> contexts = new ArrayList<Context>();
 		if (resultObject.has("contexts")) {
@@ -64,7 +75,8 @@ public class AgentResponseParser {
 				contexts.add(new Context(name, contextParameters, lifespan));
 			}
 		}
-		return new AgentResponse(source, resolvedQuery, action, parameters, contexts, reply, score);
+		return new AgentResponse(source, resolvedQuery, action, parameters, contexts, reply, sessionId,
+				actionIncomplete);
 	}
 
 }
