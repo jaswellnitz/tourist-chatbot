@@ -31,25 +31,34 @@ public class PointConverter {
 		// http://postgis.net/2013/08/18/tip_lon_lat/
 		String x = String.valueOf(longitude);
 		String y = String.valueOf(latitude);
-		
-		String query = "SELECT ways.id, ways.tags-> 'name' as _name, ways.tags-> 'tourism' as tourism, ways.tags-> 'amenity' as amenity, ways.tags-> 'leisure' as leisure,"
-				+ "ways.tags-> 'cuisine' as cuisine, ways.tags-> 'historic' as historic, ways.tags-> 'shop' as shop,"
-				+ "ways.tags-> 'addr:street' as street,  ways.tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
-				+ x + ", " + y + ")), 4326)) as distance, ways.tags-> 'opening_hours' as openingHours "
-				+ "FROM ways inner join nodes on ways.nodes[1]=nodes.id "
-				+ "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
-				+ ")), 4326), " + radius + ") and "
-				+ "ways.tags ? 'name' and (ways.tags ? 'tourism' or ways.tags ? 'amenity' or ways.tags ? 'leisure' or ways.tags ? 'cuisine') "
-				+ "UNION ALL "
-				+ "SELECT nodes.id, nodes.tags-> 'name' as _name, nodes.tags-> 'tourism' as tourism, nodes.tags-> 'amenity' as amenity, nodes.tags-> 'leisure' as leisure,"
-				+ "nodes.tags-> 'cuisine' as cuisine, nodes.tags-> 'historic' as historic, nodes.tags-> 'shop' as shop,"
-				+ "nodes.tags-> 'addr:street' as street, nodes.tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
-				+ x + ", " + y + ")), 4326)) as distance, nodes.tags-> 'opening_hours' as openingHours " + "FROM nodes "
-				+ "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
-				+ ")), 4326), " + radius + ") and "
-				+ "nodes.tags ? 'name' and (nodes.tags ? 'tourism' or nodes.tags ? 'amenity' or nodes.tags ? 'leisure' or nodes.tags ? 'cuisine');";
+
+		String query = getSelectQuery("ways", x, y) + " FROM ways inner join nodes on ways.nodes[1]=nodes.id "
+				+ getConditionQueryForGeneralPOISearch("ways", x, y, radius) + "UNION ALL "
+				+ getSelectQuery("nodes", x, y) + " FROM nodes "
+				+ getConditionQueryForGeneralPOISearch("nodes", x, y, radius) + ";";
 
 		return getPOIForQuery(query);
+	}
+
+	private String getSelectQuery(String table, String x, String y) {
+		String query = "SELECT " + table + ".id, " + table + ".tags-> 'name' as _name, " + table
+				+ ".tags-> 'tourism' as tourism, " + table + ".tags-> 'amenity' as amenity, " + table
+				+ ".tags-> 'leisure' as leisure, " + table + ".tags-> 'cuisine' as cuisine, " + table
+				+ ".tags-> 'historic' as historic, " + table + ".tags-> 'shop' as shop," + table
+				+ ".tags-> 'beach' as beach, " + table
+				+ ".tags-> 'addr:street' as street, " + table
+				+ ".tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
+				+ x + ", " + y + ")), 4326)) as distance, " + table + ".tags-> 'opening_hours' as openingHours";
+		return query;
+	}
+
+	// TODO update for shop, historic and beach
+	private String getConditionQueryForGeneralPOISearch(String table, String x, String y, int radius) {
+		String query = "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
+				+ ")), 4326), " + radius + ") and " + table + ".tags ? 'name' and (" + table + ".tags ? 'tourism' or "
+				+ table + ".tags ? 'amenity' " + "or " + table + ".tags ? 'leisure' or " + table + ".tags ? 'cuisine' or "
+						+ table+".tags ? 'beach' or " +table+".tags ? 'historic' or " + table + ".tags ? 'shop')";
+		return query;
 	}
 
 	public List<RecommendedPointOfInterest> getPOIForId(long itemId, double latitude, double longitude, int radius) {
@@ -58,17 +67,10 @@ public class PointConverter {
 		String x = String.valueOf(longitude);
 		String y = String.valueOf(latitude);
 
-		String query = "SELECT ways.id as id, ways.tags-> 'name' as _name, ways.tags-> 'tourism' as tourism, ways.tags-> 'amenity' as amenity, "
-				+ "ways.tags-> 'leisure' as leisure,ways.tags-> 'cuisine' as cuisine, ways.tags-> 'historic' as historic, ways.tags-> 'shop' as shop,"
-				+ "ways.tags-> 'addr:street' as street, ways.tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
-				+ x + ", " + y + ")), 4326)) as distance, ways.tags-> 'opening_hours' as openingHours "
-				+ "FROM ways inner join nodes on ways.nodes[1]=nodes.id "
+		String query = getSelectQuery("ways", x, y) + " FROM ways inner join nodes on ways.nodes[1]=nodes.id "
 				+ "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
 				+ ")), 4326), " + radius + ") and " + "ways.id=" + itemId + " UNION ALL "
-				+ " SELECT nodes.id as id, nodes.tags-> 'name' as _name, nodes.tags-> 'tourism' as tourism, nodes.tags-> 'amenity' as amenity, "
-				+ "nodes.tags-> 'leisure' as leisure,nodes.tags-> 'cuisine' as cuisine, nodes.tags-> 'historic' as historic, nodes.tags-> 'shop' as shop,"
-				+ "nodes.tags-> 'addr:street' as street, nodes.tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
-				+ x + ", " + y + ")), 4326)) as distance, nodes.tags-> 'opening_hours' as openingHours " + "FROM nodes "
+				+ getSelectQuery("nodes", x, y) + " FROM nodes "
 				+ "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
 				+ ")), 4326), " + radius + ") and nodes.id=" + itemId + ";";
 
@@ -100,7 +102,8 @@ public class PointConverter {
 					int distance = (int) Math.round(resultSet.getDouble("distance"));
 					String openingHours = resultSet.getString("openingHours");
 					openingHours = openingHours == null ? "" : openingHours;
-					pois.add(new RecommendedPointOfInterest(id, name, street, houseNumber, distance, openingHours, profile));
+					pois.add(new RecommendedPointOfInterest(id, name, street, houseNumber, distance, openingHours,
+							profile));
 				}
 			}
 			databaseAccess.close();
@@ -118,7 +121,7 @@ public class PointConverter {
 		Preference nightlife = Preference.FALSE;
 		Preference nature = Preference.FALSE;
 		Preference shopping = Preference.FALSE;
-		
+
 		try {
 
 			String tourismTag = set.getString("tourism");
@@ -141,9 +144,13 @@ public class PointConverter {
 					break;
 				}
 			}
-			
 
-			String historicTag  = set.getString("historic");
+			String beachTag = set.getString("beach");
+			if (beachTag != null) {
+				nature = Preference.TRUE;
+			}
+
+			String historicTag = set.getString("historic");
 			if (historicTag != null) {
 				sightseeing = Preference.TRUE;
 			}

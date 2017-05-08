@@ -9,6 +9,7 @@ import model.User;
 public class TouristChatbot {
 
 	private final AgentHandler agentHandler;
+	// TODO clear cache
 	private Set<User> activeUsers;
 //	private UserDB userDB;
 
@@ -20,6 +21,7 @@ public class TouristChatbot {
 
 	public String processInput(long userId, String userInput) {
 		User user = getUserFromId(userId);
+		System.out.println(userInput + ", " + user);
 		AgentResponse response = agentHandler.sendUserInput(userInput, user.getId());
 		String answer = "";
 
@@ -56,7 +58,9 @@ public class TouristChatbot {
 			}
 		}
 //		return userDB.getUser(userId);
-		return new User(userId, "");
+		User user = new User(userId, "");
+		activeUsers.add(user);
+		return user;
 	}
 
 	private boolean trySaveRadius(User user, AgentResponse response) {

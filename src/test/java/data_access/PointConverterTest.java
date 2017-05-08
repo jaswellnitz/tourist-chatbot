@@ -68,7 +68,8 @@ public class PointConverterTest {
 		List<RecommendedPointOfInterest> poiInRadius = pointConverter.getPOIInRadius(lat, lon, radius);
 		
 		// Check
-		assertEquals(poiInRadius.size(),3);
+		System.out.println(poiInRadius);
+		assertEquals(poiInRadius.size(),4);
 		boolean containsSagrada = poiInRadius.contains(sagradaFamilia);
 		assertTrue(containsSagrada);
 	}
