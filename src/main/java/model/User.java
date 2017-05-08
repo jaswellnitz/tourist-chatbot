@@ -13,6 +13,7 @@ public class User implements ProfileItem {
 	
 	// TODO refactor constructors
 
+	// used
 	public User(long id, String name){
 		this(id, new POIProfile(), DEFAULT_RECOMMENDATION_RADIUS, null, name);
 	}
@@ -37,6 +38,11 @@ public class User implements ProfileItem {
 		this.name = name;
 	}
 	
+	// used
+	public User(long id, String name, int radius) {
+		this(id, new POIProfile(), radius, null, name);
+	}
+
 	public long getId() {
 		return id;
 	}
@@ -70,16 +76,19 @@ public class User implements ProfileItem {
 		return "User:("+id+", " + profile+", " + prefRecommendationRadius +", " + currentLocation +")";
 	}
 	
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((currentLocation == null) ? 0 : currentLocation.hashCode());
 		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + prefRecommendationRadius;
 		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -96,6 +105,11 @@ public class User implements ProfileItem {
 			return false;
 		if (id != other.id)
 			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
 		if (prefRecommendationRadius != other.prefRecommendationRadius)
 			return false;
 		if (profile == null) {
@@ -105,7 +119,7 @@ public class User implements ProfileItem {
 			return false;
 		return true;
 	}
-	
+
 	public int getPrefRecommendationRadius() {
 		return prefRecommendationRadius;
 	}

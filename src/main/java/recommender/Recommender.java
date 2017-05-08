@@ -19,7 +19,7 @@ import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
 import data_access.PointConverter;
-import data_access.UserDataHandler;
+import data_access.UserRatingHandler;
 import model.Location;
 import model.POIProfile;
 import model.Preference;
@@ -46,7 +46,7 @@ public class Recommender {
 
 	public static void main(String... args) {
 		PointConverter pointConverter = new PointConverter();
-		UserDataHandler userDataHandler = new UserDataHandler();
+		UserRatingHandler userDataHandler = new UserRatingHandler();
 
 		Recommender rec = new Recommender(pointConverter);
 		long userId = 1001;

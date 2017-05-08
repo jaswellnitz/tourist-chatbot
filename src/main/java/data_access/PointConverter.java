@@ -78,7 +78,7 @@ public class PointConverter {
 	}
 
 	private List<RecommendedPointOfInterest> getPOIForQuery(String query) {
-		ResultSet resultSet = databaseAccess.sendQuery(query);
+		ResultSet resultSet = databaseAccess.executeQuery(query);
 		List<RecommendedPointOfInterest> pois = new ArrayList<>();
 
 		if (resultSet == null) {

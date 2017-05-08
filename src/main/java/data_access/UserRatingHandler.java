@@ -11,18 +11,18 @@ import model.Preference;
 import model.Rating;
 import model.User;
 
-public class UserDataHandler {
+public class UserRatingHandler {
 
 	private final static String DEFAULT_PROFILE_PATH = "src/main/resources/userProfile.csv";
 	private final static String DEFAULT_RATING_PATH = "src/main/resources/ratings.csv";
 	private String profilePath;
 	private String ratingPath;
 
-	public UserDataHandler() {
+	public UserRatingHandler() {
 		this(DEFAULT_PROFILE_PATH, DEFAULT_RATING_PATH);
 	}
 
-	public UserDataHandler(String profilePath, String ratingPath) {
+	public UserRatingHandler(String profilePath, String ratingPath) {
 		this.profilePath = profilePath;
 		this.ratingPath = ratingPath;
 

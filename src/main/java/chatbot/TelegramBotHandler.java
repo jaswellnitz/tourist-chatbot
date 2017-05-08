@@ -33,16 +33,15 @@ public class TelegramBotHandler implements Route {
 		Update update = BotUtils.parseUpdate(request.body());
 		Message message = update.message();
 		String answer = "";
-		User user = new User(message.from().id(), message.from().firstName());	// user handling
 		
-		if(message.location() != null){
-			user.setCurrentLocation(message.location().latitude(),message.location().longitude());
-		}
+//		if(message.location() != null){
+//			user.setCurrentLocation(message.location().latitude(),message.location().longitude());
+//		}
 		
 		if (isStartMessage(message)) {
-			answer = touristChatbot.processStartMessage(user);
+			answer = touristChatbot.processStartMessage(message.from().id(), message.from().firstName());
 		} else {
-			answer = touristChatbot.processInput(user, message.text());
+			answer = touristChatbot.processInput(message.from().id(), message.text());
 		}
 	
 		sendMessage(message.chat().id(), answer);
@@ -62,7 +61,6 @@ public class TelegramBotHandler implements Route {
 		return telegramBot;
 	}
 
-	// TODO ->
 	protected boolean isStartMessage(Message message) {
 		return message != null && message.text() != null && message.text().startsWith("/start");
 	}

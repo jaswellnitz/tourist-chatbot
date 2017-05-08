@@ -19,7 +19,16 @@ public class DatabaseAccess {
 
 	}
 
-	public ResultSet sendQuery(String query) {
+	public void executeUpdate(String query){
+		try {
+			statement = conn.createStatement();
+			statement.executeUpdate(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public ResultSet executeQuery(String query) {
 		ResultSet set = null;
 		try {
 			statement = conn.createStatement();

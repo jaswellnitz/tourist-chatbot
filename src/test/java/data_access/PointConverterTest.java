@@ -1,4 +1,4 @@
-package poi_recommendation;
+package data_access;
 
 import static org.junit.Assert.*;
 
