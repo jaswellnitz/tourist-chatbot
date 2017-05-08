@@ -71,8 +71,7 @@ public class TouristChatbot {
 
 	// TODO send welcome event to API.ai
 	public String processStartMessage(User from) {
-		// TODO Auto-generated method stub
-		return null;
+		AgentResponse response = agentHandler.sendEvent("WELCOME");
+		return response.getReply();
 	}
-
 }
