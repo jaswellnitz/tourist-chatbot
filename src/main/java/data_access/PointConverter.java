@@ -8,17 +8,15 @@ import java.util.List;
 import model.POIProfile;
 import model.RecommendedPointOfInterest;
 import model.Preference;
-import util.PropertyLoader;
 
 public class PointConverter {
 
 	private DatabaseAccess databaseAccess;
 
-	// TODO: dependency injection
+	// dependency injection
 	@Deprecated
 	public PointConverter() {
-		this(new DatabaseAccess(PropertyLoader.getProperty("db_name"), PropertyLoader.getProperty("db_user"),
-				PropertyLoader.getProperty("db_pw")));
+		this(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")));
 	}
 
 	public PointConverter(DatabaseAccess db) {
@@ -52,12 +50,10 @@ public class PointConverter {
 		return query;
 	}
 
-	// TODO update for shop, historic and beach
 	private String getConditionQueryForGeneralPOISearch(String table, String x, String y, int radius) {
 		String query = "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
-				+ ")), 4326), " + radius + ") and " + table + ".tags ? 'name' and (" + table + ".tags ? 'tourism' or "
-				+ table + ".tags ? 'amenity' " + "or " + table + ".tags ? 'leisure' or " + table + ".tags ? 'cuisine' or "
-						+ table+".tags ? 'beach' or " +table+".tags ? 'historic' or " + table + ".tags ? 'shop')";
+				+ ")), 4326), " + radius + ") and " + table + ".tags ? 'name' and " + table 
+				+ ".tags ?| ARRAY['tourism','amenity','leisure','cuisine','beach','historic','shop']";
 		return query;
 	}
 
@@ -191,6 +187,8 @@ public class PointConverter {
 				case "mall":
 					shopping = Preference.TRUE;
 					break;
+				case "marketplace":
+					shopping= Preference.TRUE;
 				}
 			}
 			String leisureTag = set.getString("leisure");

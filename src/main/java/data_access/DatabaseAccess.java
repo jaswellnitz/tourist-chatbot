@@ -6,19 +6,16 @@ public class DatabaseAccess {
 	private Connection conn;
 	private Statement statement;
 
-	public DatabaseAccess(String database, String user, String pw) {
+	public DatabaseAccess(String url) {
 		try {
-			// TODO adapt for heroku
-			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://localhost:5432/" + database;
-			conn = DriverManager.getConnection(url, user, pw);
+			conn = DriverManager.getConnection(url);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
-
+	
 	public void executeUpdate(String query){
 		try {
 			statement = conn.createStatement();

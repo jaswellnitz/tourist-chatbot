@@ -8,7 +8,6 @@ import com.pengrad.telegrambot.model.Update;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import util.PropertyLoader;
 
 import com.pengrad.telegrambot.TelegramBotAdapter;
 import com.pengrad.telegrambot.request.SendMessage;

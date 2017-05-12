@@ -6,8 +6,6 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import util.JsonUtil;
-import util.PropertyLoader;
 
 // Sends requests to api.ai agent via its http api 
 public class AgentHandler {

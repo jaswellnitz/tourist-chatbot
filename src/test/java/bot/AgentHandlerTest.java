@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import chatbot.AgentHandler;
 import chatbot.AgentResponse;
-import util.PropertyLoader;
 
 public class AgentHandlerTest {
 	
@@ -15,7 +14,7 @@ public class AgentHandlerTest {
 
 	@Before
 	public void setUp(){
-		this.agentHandler = new AgentHandler(PropertyLoader.getProperty("clientAccessToken"));
+		this.agentHandler = new AgentHandler(System.getenv("API_AI_ACCESS_TOKEN"));
 	}
 	
 	@Test
@@ -60,7 +59,7 @@ public class AgentHandlerTest {
 		String welcomeEvent = "WELCOME";
 		long sessionIdUser1= 1234567890;
 		
-		String followUpInput = "I want the short version";
+		String followUpInput = "Yes";
 		long sessionIdUser2 = 1000000000;
 		
 		// Action
@@ -90,7 +89,7 @@ public class AgentHandlerTest {
 		assertEquals(String.valueOf(sessionIdUser1),agentResult3.getSessionId());
 		assertFalse(agentResult3.getReply().isEmpty());
 		assertFalse(agentResult3.getContexts().isEmpty());
-		assertEquals("interview-short",agentResult3.getContexts().get(0).getName());
+		assertEquals("interview",agentResult3.getContexts().get(0).getName());
 	}
 
 }
