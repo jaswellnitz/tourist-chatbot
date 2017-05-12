@@ -8,7 +8,6 @@ import org.junit.Test;
 import chatbot.AgentHandler;
 import chatbot.TouristChatbot;
 import model.User;
-import util.PropertyLoader;
 
 public class TouristChatbotTest {
 	
@@ -16,6 +15,6 @@ public class TouristChatbotTest {
 	
 	@Before
 	public void setUp(){
-		this.touristChatbot = new TouristChatbot(new AgentHandler(PropertyLoader.getProperty("clientAccessToken")));
+		this.touristChatbot = new TouristChatbot(new AgentHandler(System.getenv("API_AI_ACCESS_TOKEN")));
 	}
 }

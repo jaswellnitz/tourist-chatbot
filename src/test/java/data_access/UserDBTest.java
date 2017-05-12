@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import model.User;
-import util.PropertyLoader;
 
 public class UserDBTest {
 
@@ -17,8 +16,7 @@ public class UserDBTest {
 
 	@Before
 	public void setUp() {
-		this.dbAccess = new DatabaseAccess(PropertyLoader.getProperty("db_name"), PropertyLoader.getProperty("db_user"),
-				PropertyLoader.getProperty("db_pw"));
+		this.dbAccess = new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"));
 		this.userDB = new UserDB(dbAccess);
 		this.expectedUser = new User(100l, "Testuser");
 	}
