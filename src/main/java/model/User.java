@@ -27,7 +27,7 @@ public class User implements ProfileItem {
 	}
 	
 	public User(long id, POIProfile profile) {
-		this(id,profile,DEFAULT_RECOMMENDATION_RADIUS, null, "");
+		this(id,profile,DEFAULT_RECOMMENDATION_RADIUS, Location.UNSET, "");
 	}
 
 	public User(long id, POIProfile profile, int radius, Location location, String name){
@@ -40,13 +40,15 @@ public class User implements ProfileItem {
 	
 	// used
 	public User(long id, String name, int radius) {
-		this(id, new POIProfile(), radius, null, name);
+		this(id, new POIProfile(), radius, Location.UNSET, name);
 	}
 
+	@Override
 	public long getId() {
 		return id;
 	}
 
+	@Override
 	public POIProfile getProfile() {
 		return profile;
 	}
@@ -58,6 +60,7 @@ public class User implements ProfileItem {
 
 	public Location getCurrentLocation() {
 		assert currentLocation != null: "Precondition failed: currentLocation != null";
+		assert !currentLocation.equals(Location.UNSET): "Precondition failed: location is unset";
 		
 		return currentLocation;
 	}
@@ -72,6 +75,7 @@ public class User implements ProfileItem {
 		this.currentLocation = new Location(latitude,longitude);
 	}
 
+	@Override
 	public String toString(){
 		return "User:("+id+", " + profile+", " + prefRecommendationRadius +", " + currentLocation +")";
 	}

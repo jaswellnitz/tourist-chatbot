@@ -1,22 +1,27 @@
 package chatbot;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import data_access.UserDB;
 import model.User;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 
 // TODO (integration) tests
 public class TouristChatbot {
 
 	private final AgentHandler agentHandler;
-	// TODO clear cache
-	private Set<User> activeUsers;
-//	private UserDB userDB;
+	private final Map<Long, User> activeUsers;
+	private UserDB userDB;
+	// private Recommender recommender;
 
-	public TouristChatbot(AgentHandler agentHandler) {
+	public TouristChatbot(AgentHandler agentHandler, UserDB userDB) {
 		this.agentHandler = agentHandler;
-		this.activeUsers = new HashSet<>();
-//		this.userDB = userDB;
+		this.activeUsers = ExpiringMap.builder().maxSize(100).expirationPolicy(ExpirationPolicy.ACCESSED)
+				.expiration(1, TimeUnit.DAYS).build();
+		this.userDB = userDB;
+		// this.recommender = recommender;
 	}
 
 	public String processInput(long userId, String userInput) {
@@ -52,14 +57,18 @@ public class TouristChatbot {
 
 	// check if telegram bot responds when /start was not triggered
 	private User getUserFromId(long userId) {
-		for (User activeUser : activeUsers) {
-			if (activeUser.getId() == userId) {
-				return activeUser;
-			}
+		if (getActiveUsers().containsKey(userId)) {
+			return getActiveUsers().get(userId);
 		}
-//		return userDB.getUser(userId);
-		User user = new User(userId, "");
-		activeUsers.add(user);
+		
+		User user;
+		if (userDB.hasUser(userId)) {
+			user = userDB.getUser(userId);
+		} else {
+			user = new User(userId, "");
+		}
+		getActiveUsers().put(user.getId(), user);
+		
 		return user;
 	}
 
@@ -70,6 +79,7 @@ public class TouristChatbot {
 			int radius = (int) object;
 			if (radius > 0) {
 				user.setPrefRecommendationRadius(radius);
+				userDB.changeRadiusForUser(user.getId(), radius);
 				succesful = true;
 			}
 		}
@@ -90,13 +100,20 @@ public class TouristChatbot {
 		return aboutText;
 	}
 
-	// TODO store user in db
 	public String processStartMessage(long userId, String userName) {
+		if (userDB.hasUser(userId)) {
+			userDB.deleteUser(userId);
+		}
+		
 		User user = new User(userId, userName);
-//		userDB.storeUser(user);
-		activeUsers.add(user);
-		AgentResponse response = agentHandler.sendEvent("WELCOME", user.getId());
+		userDB.storeUser(user);
+		getActiveUsers().put(userId, user);
+		AgentResponse response = agentHandler.sendEvent("WELCOME", user.getId(), true);
 		System.out.println(response.getSessionId());
 		return response.getReply();
+	}
+
+	public Map<Long, User> getActiveUsers() {
+		return activeUsers;
 	}
 }

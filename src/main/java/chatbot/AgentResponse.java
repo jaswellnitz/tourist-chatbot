@@ -1,17 +1,7 @@
 package chatbot;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import util.JsonUtil;
 
 // according to https://docs.api.ai/docs/query
 public class AgentResponse {

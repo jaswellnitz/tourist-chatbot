@@ -3,7 +3,11 @@ package data_access;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.Multiset.Entry;
 
 import model.User;
 
@@ -15,9 +19,9 @@ public class UserDB {
 		this.dbAccess = dbAccess;
 	}
 
-	public boolean hasUser(long userId){
+	public boolean hasUser(long userId) {
 		String query = "select * from users where id = " + userId;
-		
+
 		ResultSet resultSet = dbAccess.executeQuery(query);
 		boolean hasNext = false;
 		try {
@@ -25,14 +29,40 @@ public class UserDB {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return hasNext;
 	}
+
+	public boolean changeRadiusForUser(long userId, int radius){
+		String radiusParam = "radius";
+		Map<String,String> param = new HashMap<String,String>();
+		param.put(radiusParam, String.valueOf(radius));
+		return updateUser(userId, param);
+	}
 	
-	public void storeUser(User user) {
+	private boolean updateUser(long userId, Map<String, String> parameters) {
+		String query = "update users set";
+		
+		for (Map.Entry<String, String> entry : parameters.entrySet()) {
+			query+= " " + entry.getKey() +"= '" + entry.getValue() +"',";
+		}
+		query = query.substring(0,query.length()-1) +  " where id = " + userId + ";";
+		
+		int rowCount = dbAccess.executeUpdate(query);
+		return rowCount == 1;
+	}
+
+	public boolean deleteUser(long userId) {
+		String query = "DELETE from users where id = " + userId + ";";
+		int rowCount = dbAccess.executeUpdate(query);
+		return rowCount == 1;
+	}
+
+	public boolean storeUser(User user) {
 		String query = "INSERT into users (id, name, radius) values (" + user.getId() + ",'" + user.getName() + "',"
 				+ user.getPrefRecommendationRadius() + ")";
-		dbAccess.executeUpdate(query);
+		int rowCount = dbAccess.executeUpdate(query);
+		return rowCount == 1;
 	}
 
 	public User getUser(long userId) {
@@ -52,7 +82,7 @@ public class UserDB {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		assert users.size() == 1 : "Postcondition failed: multiple users with same id found.";
+		assert users.size() == 1 : "Postcondition failed: getUser from UserDB for id " + userId;
 
 		return users.get(0);
 	}

@@ -2,6 +2,9 @@ package data_access;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +26,22 @@ public class UserDBTest {
 
 	@After
 	public void tearDown() {
-		String query = "Delete from users where id = " + expectedUser.getId();
-		dbAccess.executeUpdate(query);
+		long id = expectedUser.getId();
+		if (userDB.hasUser(id))
+			userDB.deleteUser(id);
+	}
+
+	@Test
+	public void testDeleteUser() {
+		// Prepare
+		userDB.storeUser(expectedUser);
+
+		// Action
+		boolean succesful = userDB.deleteUser(expectedUser.getId());
+
+		// Check
+		assertTrue(succesful);
+		assertFalse(userDB.hasUser(expectedUser.getId()));
 	}
 
 	@Test
@@ -34,10 +51,27 @@ public class UserDBTest {
 		assertFalse(userDB.hasUser(id));
 
 		// Action
-		userDB.storeUser(expectedUser);
+		boolean succesful = userDB.storeUser(expectedUser);
 
 		// Check
+		assertTrue(succesful);
 		assertTrue(userDB.hasUser(id));
+	}
+	
+	@Test
+	public void testUpdateUser() {
+		// Prepare
+		long id = expectedUser.getId();
+		userDB.storeUser(expectedUser);
+		int radius = 200;
+		
+		// Action
+		boolean succesful = userDB.changeRadiusForUser(id, radius);
+
+		// Check
+		assertTrue(succesful);
+		User user = userDB.getUser(id);
+		assertEquals(radius, user.getPrefRecommendationRadius());
 	}
 
 	@Test
@@ -45,11 +79,11 @@ public class UserDBTest {
 		// Prepare
 		long id = expectedUser.getId();
 		userDB.storeUser(expectedUser);
-		
+
 		// Action
 		User user = userDB.getUser(id);
-		
+
 		// Check
-		assertEquals(expectedUser,user);
+		assertEquals(expectedUser, user);
 	}
 }

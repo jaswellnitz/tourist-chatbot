@@ -40,6 +40,7 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		return s + h;
 	}
 
+	@Override
 	public long getId() {
 		return id;
 	}
@@ -52,6 +53,7 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		return address;
 	}
 
+	@Override
 	public POIProfile getProfile() {
 		return profile;
 	}

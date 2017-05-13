@@ -16,13 +16,15 @@ public class DatabaseAccess {
 
 	}
 	
-	public void executeUpdate(String query){
+	public int executeUpdate(String query){
+		int rowCount = -1;
 		try {
 			statement = conn.createStatement();
-			statement.executeUpdate(query);
+			rowCount = statement.executeUpdate(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return rowCount;
 	}
 	
 	public ResultSet executeQuery(String query) {
