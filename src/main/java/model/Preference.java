@@ -28,11 +28,8 @@ public enum Preference {
 			return NOT_RATED;
 		}
 	}
-<<<<<<< HEAD
 
 	public boolean toBoolean() {
 		return value == 1;
 	}
-=======
->>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 }

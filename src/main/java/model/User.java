@@ -15,7 +15,7 @@ public class User implements ProfileItem {
 
 	// used
 	public User(long id, String name){
-		this(id, new POIProfile(), DEFAULT_RECOMMENDATION_RADIUS, null, name);
+		this(id, new POIProfile(), DEFAULT_RECOMMENDATION_RADIUS, Location.UNSET, name);
 	}
 	
 	public User(long id, Location location){

@@ -10,11 +10,8 @@ import chatbot.AgentHandler;
 import chatbot.TouristChatbot;
 import data_access.DatabaseAccess;
 import data_access.UserDB;
-<<<<<<< HEAD
 import model.POIProfile;
 import model.Preference;
-=======
->>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 import model.User;
 
 public class TouristChatbotTest {
@@ -74,27 +71,7 @@ public class TouristChatbotTest {
 		assertEquals(radius,storedUser.getPrefRecommendationRadius());
 		assertEquals(radius, cachedUser.getPrefRecommendationRadius());
 	}
-<<<<<<< HEAD
 	
-	@Test
-	public void testSaveInterests() {
-		// Prepare
-		int radius = 500;
-	
-		String input = "I want to change the recommendation radius to " + radius +" m";
-		
-		// Action
-		String answer = touristChatbot.processInput(user.getId(), input);
-
-		assertFalse(answer.isEmpty());
-		assertTrue(touristChatbot.getActiveUsers().containsKey(user.getId()));
-		assertTrue(userDB.hasUser(user.getId()));
-		User storedUser = userDB.getUser(user.getId());
-		User cachedUser = touristChatbot.getActiveUsers().get(user.getId());
-		assertEquals(storedUser,cachedUser);
-		assertEquals(radius,storedUser.getPrefRecommendationRadius());
-		assertEquals(radius, cachedUser.getPrefRecommendationRadius());
-	}
 	
 	@Test
 	public void testGetPersonalInformation(){
@@ -113,6 +90,4 @@ public class TouristChatbotTest {
 		assertFalse(answer.isEmpty());
 		assertEquals(expectedAnswer, answer);
 	}
-=======
->>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 }
