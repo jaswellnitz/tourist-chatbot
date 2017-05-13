@@ -9,6 +9,7 @@ import com.pengrad.telegrambot.request.SetWebhook;
 
 import data_access.DatabaseAccess;
 import data_access.PointConverter;
+import data_access.UserDB;
 import recommender.Recommender;
 
 // Entry Point: enables Telegram webhook
@@ -22,7 +23,6 @@ public class Main {
 		TelegramBotHandler botHandler = initBotHandler();
 		post("/" + botHandler.getToken(), botHandler);
 
-//		String serviceUrl = PropertyLoader.getProperty("serviceUrl");
 		String serviceUrl = System.getenv("HEROKU_URL");
 		botHandler.getTelegramBot().execute(new SetWebhook().url(serviceUrl + botHandler.getToken()));
 	}
@@ -37,12 +37,15 @@ public class Main {
 		 * Recommender(pointConverter);
 		UserDB userDB = new UserDB(dbAccess);
 		 */
-//		String clientAccess = PropertyLoader.getProperty("clientAccessToken");
-//		String telegramToken = PropertyLoader.getProperty("telegramToken");
+		String dbUrl = System.getenv("JDBC_DATABASE_URL");
 		String clientAccess = System.getenv("API_AI_ACCESS_TOKEN");
 		String telegramToken = System.getenv("TELEGRAM_TOKEN");
+		DatabaseAccess dbAccess = new DatabaseAccess(dbUrl);
+		UserDB userDB = new UserDB(dbAccess);
+		PointConverter pointConverter = new PointConverter(dbAccess);
+//		Recommender recommender = new Recommender(pointConverter);
 		AgentHandler agentConnector = new AgentHandler(clientAccess);
-		TouristChatbot touristChatbot = new TouristChatbot(agentConnector);
+		TouristChatbot touristChatbot = new TouristChatbot(agentConnector, userDB);
 		TelegramBotHandler botHandler = new TelegramBotHandler(telegramToken, touristChatbot);
 		return botHandler;
 	}

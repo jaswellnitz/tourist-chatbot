@@ -38,10 +38,10 @@ public class AgentHandlerTest {
 	public void testSendWelcomeEvent(){
 		// Prepare
 		String welcomeEvent = "WELCOME";
-		long sessionId = 1234567890;
+		long sessionId = 1234567890l;
 
 		// Action
-		AgentResponse agentResult = agentHandler.sendEvent(welcomeEvent, sessionId);
+		AgentResponse agentResult = agentHandler.sendEvent(welcomeEvent, sessionId, true);
 		
 		// Check
 		assertNotNull(agentResult);
@@ -50,25 +50,25 @@ public class AgentHandlerTest {
 		assertEquals(String.valueOf(sessionId),agentResult.getSessionId());
 		
 		assertEquals("welcome-followup",agentResult.getContexts().get(0).getName());
-		System.out.println(agentResult);
 	}
 	
 	@Test
 	public void testDifferentSessions(){
 		// Prepare
 		String welcomeEvent = "WELCOME";
-		long sessionIdUser1= 1234567890;
+		long sessionIdUser1= 2345678901l;
 		
 		String followUpInput = "Yes";
-		long sessionIdUser2 = 1000000000;
+		long sessionIdUser2 = 3456789012l;
 		
 		// Action
-		AgentResponse agentResult = agentHandler.sendEvent(welcomeEvent, sessionIdUser1);
+		AgentResponse agentResult = agentHandler.sendEvent(welcomeEvent, sessionIdUser1, true);
 		
 		// Check
 		assertNotNull(agentResult);
 		assertEquals(String.valueOf(sessionIdUser1),agentResult.getSessionId());
 		assertFalse(agentResult.getReply().isEmpty());
+		System.out.println(agentResult.getContexts());
 		assertEquals(1,agentResult.getContexts().size());
 		assertEquals("welcome-followup",agentResult.getContexts().get(0).getName());
 		
@@ -91,5 +91,4 @@ public class AgentHandlerTest {
 		assertFalse(agentResult3.getContexts().isEmpty());
 		assertEquals("interview",agentResult3.getContexts().get(0).getName());
 	}
-
 }

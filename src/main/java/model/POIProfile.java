@@ -2,7 +2,6 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -83,6 +82,7 @@ public class POIProfile {
 		return new POIProfile(preference[0], preference[1], preference[2], preference[3], preference[4], preference[5]);
 	}
 
+	@Override
 	public String toString() {
 		String result = "";
 		for (Preference category : categories) {

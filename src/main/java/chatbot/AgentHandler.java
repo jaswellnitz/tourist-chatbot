@@ -19,16 +19,21 @@ public class AgentHandler {
 	}
 
 	
+	public AgentResponse sendEvent(String event, long sessionId, boolean resetContext){
+		return sendQuery(event, "", sessionId, resetContext);
+	}
+	
 	public AgentResponse sendEvent(String event, long sessionId){
-		return sendQuery(event, "", sessionId);
+		return sendQuery(event, "", sessionId, false);
 	}
 	
 	public AgentResponse sendUserInput(String userInput, long sessionId){
-		return sendQuery("", userInput, sessionId);
+		return sendQuery("", userInput, sessionId, false);
 	}
+	
 	// TODO error handling
-	private AgentResponse sendQuery(String event, String userInput, long sessionId) {
-		String url = buildQuery(event, userInput, sessionId);
+	private AgentResponse sendQuery(String event, String userInput, long sessionId, boolean resetContext) {
+		String url = buildQuery(event, userInput, sessionId, resetContext);
 		Request request = new Request.Builder().header("Authorization", "Bearer " + clientAccessToken).url(url).build();
 
 		String jsonResponse = null;
@@ -42,8 +47,7 @@ public class AgentHandler {
 		return AgentResponseParser.fromJson(jsonResponse);
 	}
 
-	// TODO check sessionId and metadata
-	private String buildQuery(String event, String userInput, long sessionId) {
+	private String buildQuery(String event, String userInput, long sessionId, boolean resetContext) {
 		HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.api.ai/v1/query").newBuilder();
 		if (!event.isEmpty()) {
 			urlBuilder.addQueryParameter("e", event);
@@ -53,6 +57,11 @@ public class AgentHandler {
 		}
 		urlBuilder.addQueryParameter("v", "20150910");
 		urlBuilder.addQueryParameter("lang", "en");
+		
+		if(resetContext){
+			urlBuilder.addQueryParameter("resetContexts", String.valueOf(resetContext));
+		}
+		
 		String sessionIdStr = String.valueOf(sessionId);
 		if(sessionIdStr.length() < 10){
 			 sessionIdStr = String.format("%10s", sessionIdStr).replace(" ", "0");

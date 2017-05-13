@@ -4,6 +4,7 @@ public class Location {
 
 	private final double latitude;
 	private final double longitude;
+	public static final Location UNSET = new Location(0,0);
 
 	public Location(double latitude, double longitude) {
 		this.latitude = latitude;

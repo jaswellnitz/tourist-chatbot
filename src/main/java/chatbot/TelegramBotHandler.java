@@ -2,7 +2,6 @@ package chatbot;
 
 import com.pengrad.telegrambot.BotUtils;
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.Location;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import spark.Request;
@@ -11,8 +10,6 @@ import spark.Route;
 
 import com.pengrad.telegrambot.TelegramBotAdapter;
 import com.pengrad.telegrambot.request.SendMessage;
-
-import model.User;
 
 // Receives Updates from Telegram and passes text messages to api.ai
 public class TelegramBotHandler implements Route {
