@@ -10,8 +10,11 @@ import chatbot.AgentHandler;
 import chatbot.TouristChatbot;
 import data_access.DatabaseAccess;
 import data_access.UserDB;
+<<<<<<< HEAD
 import model.POIProfile;
 import model.Preference;
+=======
+>>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 import model.User;
 
 public class TouristChatbotTest {
@@ -71,6 +74,7 @@ public class TouristChatbotTest {
 		assertEquals(radius,storedUser.getPrefRecommendationRadius());
 		assertEquals(radius, cachedUser.getPrefRecommendationRadius());
 	}
+<<<<<<< HEAD
 	
 	@Test
 	public void testSaveInterests() {
@@ -109,4 +113,6 @@ public class TouristChatbotTest {
 		assertFalse(answer.isEmpty());
 		assertEquals(expectedAnswer, answer);
 	}
+=======
+>>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 }

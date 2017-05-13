@@ -4,11 +4,18 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import data_access.UserDB;
+<<<<<<< HEAD
 import model.POIProfile;
+=======
+>>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 import model.User;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
+<<<<<<< HEAD
+=======
+// TODO (integration) tests
+>>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 public class TouristChatbot {
 
 	private final AgentHandler agentHandler;
@@ -38,9 +45,12 @@ public class TouristChatbot {
 			answer = response.getReply();
 			// saveInterests(user, response);
 			break;
+<<<<<<< HEAD
 		case SHOW_INFORMATION:
 			answer = getPersonalInformation(user);
 			break;
+=======
+>>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 		case SAVE_RADIUS:
 			answer = response.getReply();
 			if (trySaveRadius(user, response)) {
@@ -57,6 +67,7 @@ public class TouristChatbot {
 		}
 		return answer;
 	}
+<<<<<<< HEAD
 	
 	public String processStartMessage(long userId, String userName) {
 		if (userDB.hasUser(userId)) {
@@ -107,13 +118,19 @@ public class TouristChatbot {
 		
 		return answer;
 	}
+=======
+>>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 
 	// check if telegram bot responds when /start was not triggered
 	private User getUserFromId(long userId) {
 		if (getActiveUsers().containsKey(userId)) {
 			return getActiveUsers().get(userId);
 		}
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 		User user;
 		if (userDB.hasUser(userId)) {
 			user = userDB.getUser(userId);
@@ -121,7 +138,11 @@ public class TouristChatbot {
 			user = new User(userId, "");
 		}
 		getActiveUsers().put(user.getId(), user);
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 		return user;
 	}
 
@@ -152,4 +173,24 @@ public class TouristChatbot {
 				+ " While doing so, you can also tell me how you liked them in order to improve my recommendations.";
 		return aboutText;
 	}
+<<<<<<< HEAD
+=======
+
+	public String processStartMessage(long userId, String userName) {
+		if (userDB.hasUser(userId)) {
+			userDB.deleteUser(userId);
+		}
+		
+		User user = new User(userId, userName);
+		userDB.storeUser(user);
+		getActiveUsers().put(userId, user);
+		AgentResponse response = agentHandler.sendEvent("WELCOME", user.getId(), true);
+		System.out.println(response.getSessionId());
+		return response.getReply();
+	}
+
+	public Map<Long, User> getActiveUsers() {
+		return activeUsers;
+	}
+>>>>>>> 305535a612534a56e7f2c460a883c17155f98478
 }
