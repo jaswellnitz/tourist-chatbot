@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import data_access.UserDB;
+import model.POIProfile;
 import model.User;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
-// TODO (integration) tests
 public class TouristChatbot {
 
 	private final AgentHandler agentHandler;
@@ -38,6 +38,9 @@ public class TouristChatbot {
 			answer = response.getReply();
 			// saveInterests(user, response);
 			break;
+		case SHOW_INFORMATION:
+			answer = getPersonalInformation(user);
+			break;
 		case SAVE_RADIUS:
 			answer = response.getReply();
 			if (trySaveRadius(user, response)) {
@@ -54,13 +57,63 @@ public class TouristChatbot {
 		}
 		return answer;
 	}
+	
+	public String processStartMessage(long userId, String userName) {
+		if (userDB.hasUser(userId)) {
+			userDB.deleteUser(userId);
+		}
+
+		User user = new User(userId, userName);
+		userDB.storeUser(user);
+		getActiveUsers().put(userId, user);
+		AgentResponse response = agentHandler.sendEvent("WELCOME", user.getId(), true);
+		System.out.println(response.getSessionId());
+		return response.getReply();
+	}
+
+	public Map<Long, User> getActiveUsers() {
+		return activeUsers;
+	}
+	
+
+	private String getPersonalInformation(User user) {
+		String answer = "So, here's what I know about you: Your current recommendation radius is "
+				+ user.getPrefRecommendationRadius() + " m.";
+		String interests = "";
+		POIProfile profile = user.getProfile();
+		if (profile.hasSightseeing().toBoolean()) {
+			interests += "sightseeing, ";
+		}
+		if (profile.hasCulture().toBoolean()) {
+			interests += "culture, ";
+		}
+		if (profile.hasFood().toBoolean()) {
+			interests += "food, ";
+		}
+		if (profile.hasNature().toBoolean()) {
+			interests += "nature, ";
+		}
+		if (profile.hasNightlife().toBoolean()) {
+			interests += "nightlife, ";
+		}
+		if (profile.hasShopping().toBoolean()) {
+			interests += "shopping, ";
+		}
+		
+		if (!interests.isEmpty()) {
+			interests = interests.substring(0, interests.length()-2);
+			answer += "\n\nYou are interested in: "+ interests + ".";
+		}
+		
+		return answer;
+	}
 
 	// check if telegram bot responds when /start was not triggered
 	private User getUserFromId(long userId) {
 		if (getActiveUsers().containsKey(userId)) {
 			return getActiveUsers().get(userId);
 		}
-		
+
 		User user;
 		if (userDB.hasUser(userId)) {
 			user = userDB.getUser(userId);
@@ -68,7 +121,7 @@ public class TouristChatbot {
 			user = new User(userId, "");
 		}
 		getActiveUsers().put(user.getId(), user);
-		
+
 		return user;
 	}
 
@@ -98,22 +151,5 @@ public class TouristChatbot {
 				+ "If you already asked for recommendations, I can show them to you if you like."
 				+ " While doing so, you can also tell me how you liked them in order to improve my recommendations.";
 		return aboutText;
-	}
-
-	public String processStartMessage(long userId, String userName) {
-		if (userDB.hasUser(userId)) {
-			userDB.deleteUser(userId);
-		}
-		
-		User user = new User(userId, userName);
-		userDB.storeUser(user);
-		getActiveUsers().put(userId, user);
-		AgentResponse response = agentHandler.sendEvent("WELCOME", user.getId(), true);
-		System.out.println(response.getSessionId());
-		return response.getReply();
-	}
-
-	public Map<Long, User> getActiveUsers() {
-		return activeUsers;
 	}
 }

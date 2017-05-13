@@ -2,7 +2,7 @@ package chatbot;
 
 public enum Action {
 
-	ABOUT, SAVE_INTEREST, SAVE_RADIUS, RECOMMEND, SHOW_RECOMMENDATIONS, NONE;
+	ABOUT, SAVE_INTEREST, SAVE_RADIUS, RECOMMEND, SHOW_RECOMMENDATIONS, NONE, SHOW_INFORMATION;
 	
 	public static Action getEnum(String s){
 		for(Action a: values()){

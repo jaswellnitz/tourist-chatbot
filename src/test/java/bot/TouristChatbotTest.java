@@ -10,6 +10,8 @@ import chatbot.AgentHandler;
 import chatbot.TouristChatbot;
 import data_access.DatabaseAccess;
 import data_access.UserDB;
+import model.POIProfile;
+import model.Preference;
 import model.User;
 
 public class TouristChatbotTest {
@@ -68,5 +70,43 @@ public class TouristChatbotTest {
 		assertEquals(storedUser,cachedUser);
 		assertEquals(radius,storedUser.getPrefRecommendationRadius());
 		assertEquals(radius, cachedUser.getPrefRecommendationRadius());
+	}
+	
+	@Test
+	public void testSaveInterests() {
+		// Prepare
+		int radius = 500;
+	
+		String input = "I want to change the recommendation radius to " + radius +" m";
+		
+		// Action
+		String answer = touristChatbot.processInput(user.getId(), input);
+
+		assertFalse(answer.isEmpty());
+		assertTrue(touristChatbot.getActiveUsers().containsKey(user.getId()));
+		assertTrue(userDB.hasUser(user.getId()));
+		User storedUser = userDB.getUser(user.getId());
+		User cachedUser = touristChatbot.getActiveUsers().get(user.getId());
+		assertEquals(storedUser,cachedUser);
+		assertEquals(radius,storedUser.getPrefRecommendationRadius());
+		assertEquals(radius, cachedUser.getPrefRecommendationRadius());
+	}
+	
+	@Test
+	public void testGetPersonalInformation(){
+		// Prepare
+		String input = "What do you know about me?";
+		user.setProfile(new POIProfile(Preference.TRUE, Preference.NOT_RATED, Preference.TRUE, Preference.FALSE, Preference.TRUE, Preference.TRUE));
+		user.setPrefRecommendationRadius(300);
+		touristChatbot.getActiveUsers().put(user.getId(), user);
+		String expectedAnswer = "So, here's what I know about you: Your current recommendation radius is 300 m.\n\n"
+				+ "You are interested in: sightseeing, food, nature, shopping.";
+		
+		// Action
+		String answer = touristChatbot.processInput(user.getId(), input);
+		
+		// Check
+		assertFalse(answer.isEmpty());
+		assertEquals(expectedAnswer, answer);
 	}
 }
