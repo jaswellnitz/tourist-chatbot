@@ -87,7 +87,7 @@ public class TouristChatbot {
 		if (!interests.isEmpty()) {
 			String interestString = "";
 			for(String interest: interests){
-				interestString += ", ";
+				interestString += interest+", ";
 			}
 			interestString = interestString.substring(0, interestString.length() - 2);
 			answer += "\n\nYou are interested in: " + interestString + ".";
