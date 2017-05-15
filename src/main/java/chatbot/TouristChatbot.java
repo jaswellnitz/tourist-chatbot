@@ -50,6 +50,7 @@ public class TouristChatbot {
 			break;
 		case RECOMMEND_LOCATION:
 			chatbotResponse = new ChatbotResponse(agentResponse.getReply(),"Send Location");
+			break;
 		case SAVE_RADIUS:
 			// TODO refactor
 			if (trySaveRadius(user, agentResponse)) { 
