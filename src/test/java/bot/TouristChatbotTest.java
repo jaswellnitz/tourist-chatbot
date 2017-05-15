@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import chatbot.AgentHandler;
+import chatbot.ChatbotResponse;
 import chatbot.TouristChatbot;
 import data_access.DatabaseAccess;
 import data_access.UserDB;
@@ -46,9 +47,10 @@ public class TouristChatbotTest {
 		assertFalse(touristChatbot.getActiveUsers().containsKey(user.getId()));
 
 		// Action
-		String answer = touristChatbot.processStartMessage(user.getId(), user.getName());
+		ChatbotResponse response  = touristChatbot.processStartMessage(user.getId(), user.getName());
 
 		// Check
+		String answer = response.getReply();
 		assertFalse(answer.isEmpty());
 		assertTrue(userDB.hasUser(user.getId()));
 		assertEquals(user, userDB.getUser(user.getId()));
@@ -63,8 +65,10 @@ public class TouristChatbotTest {
 		String input = "I want to change the recommendation radius to " + radius +" m";
 		
 		// Action
-		String answer = touristChatbot.processInput(user.getId(), input);
+		ChatbotResponse response = touristChatbot.processInput(user.getId(), input);
 
+		// Check
+		String answer = response.getReply();
 		assertFalse(answer.isEmpty());
 		assertTrue(touristChatbot.getActiveUsers().containsKey(user.getId()));
 		assertTrue(userDB.hasUser(user.getId()));
@@ -113,9 +117,10 @@ public class TouristChatbotTest {
 				+ "You are interested in: sightseeing, food, nature, shopping.";
 		
 		// Action
-		String answer = touristChatbot.processInput(user.getId(), input);
+		ChatbotResponse response = touristChatbot.processInput(user.getId(), input);
 		
 		// Check
+		String answer = response.getReply();
 		assertFalse(answer.isEmpty());
 		assertEquals(expectedAnswer, answer);
 	}

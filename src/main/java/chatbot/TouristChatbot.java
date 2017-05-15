@@ -4,63 +4,72 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import data_access.PointConverter;
 import data_access.UserDB;
+import model.Location;
 import model.POIProfile;
 import model.Preference;
 import model.User;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import recommender.Recommender;
 
 public class TouristChatbot {
 
 	private final AgentHandler agentHandler;
 	private final Map<Long, User> activeUsers;
 	private UserDB userDB;
-	// private Recommender recommender;
+//	 private Recommender recommender;
 
 	public TouristChatbot(AgentHandler agentHandler, UserDB userDB) {
 		this.agentHandler = agentHandler;
 		this.activeUsers = ExpiringMap.builder().maxSize(100).expirationPolicy(ExpirationPolicy.ACCESSED)
 				.expiration(1, TimeUnit.DAYS).build();
 		this.userDB = userDB;
-		// this.recommender = recommender;
+//		 this.recommender = new Recommender(new PointConverter(db));
 	}
 
-	public String processInput(long userId, String userInput) {
+	public ChatbotResponse processInput(long userId, String userInput) {
 		User user = getUserFromId(userId);
 		System.out.println(userInput + ", " + user);
-		AgentResponse response = agentHandler.sendUserInput(userInput, user.getId());
+		AgentResponse agentResponse = agentHandler.sendUserInput(userInput, user.getId());
 		String answer = "";
-
-		switch (response.getAction()) {
+		ChatbotResponse chatbotResponse;
+		switch (agentResponse.getAction()) {
 		case ABOUT:
 			answer = getAboutText(user.getPrefRecommendationRadius());
+			chatbotResponse = new ChatbotResponse(answer);
 			break;
 		case SAVE_INTEREST:
-			answer = response.getReply();
-			saveInterests(user, response);
+			saveInterests(user, agentResponse);
+			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
 			break;
 		case SHOW_INFORMATION:
 			answer = getPersonalInformation(user);
+			chatbotResponse = new ChatbotResponse(answer);
 			break;
+		case RECOMMEND_LOCATION:
+			chatbotResponse = new ChatbotResponse(agentResponse.getReply(),"Send Location");
 		case SAVE_RADIUS:
-			answer = response.getReply();
-			if (trySaveRadius(user, response)) {
-				answer = response.getReply();
+			// TODO refactor
+			if (trySaveRadius(user, agentResponse)) { 
+				answer = agentResponse.getReply();
 			} else {
-				// error handling
+				answer = "Please enter a valid input.";
 			}
+			chatbotResponse = new ChatbotResponse(answer);
 			break;
 		case NONE:
-			answer = response.getReply();
+			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
 			break;
 		default:
-			answer = response.getReply();
+			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
 		}
-		return answer;
+		
+		return chatbotResponse;
 	}
 
-	public String processStartMessage(long userId, String userName) {
+	public ChatbotResponse processStartMessage(long userId, String userName) {
 		if (userDB.hasUser(userId)) {
 			userDB.deleteUser(userId);
 		}
@@ -68,13 +77,19 @@ public class TouristChatbot {
 		User user = new User(userId, userName);
 		userDB.storeUser(user);
 		getActiveUsers().put(userId, user);
-		AgentResponse response = agentHandler.sendEvent("WELCOME", user.getId(), true);
-		System.out.println(response.getSessionId());
-		return response.getReply();
+		AgentResponse agentResponse = agentHandler.sendEvent("WELCOME", user.getId(), true);
+		System.out.println(agentResponse.getSessionId());
+		return new ChatbotResponse(agentResponse.getReply());
 	}
 
 	public Map<Long, User> getActiveUsers() {
 		return activeUsers;
+	}
+	
+	public void recommend(long userId, Location location){
+		User user = getUserFromId(userId);
+		user.setCurrentLocation(location);
+//		recommender.recommend(user);
 	}
 
 	// categories to enum
@@ -96,7 +111,7 @@ public class TouristChatbot {
 		return answer;
 	}
 
-	// check if telegram bot responds when /start was not triggered
+	// TODO check if telegram bot responds when /start was not triggered
 	private User getUserFromId(long userId) {
 		if (getActiveUsers().containsKey(userId)) {
 			return getActiveUsers().get(userId);
@@ -111,6 +126,8 @@ public class TouristChatbot {
 		return user;
 	}
 
+	
+	// TODO refactor
 	private boolean trySaveRadius(User user, AgentResponse response) {
 		boolean succesful = false;
 		Object object = response.getParameters().get("distance");
@@ -125,7 +142,7 @@ public class TouristChatbot {
 		return succesful;
 	}
 
-	// store interests permanently
+	// TODO store interests permanently
 	private void saveInterests(User user, AgentResponse response) {
 		for(Context context: response.getContexts()){
 			if(context.getName().equals("interview")){
