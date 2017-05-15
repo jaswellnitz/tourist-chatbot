@@ -130,7 +130,7 @@ public class RatingGenerator {
 	}
 
 	public static void main(String... args) {
-		UserRatingHandler userDataHandler = new UserRatingHandler("", "src/main/resources/generatedRatings.csv");
+		UserRatingHandler userDataHandler = new UserRatingHandler("src/main/resources/generatedRatings.csv");
 		List<List<Long>> categories = createPOICategories();
 
 		Map<Long, boolean[]> users = createUsers(categories.size());

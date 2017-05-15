@@ -1,14 +1,20 @@
 package chatbot;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.w3c.dom.UserDataHandler;
+
 import data_access.PointConverter;
 import data_access.UserDB;
+import data_access.UserRatingHandler;
 import model.Location;
 import model.POIProfile;
 import model.Preference;
+import model.Rating;
+import model.RecommendedPointOfInterest;
 import model.User;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
@@ -19,25 +25,30 @@ public class TouristChatbot {
 	private final AgentHandler agentHandler;
 	private final Map<Long, User> activeUsers;
 	private UserDB userDB;
-//	 private Recommender recommender;
+	private Recommender recommender;
+	private UserRatingHandler userRatingHandler;
 
-	public TouristChatbot(AgentHandler agentHandler, UserDB userDB) {
+	public TouristChatbot(AgentHandler agentHandler, Recommender recommender, UserDB userDB,
+			UserRatingHandler ratingHandler) {
 		this.agentHandler = agentHandler;
 		this.activeUsers = ExpiringMap.builder().maxSize(100).expirationPolicy(ExpirationPolicy.ACCESSED)
 				.expiration(1, TimeUnit.DAYS).build();
 		this.userDB = userDB;
-//		 this.recommender = new Recommender(new PointConverter(db));
+		this.recommender = recommender;
+		this.userRatingHandler = ratingHandler;
 	}
 
-	public ChatbotResponse processInput(long userId, String userInput) {
+	public ChatbotResponse processInput(long userId, Object userInput) {
+		assert userInput != null : "Precondition failed: userInput != null";
+
 		User user = getUserFromId(userId);
 		System.out.println(userInput + ", " + user);
-		AgentResponse agentResponse = agentHandler.sendUserInput(userInput, user.getId());
-		String answer = "";
+		AgentResponse agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
 		ChatbotResponse chatbotResponse;
+
 		switch (agentResponse.getAction()) {
 		case ABOUT:
-			answer = getAboutText(user.getPrefRecommendationRadius());
+			String answer = getAboutText(user.getPrefRecommendationRadius());
 			chatbotResponse = new ChatbotResponse(answer);
 			break;
 		case SAVE_INTEREST:
@@ -49,14 +60,42 @@ public class TouristChatbot {
 			chatbotResponse = new ChatbotResponse(answer);
 			break;
 		case RECOMMEND_LOCATION:
-			chatbotResponse = new ChatbotResponse(agentResponse.getReply(),"Send Location");
+			chatbotResponse = new ChatbotResponse(agentResponse.getReply(), "Send Location");
+			break;
+		case RECOMMEND:
+			user.setCurrentLocation((Location) userInput);
+			chatbotResponse = getRecommendation(user);
+			break;
+		case RECOMMENDATION_POSITIVE:
+			answer = agentResponse.getReply();
+			processFirstImpressionForPreviousPOI(user, true);
+			if (user.getPendingRecommendations().isEmpty()) {
+				chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+				agentHandler.resetContext(user.getId());
+			} else {
+				chatbotResponse = presentPendingPOIs(user);
+			}
+			break;
+		case RECOMMENDATION_NEGATIVE:
+			answer = agentResponse.getReply();
+			processFirstImpressionForPreviousPOI(user, false);
+			if (user.getPendingRecommendations().isEmpty()) {
+				chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+				agentHandler.resetContext(user.getId());
+			} else {
+			chatbotResponse = presentPendingPOIs(user);
+			}
+			break;
+		case RECOMMENDATION_MORE:
+			int index = Integer.valueOf((String)agentResponse.getParameters().get("number"));
+			chatbotResponse = presentRecommendationResult(user, index);
 			break;
 		case SAVE_RADIUS:
-			// TODO refactor
-			if (trySaveRadius(user, agentResponse)) { 
+			if (trySaveRadius(user, agentResponse)) {
 				answer = agentResponse.getReply();
 			} else {
 				answer = "Please enter a valid input.";
+				// TODO set context correctly
 			}
 			chatbotResponse = new ChatbotResponse(answer);
 			break;
@@ -66,8 +105,31 @@ public class TouristChatbot {
 		default:
 			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
 		}
-		
+
 		return chatbotResponse;
+
+	}
+
+	private void processFirstImpressionForPreviousPOI(User user, boolean positiveImpression) {
+		RecommendedPointOfInterest recPointOfInterest = user.getPendingRecommendations().get(0);
+		if (positiveImpression) {
+			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._4);
+		} else {
+			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._1);
+		}
+		user.getPendingRecommendations().remove(0);
+	}
+
+	private ChatbotResponse presentPendingPOIs(User user){
+		String[] numbers = new String[user.getPendingRecommendations().size()];
+		String answer= "Thank you! I have found these other POIs you may are interested in: [";
+		for(int i = 0; i < user.getPendingRecommendations().size(); i++){
+			RecommendedPointOfInterest recommendedPointOfInterest = user.getPendingRecommendations().get(i);
+			numbers[i] = String.valueOf(i);
+			answer += recommendedPointOfInterest.getName() +", computed recommendation value: "+ recommendedPointOfInterest.getRecommendationValue()+", ";
+		}
+		answer = answer.substring(0, answer.length()-2) + "\nDo you want to know more about any of them?";
+		return new ChatbotResponse(answer, numbers);
 	}
 
 	public ChatbotResponse processStartMessage(long userId, String userName) {
@@ -86,24 +148,39 @@ public class TouristChatbot {
 	public Map<Long, User> getActiveUsers() {
 		return activeUsers;
 	}
+
+	private ChatbotResponse getRecommendation(User user) {
+		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user);
+		ChatbotResponse chatbotResponse;
+		String answer;
+		user.setPendingRecommendations(recommendations);
+		if (recommendations.isEmpty()) {
+			answer = "I didn't find any recommendations near your current location. Maybe consider extending the recommendation radius?";
+			chatbotResponse = new ChatbotResponse(answer);
+		} else {
+			chatbotResponse = presentRecommendationResult(user,0);
+		}
+		return chatbotResponse;
+	}
 	
-	public void recommend(long userId, Location location){
-		User user = getUserFromId(userId);
-		user.setCurrentLocation(location);
-//		recommender.recommend(user);
+	private ChatbotResponse presentRecommendationResult(User user, int index){
+		assert index > 0 && index < user.getPendingRecommendations().size(): "Preconditon failed: index out of bounds";
+		
+		String reply = "Here we go:\n";
+		reply+= user.getPendingRecommendations().get(index).toString() + "\n";
+		reply += "What do you think about this place?";
+		return new ChatbotResponse(reply, "Sounds good!", "Don't like it...");
 	}
 
-	// categories to enum
 	private String getPersonalInformation(User user) {
 		String answer = "So, here's what I know about you: Your current recommendation radius is "
 				+ user.getPrefRecommendationRadius() + " m.";
-//		String interests = "";
 		List<String> interests = user.getProfile().getInterestsFromProfile();
 
 		if (!interests.isEmpty()) {
 			String interestString = "";
-			for(String interest: interests){
-				interestString += interest+", ";
+			for (String interest : interests) {
+				interestString += interest + ", ";
 			}
 			interestString = interestString.substring(0, interestString.length() - 2);
 			answer += "\n\nYou are interested in: " + interestString + ".";
@@ -127,7 +204,6 @@ public class TouristChatbot {
 		return user;
 	}
 
-	
 	// TODO refactor
 	private boolean trySaveRadius(User user, AgentResponse response) {
 		boolean succesful = false;
@@ -145,11 +221,12 @@ public class TouristChatbot {
 
 	// TODO store interests permanently
 	private void saveInterests(User user, AgentResponse response) {
-		for(Context context: response.getContexts()){
-			if(context.getName().equals("interview")){
-				List<String > interests = (List<String>) context.getParameters().get("interest");
+		for (Context context : response.getContexts()) {
+			if (context.getName().equals("interview")) {
+				List<String> interests = (List<String>) context.getParameters().get("interest");
 				POIProfile profile = POIProfile.getProfileForInterests(interests);
 				user.setProfile(profile);
+				userDB.changeProfileForUser(user.getId(), profile);
 			}
 		}
 	}

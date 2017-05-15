@@ -51,12 +51,6 @@ public class Location {
 
 	@Override
 	public String toString(){
-		String ret = "Location(";
-		if(this.equals(Location.UNSET)){
-			ret += "UNKNOWN)";
-		}else{
-			ret +=latitude+","+longitude+")";
-		}
-		return ret;
+		return latitude+","+longitude;
 	}
 }

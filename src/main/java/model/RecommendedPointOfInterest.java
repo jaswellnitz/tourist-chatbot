@@ -116,7 +116,7 @@ public class RecommendedPointOfInterest implements ProfileItem {
 
 	@Override
 	public String toString() {
-		return id + "(: " + name + ", " + address + ", " + distanceToUser + ", " + openingHours +")";
+		return id + "(: " + name + ", " + address + ", " + distanceToUser + ", " + openingHours + "," + recommendationValue +")";
 	}
 
 	public float getRecommendationValue() {

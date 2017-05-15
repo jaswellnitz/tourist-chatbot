@@ -43,30 +43,6 @@ public class Recommender {
 		this.numRecommendations = numRecommendations;
 	}
 
-	public static void main(String... args) {
-		PointConverter pointConverter = new PointConverter();
-		UserRatingHandler userDataHandler = new UserRatingHandler();
-
-		Recommender rec = new Recommender(pointConverter);
-		long userId = 1001;
-		User user = userDataHandler.getProfileForUser(userId);
-		Location location = new Location(9.991636, 53.550090);
-
-		user.setCurrentLocation(location);
-		// List<PointOfInterest> recommendedItems = rec.recommend(userId,
-		// "9.991636", "53.550090");
-		List<RecommendedPointOfInterest> recommendedItems = rec.recommendCollaborative(user);
-
-		for (RecommendedPointOfInterest recommendedPOI : recommendedItems) {
-			System.out.println("Recommended item for user " + userId + ": " + recommendedPOI);
-		}
-		// User rates recommendation with a 2
-
-		// Rating newRating = Rating._4;
-		// userDataHandler.saveRating(userId,
-		// recommendedItem.getId(),newRating);
-	}
-
 	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex){
 		POIProfile originalProfile = user.getProfile();
 		POIProfile categoryProfile = POIProfile.getProfileForCategoryIndex(categoryIndex);
@@ -80,18 +56,6 @@ public class Recommender {
 		
 		user.setProfile(originalProfile);
 		return recommendations;
-	}
-
-	private List<RecommendedPointOfInterest> filterRecommendationsForCategory(
-			List<RecommendedPointOfInterest> recommendations, int categoryIndex) {
-		List<RecommendedPointOfInterest> toRemove = new ArrayList<>();
-		for (RecommendedPointOfInterest recommendedPointOfInterest : recommendations) {
-			POIProfile poi = recommendedPointOfInterest.getProfile();
-			if (poi.getAllCategories().get(categoryIndex) != Preference.TRUE) {
-				toRemove.add(recommendedPointOfInterest);
-			}
-		}
-		return toRemove;
 	}
 
 	public List<RecommendedPointOfInterest> recommend(User user) {
@@ -126,6 +90,19 @@ public class Recommender {
 
 	public List<RecommendedPointOfInterest> recommendContentBased(User user) {
 		return recommendContentBased(user, new ArrayList<>());
+	}
+	
+
+	private List<RecommendedPointOfInterest> filterRecommendationsForCategory(
+			List<RecommendedPointOfInterest> recommendations, int categoryIndex) {
+		List<RecommendedPointOfInterest> toRemove = new ArrayList<>();
+		for (RecommendedPointOfInterest recommendedPointOfInterest : recommendations) {
+			POIProfile poi = recommendedPointOfInterest.getProfile();
+			if (poi.getAllCategories().get(categoryIndex) != Preference.TRUE) {
+				toRemove.add(recommendedPointOfInterest);
+			}
+		}
+		return toRemove;
 	}
 
 	private List<RecommendedPointOfInterest> recommendContentBased(User user,

@@ -10,10 +10,13 @@ import chatbot.AgentHandler;
 import chatbot.ChatbotResponse;
 import chatbot.TouristChatbot;
 import data_access.DatabaseAccess;
+import data_access.PointConverter;
 import data_access.UserDB;
+import data_access.UserRatingHandler;
 import model.POIProfile;
 import model.Preference;
 import model.User;
+import recommender.Recommender;
 
 public class TouristChatbotTest {
 
@@ -26,7 +29,8 @@ public class TouristChatbotTest {
 	public void setUp() {
 		this.userDB = new UserDB(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")));
 		agentHandler = new AgentHandler(System.getenv("API_AI_ACCESS_TOKEN"));
-		this.touristChatbot = new TouristChatbot(agentHandler, userDB);
+		Recommender recommender = new Recommender(new PointConverter());
+		this.touristChatbot = new TouristChatbot(agentHandler, recommender, userDB, new UserRatingHandler());
 		user = new User(1234567890, "Testuser");
 		userDB.storeUser(user);
 	}
@@ -80,7 +84,6 @@ public class TouristChatbotTest {
 	}
 	
 	
-	// TODO test if profile stored permanently
 	@Test
 	public void testSaveInterest() {
 		// Prepare
@@ -99,9 +102,8 @@ public class TouristChatbotTest {
 		// Check
 		User cachedUser = touristChatbot.getActiveUsers().get(user.getId());
 		assertEquals(expectedProfile, cachedUser.getProfile());
-		
-//		User storedUser = userDB.getUser(user.getId());
-//		assertEquals(expextedProfile, storedUser.getProfile());
+		User storedUser = userDB.getUser(user.getId());
+		assertEquals(expectedProfile, storedUser.getProfile());
 	}
 	
 	

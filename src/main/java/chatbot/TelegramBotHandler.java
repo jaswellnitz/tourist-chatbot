@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pengrad.telegrambot.BotUtils;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Location;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
@@ -37,21 +38,24 @@ public class TelegramBotHandler implements Route {
 	public Object handle(Request request, Response response) {
 		Update update = BotUtils.parseUpdate(request.body());
 		Message message = update.message();
-		String answer = "";
 
-		// if(message.location() != null){
-		// user.setCurrentLocation(message.location().latitude(),message.location().longitude());
-		// }
 		ChatbotResponse chatbotResponse;
 		if (isStartMessage(message)) {
 			chatbotResponse = touristChatbot.processStartMessage(message.from().id(), message.from().firstName());
 		} else {
-			chatbotResponse = touristChatbot.processInput(message.from().id(), message.text());
+			Object input = null;;
+			if(message.location() != null){
+				input = new model.Location(message.location().latitude(), message.location().longitude());
+			}
+			else if(message.text() != null){
+				input = message.text();
+			}
+			chatbotResponse = touristChatbot.processInput(message.from().id(), input);
 		}
 
-		boolean isOk = sendMessage(message.chat().id(), chatbotResponse);
-
-		return isOk;
+		SendResponse sendResponse = sendMessage(message.chat().id(), chatbotResponse);
+		
+		return sendResponse.isOk();
 	}
 
 	private Keyboard getKeyboard(List<String> keyboardText) {
@@ -63,17 +67,18 @@ public class TelegramBotHandler implements Route {
 			}
 			keyboardButtons[i] = keyboardButton;
 		}
-		return new ReplyKeyboardMarkup(keyboardButtons);
+		ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(keyboardButtons).oneTimeKeyboard(true).resizeKeyboard(true);
+		return replyKeyboardMarkup;
 	}
 
-	private boolean sendMessage(long chatId, ChatbotResponse chatbotResponse) {
+	private SendResponse sendMessage(long chatId, ChatbotResponse chatbotResponse) {
 		SendMessage sendMessage = new SendMessage(chatId, chatbotResponse.getReply());
 		if (chatbotResponse.changeKeyboard()) {
 			Keyboard keyboard = getKeyboard(chatbotResponse.getKeyboardButtons());
 			sendMessage.replyMarkup(keyboard);
 		}
 		SendResponse execute = telegramBot.execute(sendMessage);
-		return execute.isOk();
+		return execute;
 	}
 
 	public String getToken() {

@@ -8,6 +8,7 @@ public class ChatbotResponse {
 
 	private final String reply;
 	private final List<String> keyboardButtons;
+	private boolean triggerRecommendation;
 
 	public ChatbotResponse(String reply, String... keyboardButtons) {
 		this.reply = reply;
@@ -16,17 +17,26 @@ public class ChatbotResponse {
 		} else {
 			this.keyboardButtons = new ArrayList<>();
 		}
+		triggerRecommendation = false;
 	}
 
 	public String getReply() {
 		return reply;
 	}
-	
-	public boolean changeKeyboard(){
+
+	public boolean changeKeyboard() {
 		return !keyboardButtons.isEmpty();
 	}
-	
-	public List<String> getKeyboardButtons(){
+
+	public List<String> getKeyboardButtons() {
 		return keyboardButtons;
+	}
+
+	public boolean triggerRecommendation() {
+		return triggerRecommendation;
+	}
+
+	public void setTriggerRecommendation(boolean trigger) {
+		triggerRecommendation = trigger;
 	}
 }

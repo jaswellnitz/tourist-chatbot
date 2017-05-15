@@ -9,6 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import model.POIProfile;
+import model.Preference;
 import model.User;
 
 public class UserDBTest {
@@ -21,7 +23,8 @@ public class UserDBTest {
 	public void setUp() {
 		this.dbAccess = new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"));
 		this.userDB = new UserDB(dbAccess);
-		this.expectedUser = new User(100l, "Testuser");
+		POIProfile profile = new POIProfile(Preference.TRUE,Preference.TRUE, Preference.FALSE, Preference.NOT_RATED,Preference.NOT_RATED, Preference.TRUE);
+		this.expectedUser = new User(100l, "Testuser", 500, profile);
 	}
 
 	@After
@@ -59,7 +62,7 @@ public class UserDBTest {
 	}
 	
 	@Test
-	public void testUpdateUser() {
+	public void testUpdateRadiusForUser() {
 		// Prepare
 		long id = expectedUser.getId();
 		userDB.storeUser(expectedUser);
@@ -85,5 +88,20 @@ public class UserDBTest {
 
 		// Check
 		assertEquals(expectedUser, user);
+	}
+	
+	@Test
+	public void testUpdateProfileForUser(){
+		// Prepare
+		userDB.storeUser(expectedUser);
+		POIProfile profile = new POIProfile(Preference.TRUE,Preference.FALSE, Preference.TRUE, Preference.NOT_RATED,Preference.NOT_RATED, Preference.TRUE);
+		
+		// Action
+		boolean succesful = userDB.changeProfileForUser(expectedUser.getId(), profile);
+		
+		// Check
+		assertTrue(succesful);
+		User user = userDB.getUser(expectedUser.getId());
+		assertEquals(profile, user.getProfile());
 	}
 }

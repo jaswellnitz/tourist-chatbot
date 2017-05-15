@@ -10,6 +10,7 @@ import com.pengrad.telegrambot.request.SetWebhook;
 import data_access.DatabaseAccess;
 import data_access.PointConverter;
 import data_access.UserDB;
+import data_access.UserRatingHandler;
 import recommender.Recommender;
 
 // Entry Point: enables Telegram webhook
@@ -28,24 +29,16 @@ public class Main {
 	}
 
 	private static TelegramBotHandler initBotHandler() {
-		/*
-		 * DatabaseAccess dbAccess = new
-		 * DatabaseAccess(PropertyLoader.getProperty("db_name"),
-		 * PropertyLoader.getProperty("db_user"),
-		 * PropertyLoader.getProperty("db_pw")); PointConverter pointConverter =
-		 * new PointConverter(dbAccess); Recommender recommender = new
-		 * Recommender(pointConverter);
-		UserDB userDB = new UserDB(dbAccess);
-		 */
 		String dbUrl = System.getenv("JDBC_DATABASE_URL");
 		String clientAccess = System.getenv("API_AI_ACCESS_TOKEN");
 		String telegramToken = System.getenv("TELEGRAM_TOKEN");
 		DatabaseAccess dbAccess = new DatabaseAccess(dbUrl);
 		UserDB userDB = new UserDB(dbAccess);
 		PointConverter pointConverter = new PointConverter(dbAccess);
-//		Recommender recommender = new Recommender(pointConverter);
+		Recommender recommender = new Recommender(pointConverter);
 		AgentHandler agentConnector = new AgentHandler(clientAccess);
-		TouristChatbot touristChatbot = new TouristChatbot(agentConnector, userDB);
+		UserRatingHandler userRatingHandler = new UserRatingHandler("src/main/resources/ratings.csv");
+		TouristChatbot touristChatbot = new TouristChatbot(agentConnector, recommender, userDB, userRatingHandler);
 		TelegramBotHandler botHandler = new TelegramBotHandler(telegramToken, touristChatbot);
 		return botHandler;
 	}

@@ -35,8 +35,9 @@ public class RecommenderTest {
 	public void testRecommend() {
 		// Prepare
 		long userId = 999; // test user who liked Casa Battló
-		User user = new User(userId, defaultUserLocation);
-
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user);
 
@@ -53,7 +54,8 @@ public class RecommenderTest {
 	public void testRecommendForCategory() {
 		// Prepare
 		long userId = 999; // test user who liked Casa Battló
-		User user = new User(userId, defaultUserLocation);
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
 		int categoryIndex = 3;
 
 		// Action
@@ -76,7 +78,8 @@ public class RecommenderTest {
 	public void testRecommendCollaborative() {
 		// Prepare
 		long userId = 999; // test user who liked Casa Battló
-		User user = new User(userId, defaultUserLocation);
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
 
 		long recommendedId = 359086841; // Sagrada familia
 		// Action
@@ -95,7 +98,8 @@ public class RecommenderTest {
 	public void testRecommendCollaborativePOISameCategory() {
 		// Prepare
 		long userId = 998; // test user who has one restaurant rating
-		User user = new User(userId, defaultUserLocation);
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
 
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommendCollaborative(user);
@@ -111,7 +115,8 @@ public class RecommenderTest {
 	public void testRecommendCollaborativePOIDropExistingRating() {
 		// Prepare
 		long userId = 1011;
-		User user = new User(userId, defaultUserLocation);
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
 		long droppedId = 66713401;
 		int originalRating = 4;
 		double eps = 0.5;
@@ -136,9 +141,11 @@ public class RecommenderTest {
 	public void testRecommendContentBasedCompleteProfile() {
 		// Prepare
 		long userId = 1;
-		POIProfile sightseeingProfile = new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE,
+		POIProfile profile = new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE,
 				Preference.FALSE, Preference.FALSE, Preference.FALSE);
-		User user = new User(userId, sightseeingProfile, defaultUserLocation);
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		user.setProfile(profile);
 
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommendContentBased(user);
@@ -158,9 +165,11 @@ public class RecommenderTest {
 	public void testRecommendContentBasedSightseeing() {
 		// Prepare
 		long userId = 1;
-		POIProfile sightseeingProfile = new POIProfile(Preference.TRUE, Preference.NOT_RATED, Preference.NOT_RATED,
+		POIProfile profile = new POIProfile(Preference.TRUE, Preference.NOT_RATED, Preference.NOT_RATED,
 				Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED);
-		User user = new User(userId, sightseeingProfile, defaultUserLocation);
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		user.setProfile(profile);
 
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommendContentBased(user);
@@ -178,10 +187,12 @@ public class RecommenderTest {
 	public void testRecommendContentBasedCulture() {
 		// Prepare
 		long userId = 1;
-		POIProfile sightseeingProfile = new POIProfile(Preference.NOT_RATED, Preference.TRUE, Preference.NOT_RATED,
+		POIProfile profile = new POIProfile(Preference.NOT_RATED, Preference.TRUE, Preference.NOT_RATED,
 				Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED);
-		assertEquals(Preference.TRUE, sightseeingProfile.hasCulture());
-		User user = new User(userId, sightseeingProfile, defaultUserLocation);
+		assertEquals(Preference.TRUE, profile.hasCulture());
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		user.setProfile(profile);
 
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommendContentBased(user);
@@ -199,10 +210,12 @@ public class RecommenderTest {
 	public void testRecommendContentBasedFood() {
 		// Prepare
 		long userId = 1;
-		POIProfile sightseeingProfile = new POIProfile(Preference.NOT_RATED, Preference.NOT_RATED, Preference.TRUE,
+		POIProfile profile = new POIProfile(Preference.NOT_RATED, Preference.NOT_RATED, Preference.TRUE,
 				Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED);
-		assertEquals(Preference.TRUE, sightseeingProfile.hasFood());
-		User user = new User(userId, sightseeingProfile, defaultUserLocation);
+		assertEquals(Preference.TRUE, profile.hasFood());
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		user.setProfile(profile);;
 
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommendContentBased(user);
@@ -220,10 +233,12 @@ public class RecommenderTest {
 	public void testRecommendContentBasedNature() {
 		// Prepare
 		long userId = 1;
-		POIProfile sightseeingProfile = new POIProfile(Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED,
+		POIProfile profile = new POIProfile(Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED,
 				Preference.NOT_RATED, Preference.TRUE, Preference.NOT_RATED);
-		assertEquals(Preference.TRUE, sightseeingProfile.hasNature());
-		User user = new User(userId, sightseeingProfile, defaultUserLocation);
+		assertEquals(Preference.TRUE, profile.hasNature());
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		user.setProfile(profile);
 
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommendContentBased(user);
@@ -241,10 +256,12 @@ public class RecommenderTest {
 	public void testRecommendContentBasedNightlife() {
 		// Prepare
 		long userId = 1;
-		POIProfile sightseeingProfile = new POIProfile(Preference.FALSE, Preference.FALSE, Preference.FALSE,
+		POIProfile profile = new POIProfile(Preference.FALSE, Preference.FALSE, Preference.FALSE,
 				Preference.TRUE, Preference.FALSE, Preference.FALSE);
-		assertEquals(Preference.TRUE, sightseeingProfile.hasNightlife());
-		User user = new User(userId, sightseeingProfile, defaultUserLocation);
+		assertEquals(Preference.TRUE, profile.hasNightlife());
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		user.setProfile(profile);
 
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommendContentBased(user);
@@ -265,7 +282,9 @@ public class RecommenderTest {
 		POIProfile sightseeingProfile = new POIProfile(Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED,
 				Preference.TRUE, Preference.NOT_RATED, Preference.NOT_RATED);
 		assertEquals(Preference.TRUE, sightseeingProfile.hasNightlife());
-		User user = new User(userId, sightseeingProfile, defaultUserLocation);
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		user.setProfile(sightseeingProfile);
 
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommendContentBased(user);
@@ -283,10 +302,12 @@ public class RecommenderTest {
 	public void testRecommendContentBasedShopping() {
 		// Prepare
 		long userId = 1000;
-		POIProfile nightlifeProfile = new POIProfile(Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED,
+		POIProfile profile = new POIProfile(Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED,
 				Preference.NOT_RATED, Preference.NOT_RATED, Preference.TRUE);
-		assertEquals(Preference.TRUE, nightlifeProfile.hasShopping());
-		User user = new User(userId, nightlifeProfile, defaultUserLocation);
+		assertEquals(Preference.TRUE, profile.hasShopping());
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		user.setProfile(profile);
 
 		// Action
 		List<RecommendedPointOfInterest> recommendations = recommender.recommendContentBased(user);

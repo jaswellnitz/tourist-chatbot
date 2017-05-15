@@ -1,5 +1,8 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User implements ProfileItem {
 
 	private final long id;
@@ -9,21 +12,14 @@ public class User implements ProfileItem {
 	private int prefRecommendationRadius;
 	private static final int DEFAULT_RECOMMENDATION_RADIUS = 3000;
 	private Location currentLocation;
-	
+	private List<RecommendedPointOfInterest> pendingRecommendations;
+//	private List<RecommendedPointOfInterest> unratedPOIs;
 	
 	// TODO refactor constructors
 
 	// used
 	public User(long id, String name){
 		this(id, new POIProfile(), DEFAULT_RECOMMENDATION_RADIUS, Location.UNSET, name);
-	}
-	
-	public User(long id, Location location){
-		this(id, new POIProfile(), location);
-	}
-	
-	public User(long id, POIProfile profile, Location location) {
-		this(id,profile,DEFAULT_RECOMMENDATION_RADIUS, location, "");
 	}
 	
 	public User(long id, POIProfile profile) {
@@ -36,11 +32,12 @@ public class User implements ProfileItem {
 		this.prefRecommendationRadius = radius;
 		this.currentLocation = location;
 		this.name = name;
+		pendingRecommendations = new ArrayList<>();
 	}
 	
 	// used
-	public User(long id, String name, int radius) {
-		this(id, new POIProfile(), radius, Location.UNSET, name);
+	public User(long id, String name, int radius, POIProfile profile) {
+		this(id, profile, radius, Location.UNSET, name);
 	}
 
 	@Override
@@ -134,5 +131,13 @@ public class User implements ProfileItem {
 
 	public String getName() {
 		return name;
+	}
+	
+	public void setPendingRecommendations(List<RecommendedPointOfInterest> recPOIs){
+		pendingRecommendations = recPOIs;
+	}
+	
+	public List<RecommendedPointOfInterest> getPendingRecommendations(){
+		return pendingRecommendations;
 	}
 }
