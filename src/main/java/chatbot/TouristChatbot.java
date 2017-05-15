@@ -1,10 +1,12 @@
 package chatbot;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import data_access.UserDB;
 import model.POIProfile;
+import model.Preference;
 import model.User;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
@@ -36,7 +38,7 @@ public class TouristChatbot {
 			break;
 		case SAVE_INTEREST:
 			answer = response.getReply();
-			// saveInterests(user, response);
+			saveInterests(user, response);
 			break;
 		case SHOW_INFORMATION:
 			answer = getPersonalInformation(user);
@@ -57,7 +59,7 @@ public class TouristChatbot {
 		}
 		return answer;
 	}
-	
+
 	public String processStartMessage(long userId, String userName) {
 		if (userDB.hasUser(userId)) {
 			userDB.deleteUser(userId);
@@ -74,40 +76,26 @@ public class TouristChatbot {
 	public Map<Long, User> getActiveUsers() {
 		return activeUsers;
 	}
-	
 
+	// categories to enum
 	private String getPersonalInformation(User user) {
 		String answer = "So, here's what I know about you: Your current recommendation radius is "
 				+ user.getPrefRecommendationRadius() + " m.";
-		String interests = "";
-		POIProfile profile = user.getProfile();
-		if (profile.hasSightseeing().toBoolean()) {
-			interests += "sightseeing, ";
-		}
-		if (profile.hasCulture().toBoolean()) {
-			interests += "culture, ";
-		}
-		if (profile.hasFood().toBoolean()) {
-			interests += "food, ";
-		}
-		if (profile.hasNature().toBoolean()) {
-			interests += "nature, ";
-		}
-		if (profile.hasNightlife().toBoolean()) {
-			interests += "nightlife, ";
-		}
-		if (profile.hasShopping().toBoolean()) {
-			interests += "shopping, ";
-		}
-		
+//		String interests = "";
+		List<String> interests = user.getProfile().getInterestsFromProfile();
+
 		if (!interests.isEmpty()) {
-			interests = interests.substring(0, interests.length()-2);
-			answer += "\n\nYou are interested in: "+ interests + ".";
+			String interestString = "";
+			for(String interest: interests){
+				interestString += ", ";
+			}
+			interestString = interestString.substring(0, interestString.length() - 2);
+			answer += "\n\nYou are interested in: " + interestString + ".";
 		}
-		
+
 		return answer;
 	}
-	
+
 	// check if telegram bot responds when /start was not triggered
 	private User getUserFromId(long userId) {
 		if (getActiveUsers().containsKey(userId)) {
@@ -137,8 +125,15 @@ public class TouristChatbot {
 		return succesful;
 	}
 
+	// store interests permanently
 	private void saveInterests(User user, AgentResponse response) {
-		// TODO implement
+		for(Context context: response.getContexts()){
+			if(context.getName().equals("interview")){
+				List<String > interests = (List<String>) context.getParameters().get("interest");
+				POIProfile profile = POIProfile.getProfileForInterests(interests);
+				user.setProfile(profile);
+			}
+		}
 	}
 
 	private String getAboutText(int recommendationRadius) {

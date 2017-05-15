@@ -18,7 +18,13 @@ public class AgentResponseParser {
 		Map<String, Object> parameters = new HashMap<>();
 		if (resultObject.has("parameters")) {
 			for (Entry<String, JsonElement> entry : resultObject.get("parameters").getAsJsonObject().entrySet()) {
-				if (entry.getKey().equals("distance") && entry.getValue().isJsonObject()) {
+				if (entry.getValue().isJsonArray()) {
+					List<String> list = new ArrayList<>();
+					for (JsonElement jsonElement : entry.getValue().getAsJsonArray()) {
+						list.add(jsonElement.getAsString());
+					}
+					parameters.put(entry.getKey(), list);
+				} else if (entry.getKey().equals("distance") && entry.getValue().isJsonObject()) {
 					int distance = parseDistance(entry.getValue());
 					parameters.put(entry.getKey(), distance);
 				} else {
@@ -49,7 +55,7 @@ public class AgentResponseParser {
 		JsonObject resultObject = responseObject.get("result").getAsJsonObject();
 		Map<String, Object> parameters = parseParameters(resultObject);
 		boolean actionIncomplete = false;
-		
+
 		if (resultObject.has("actionIncomplete")) {
 			actionIncomplete = resultObject.get("actionIncomplete").getAsBoolean();
 		}

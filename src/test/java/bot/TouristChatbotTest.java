@@ -19,11 +19,13 @@ public class TouristChatbotTest {
 	private TouristChatbot touristChatbot;
 	private UserDB userDB;
 	private User user;
+	private AgentHandler agentHandler;
 
 	@Before
 	public void setUp() {
 		this.userDB = new UserDB(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")));
-		this.touristChatbot = new TouristChatbot(new AgentHandler(System.getenv("API_AI_ACCESS_TOKEN")), userDB);
+		agentHandler = new AgentHandler(System.getenv("API_AI_ACCESS_TOKEN"));
+		this.touristChatbot = new TouristChatbot(agentHandler, userDB);
 		user = new User(1234567890, "Testuser");
 		userDB.storeUser(user);
 	}
@@ -33,6 +35,7 @@ public class TouristChatbotTest {
 		if (userDB.hasUser(user.getId())) {
 			userDB.deleteUser(user.getId());
 		}
+		agentHandler.resetContext(user.getId());
 	}
 
 	@Test
@@ -71,6 +74,32 @@ public class TouristChatbotTest {
 		assertEquals(radius,storedUser.getPrefRecommendationRadius());
 		assertEquals(radius, cachedUser.getPrefRecommendationRadius());
 	}
+	
+	
+	// TODO test if profile stored permanently
+	@Test
+	public void testSaveInterest() {
+		// Prepare
+		touristChatbot.getActiveUsers().put(user.getId(), user);
+		agentHandler.resetContext(user.getId());
+		touristChatbot.processInput(user.getId(), "Let's talk.");
+		POIProfile emptyProfile = new POIProfile(); // empty profile
+		POIProfile expectedProfile = new POIProfile(Preference.TRUE,Preference.TRUE,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED, Preference.TRUE);
+		assertEquals(emptyProfile,user.getProfile());
+		
+		// Action
+		touristChatbot.processInput(user.getId(), "I am interested in museums, sightseeing and shopping.");
+		touristChatbot.processInput(user.getId(), "Yes");
+		
+		
+		// Check
+		User cachedUser = touristChatbot.getActiveUsers().get(user.getId());
+		assertEquals(expectedProfile, cachedUser.getProfile());
+		
+//		User storedUser = userDB.getUser(user.getId());
+//		assertEquals(expextedProfile, storedUser.getProfile());
+	}
+	
 	
 	
 	@Test

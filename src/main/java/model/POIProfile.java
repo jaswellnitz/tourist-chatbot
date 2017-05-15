@@ -82,6 +82,59 @@ public class POIProfile {
 		return new POIProfile(preference[0], preference[1], preference[2], preference[3], preference[4], preference[5]);
 	}
 
+	
+	public static POIProfile getProfileForInterests(List<String> interests){
+		Preference[] preference = {Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED};
+		for(String interest: interests){
+			switch(interest){
+			case "sightseeing":
+				preference[0] = Preference.TRUE;
+				break;
+			case "culture":
+				preference[1] = Preference.TRUE;
+				break;
+			case "food":
+				preference[2] = Preference.TRUE;
+				break;
+			case "nightlife":
+				preference[3] = Preference.TRUE;
+				break;
+			case "nature":
+				preference[4] = Preference.TRUE;
+				break;
+			case "shopping":
+				preference[5] = Preference.TRUE;
+				break;
+			}
+		}
+		return new POIProfile(preference[0],preference[1],preference[2],preference[3],preference[4],preference[5]);
+	}
+	
+	public List<String> getInterestsFromProfile(){
+		List<String> interests = new ArrayList<>();
+		
+		if (hasSightseeing().toBoolean()) {
+			interests.add("sightseeing");
+		}
+		if (hasCulture().toBoolean()) {
+			interests.add("culture");
+		}
+		if (hasFood().toBoolean()) {
+			interests.add("food");
+		}
+		if (hasNature().toBoolean()) {
+			interests.add("nature");
+		}
+		if (hasNightlife().toBoolean()) {
+			interests.add("nightlife");
+		}
+		if (hasShopping().toBoolean()) {
+			interests.add("shopping");
+		}
+		return interests;
+	}
+	
+	
 	@Override
 	public String toString() {
 		String result = "";
@@ -91,6 +144,7 @@ public class POIProfile {
 		result = result.substring(0, result.length() - 1);
 		return result;
 	}
+
 
 	@Override
 	public int hashCode() {

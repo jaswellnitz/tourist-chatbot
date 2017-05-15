@@ -51,6 +51,21 @@ public class AgentHandlerTest {
 		
 		assertEquals("welcome-followup",agentResult.getContexts().get(0).getName());
 	}
+	@Test
+	public void resetContext(){
+		// Prepare
+		long sessionId = 1234567890;
+		AgentResponse previousResponse = agentHandler.sendEvent("WELCOME", sessionId, true);
+		assertFalse(previousResponse.getContexts().isEmpty());
+		
+		// Action
+		AgentResponse agentResponse = agentHandler.resetContext(sessionId);
+		
+		// Check
+		assertTrue(agentResponse.getContexts().isEmpty());
+		assertTrue(agentResponse.getParameters().isEmpty());
+	}
+	
 	
 	@Test
 	public void testDifferentSessions(){
