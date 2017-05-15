@@ -14,7 +14,9 @@ public class User implements ProfileItem {
 	private Location currentLocation;
 	private List<RecommendedPointOfInterest> pendingRecommendations;
 	private int lastRecommendedIndex;
-//	private List<RecommendedPointOfInterest> unratedPOIs;
+	// TODO unify recommendation handling
+	private List<RecommendedPointOfInterest> unratedPOIs;
+	private List<RecommendedPointOfInterest> positiveRecommendations;
 	
 	public User(long id, String name){
 		this(id, new POIProfile(), DEFAULT_RECOMMENDATION_RADIUS, Location.UNSET, name);
@@ -31,6 +33,8 @@ public class User implements ProfileItem {
 		this.currentLocation = location;
 		this.name = name;
 		pendingRecommendations = new ArrayList<>();
+		unratedPOIs = new ArrayList<>();
+		positiveRecommendations = new ArrayList<>();
 		lastRecommendedIndex = -1;
 	}
 	
@@ -141,5 +145,19 @@ public class User implements ProfileItem {
 	
 	public void setLastRecommendedIndex(int index){
 		lastRecommendedIndex = index;
+	}
+	
+	public void addUnratedPOI(RecommendedPointOfInterest poi){
+		unratedPOIs.add(poi);
+	}
+	
+
+	public List<RecommendedPointOfInterest> getPositiveRecommendations(){
+		return positiveRecommendations;
+	}
+	
+
+	public void addPositiveRecommendations(RecommendedPointOfInterest recPOI){
+		positiveRecommendations.add(recPOI);
 	}
 }

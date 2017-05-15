@@ -99,6 +99,9 @@ public class TouristChatbot {
 			int index = Integer.valueOf((String)agentResponse.getParameters().get("number"));
 			chatbotResponse = presentRecommendationResult(user, index);
 			break;
+		case SHOW_PAST_RECOMMENDATIONS:
+			chatbotResponse = showPastRecommendations(user);
+			break;
 		case SAVE_RADIUS:
 			answer = agentResponse.getReply();
 			if (trySaveRadius(user, agentResponse)) {
@@ -120,12 +123,25 @@ public class TouristChatbot {
 
 	}
 
+	// TODO rating
+	private ChatbotResponse showPastRecommendations(User user) {
+		String ret = "Here are the past recommendations you were interested in: ";
+		for(RecommendedPointOfInterest poi: user.getPositiveRecommendations()){
+			ret += "\n" +poi.getFormattedString();
+		}
+		// rate
+		ChatbotResponse response = new ChatbotResponse(ret);
+		return response;
+	}
+
 	private void processFirstImpressionForPreviousPOI(User user, boolean positiveImpression) {
 		RecommendedPointOfInterest recPointOfInterest = user.getPendingRecommendations().get(user.getLastRecommendedIndex());
 		if (positiveImpression) {
-			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._4);
+//			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._4);
+			user.addUnratedPOI(recPointOfInterest);
+			user.addPositiveRecommendations(recPointOfInterest);
 		} else {
-			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._1);
+//			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._1);
 		}
 		user.getPendingRecommendations().remove(user.getLastRecommendedIndex());
 	}
@@ -135,8 +151,11 @@ public class TouristChatbot {
 		String answer= "Thank you! I have found these other POIs you may are interested in: [";
 		for(int i = 0; i < user.getPendingRecommendations().size(); i++){
 			RecommendedPointOfInterest recommendedPointOfInterest = user.getPendingRecommendations().get(i);
-			numbers[i] = String.valueOf(i);
-			answer += recommendedPointOfInterest.getName() +", computed recommendation value: "+ recommendedPointOfInterest.getRecommendationValue()+", ";
+			numbers[i] = String.valueOf(i+1);
+			answer += (i+1) +":"+ recommendedPointOfInterest.getName()+ ", ";
+			if(recommendedPointOfInterest.getRecommendationValue() != 0){
+				answer+="our computed recommendation value: "+ recommendedPointOfInterest.getRecommendationValue()+", ";
+			}
 		}
 		answer = answer.substring(0, answer.length()-2) + "\nDo you want to know more about any of them?";
 		return new ChatbotResponse(answer, numbers);
