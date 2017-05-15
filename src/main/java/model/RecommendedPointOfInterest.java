@@ -118,6 +118,21 @@ public class RecommendedPointOfInterest implements ProfileItem {
 	public String toString() {
 		return id + "(: " + name + ", " + address + ", " + distanceToUser + ", " + openingHours + "," + recommendationValue +")";
 	}
+	
+	public String getFormattedString(){
+		String ret = name +": distance to your current location - " + distanceToUser + " m, ";
+		if(!address.isEmpty()){
+			ret += address + ", ";
+		}
+		if(!openingHours.isEmpty()){
+			ret += openingHours +", ";
+		}
+		if(recommendationValue != 0.0){
+			ret += "your computed preference value: " + recommendationValue + ", ";
+		}
+
+		return ret.substring(0, ret.length()-2) +".";
+	}
 
 	public float getRecommendationValue() {
 		return recommendationValue;

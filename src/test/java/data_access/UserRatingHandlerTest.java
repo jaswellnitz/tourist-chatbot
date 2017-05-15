@@ -32,7 +32,8 @@ public class UserRatingHandlerTest {
 		long id = 1001;
 		POIProfile profile = new POIProfile(Preference.TRUE, Preference.FALSE, Preference.NOT_RATED,
 				Preference.NOT_RATED, Preference.FALSE, Preference.NOT_RATED);
-		user = new User(id, profile);
+		user = new User(id, "Testuser");
+		user.setProfile(profile);
 	}
 
 	@After

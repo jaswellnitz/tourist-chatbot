@@ -1,18 +1,13 @@
 package chatbot;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.w3c.dom.UserDataHandler;
-
-import data_access.PointConverter;
 import data_access.UserDB;
 import data_access.UserRatingHandler;
 import model.Location;
 import model.POIProfile;
-import model.Preference;
 import model.Rating;
 import model.RecommendedPointOfInterest;
 import model.User;
@@ -36,6 +31,20 @@ public class TouristChatbot {
 		this.userDB = userDB;
 		this.recommender = recommender;
 		this.userRatingHandler = ratingHandler;
+	}
+	
+	public ChatbotResponse processStartMessage(long userId, String userName) {
+		if (userDB.hasUser(userId)) {
+			// TODO cleanup user ratings
+			userDB.deleteUser(userId);
+		}
+
+		User user = new User(userId, userName);
+		userDB.storeUser(user);
+		getActiveUsers().put(userId, user);
+		AgentResponse agentResponse = agentHandler.sendEvent("WELCOME", user.getId(), true);
+		System.out.println(agentResponse.getSessionId());
+		return new ChatbotResponse(agentResponse.getReply());
 	}
 
 	public ChatbotResponse processInput(long userId, Object userInput) {
@@ -91,10 +100,11 @@ public class TouristChatbot {
 			chatbotResponse = presentRecommendationResult(user, index);
 			break;
 		case SAVE_RADIUS:
+			answer = agentResponse.getReply();
 			if (trySaveRadius(user, agentResponse)) {
 				answer = agentResponse.getReply();
 			} else {
-				answer = "Please enter a valid input.";
+//				answer = "Please enter a valid input.";
 				// TODO set context correctly
 			}
 			chatbotResponse = new ChatbotResponse(answer);
@@ -111,13 +121,13 @@ public class TouristChatbot {
 	}
 
 	private void processFirstImpressionForPreviousPOI(User user, boolean positiveImpression) {
-		RecommendedPointOfInterest recPointOfInterest = user.getPendingRecommendations().get(0);
+		RecommendedPointOfInterest recPointOfInterest = user.getPendingRecommendations().get(user.getLastRecommendedIndex());
 		if (positiveImpression) {
 			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._4);
 		} else {
 			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._1);
 		}
-		user.getPendingRecommendations().remove(0);
+		user.getPendingRecommendations().remove(user.getLastRecommendedIndex());
 	}
 
 	private ChatbotResponse presentPendingPOIs(User user){
@@ -130,19 +140,6 @@ public class TouristChatbot {
 		}
 		answer = answer.substring(0, answer.length()-2) + "\nDo you want to know more about any of them?";
 		return new ChatbotResponse(answer, numbers);
-	}
-
-	public ChatbotResponse processStartMessage(long userId, String userName) {
-		if (userDB.hasUser(userId)) {
-			userDB.deleteUser(userId);
-		}
-
-		User user = new User(userId, userName);
-		userDB.storeUser(user);
-		getActiveUsers().put(userId, user);
-		AgentResponse agentResponse = agentHandler.sendEvent("WELCOME", user.getId(), true);
-		System.out.println(agentResponse.getSessionId());
-		return new ChatbotResponse(agentResponse.getReply());
 	}
 
 	public Map<Long, User> getActiveUsers() {
@@ -166,8 +163,9 @@ public class TouristChatbot {
 	private ChatbotResponse presentRecommendationResult(User user, int index){
 		assert index > 0 && index < user.getPendingRecommendations().size(): "Preconditon failed: index out of bounds";
 		
+		user.setLastRecommendedIndex(index);
 		String reply = "Here we go:\n";
-		reply+= user.getPendingRecommendations().get(index).toString() + "\n";
+		reply+= user.getPendingRecommendations().get(index).getFormattedString() + "\n";
 		reply += "What do you think about this place?";
 		return new ChatbotResponse(reply, "Sounds good!", "Don't like it...");
 	}
@@ -219,7 +217,6 @@ public class TouristChatbot {
 		return succesful;
 	}
 
-	// TODO store interests permanently
 	private void saveInterests(User user, AgentResponse response) {
 		for (Context context : response.getContexts()) {
 			if (context.getName().equals("interview")) {

@@ -13,19 +13,17 @@ public class User implements ProfileItem {
 	private static final int DEFAULT_RECOMMENDATION_RADIUS = 3000;
 	private Location currentLocation;
 	private List<RecommendedPointOfInterest> pendingRecommendations;
+	private int lastRecommendedIndex;
 //	private List<RecommendedPointOfInterest> unratedPOIs;
 	
-	// TODO refactor constructors
-
-	// used
 	public User(long id, String name){
 		this(id, new POIProfile(), DEFAULT_RECOMMENDATION_RADIUS, Location.UNSET, name);
 	}
 	
-	public User(long id, POIProfile profile) {
-		this(id,profile,DEFAULT_RECOMMENDATION_RADIUS, Location.UNSET, "");
+	public User(long id, String name, int radius, POIProfile profile) {
+		this(id, profile, radius, Location.UNSET, name);
 	}
-
+	
 	public User(long id, POIProfile profile, int radius, Location location, String name){
 		this.id = id;
 		this.profile = profile;
@@ -33,13 +31,9 @@ public class User implements ProfileItem {
 		this.currentLocation = location;
 		this.name = name;
 		pendingRecommendations = new ArrayList<>();
+		lastRecommendedIndex = -1;
 	}
 	
-	// used
-	public User(long id, String name, int radius, POIProfile profile) {
-		this(id, profile, radius, Location.UNSET, name);
-	}
-
 	@Override
 	public long getId() {
 		return id;
@@ -139,5 +133,13 @@ public class User implements ProfileItem {
 	
 	public List<RecommendedPointOfInterest> getPendingRecommendations(){
 		return pendingRecommendations;
+	}
+	
+	public int getLastRecommendedIndex(){
+		return lastRecommendedIndex;
+	}
+	
+	public void setLastRecommendedIndex(int index){
+		lastRecommendedIndex = index;
 	}
 }
