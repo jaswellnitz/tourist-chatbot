@@ -7,17 +7,20 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Location;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
 import com.pengrad.telegrambot.TelegramBotAdapter;
+import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 
@@ -46,6 +49,8 @@ public class TelegramBotHandler implements Route {
 			Object input = null;;
 			if(message.location() != null){
 				input = new model.Location(message.location().latitude(), message.location().longitude());
+				SendChatAction sendChatAction = new SendChatAction(message.chat().id(), ChatAction.find_location.name());
+				telegramBot.execute(sendChatAction);
 			}
 			else if(message.text() != null){
 				input = message.text();
@@ -73,11 +78,15 @@ public class TelegramBotHandler implements Route {
 
 	private SendResponse sendMessage(long chatId, ChatbotResponse chatbotResponse) {
 		SendMessage sendMessage = new SendMessage(chatId, chatbotResponse.getReply());
+		Keyboard keyboard;
 		if (chatbotResponse.changeKeyboard()) {
-			Keyboard keyboard = getKeyboard(chatbotResponse.getKeyboardButtons());
-			sendMessage.replyMarkup(keyboard);
+			keyboard = getKeyboard(chatbotResponse.getKeyboardButtons());
+		}else{
+			keyboard = new ReplyKeyboardRemove();
 		}
+		sendMessage.replyMarkup(keyboard);
 		SendResponse execute = telegramBot.execute(sendMessage);
+		
 		return execute;
 	}
 

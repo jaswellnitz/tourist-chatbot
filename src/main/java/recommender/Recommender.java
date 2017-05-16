@@ -58,7 +58,6 @@ public class Recommender {
 		return recommendations;
 	}
 
-	// TODO filter opening hours
 	public List<RecommendedPointOfInterest> recommend(User user) {
 		List<RecommendedPointOfInterest> recommendedItems = recommendCollaborative(user);
 		recommendedItems.addAll(recommendContentBased(user, recommendedItems));
