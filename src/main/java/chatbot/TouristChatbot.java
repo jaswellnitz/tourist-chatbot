@@ -96,7 +96,7 @@ public class TouristChatbot {
 			}
 			break;
 		case RECOMMENDATION_MORE:
-			int index = Integer.valueOf((String)agentResponse.getParameters().get("number"));
+			int index = Integer.valueOf((String)agentResponse.getParameters().get("number"))-1;
 			chatbotResponse = presentRecommendationResult(user, index);
 			break;
 		case SHOW_PAST_RECOMMENDATIONS:
@@ -148,16 +148,16 @@ public class TouristChatbot {
 
 	private ChatbotResponse presentPendingPOIs(User user){
 		String[] numbers = new String[user.getPendingRecommendations().size()];
-		String answer= "Thank you! I have found these other POIs you may are interested in: [";
+		String answer= "Thank you! I have found these other POIs you may are interested in: ";
 		for(int i = 0; i < user.getPendingRecommendations().size(); i++){
 			RecommendedPointOfInterest recommendedPointOfInterest = user.getPendingRecommendations().get(i);
 			numbers[i] = String.valueOf(i+1);
-			answer += (i+1) +":"+ recommendedPointOfInterest.getName()+ ", ";
+			answer += "\n" + (i+1) +": "+ recommendedPointOfInterest.getName();
 			if(recommendedPointOfInterest.getRecommendationValue() != 0){
-				answer+="our computed recommendation value: "+ recommendedPointOfInterest.getRecommendationValue()+", ";
+				answer+=", our computed recommendation value: "+ recommendedPointOfInterest.getRecommendationValue();
 			}
 		}
-		answer = answer.substring(0, answer.length()-2) + "\nDo you want to know more about any of them?";
+		answer = answer + "\nDo you want to know more about any of them?";
 		return new ChatbotResponse(answer, numbers);
 	}
 
