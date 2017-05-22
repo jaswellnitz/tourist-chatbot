@@ -13,6 +13,7 @@ import chatbot.Action;
 import chatbot.AgentResponse;
 import chatbot.AgentResponseParser;
 import chatbot.Context;
+import chatbot.ParameterKey;
 
 public class AgentResponseParserTest {
 
@@ -117,7 +118,7 @@ public class AgentResponseParserTest {
 				+ "[ { \"type\": 0, \"speech\": \"Fine, I will only recommend you places in less than 500 m\" } ] }, \"score\": 1 }, "
 				+ "\"status\": { \"code\": 200, \"errorType\": \"success\" }, \"sessionId\": \"9196295d-f6f3-4d41-9750-b19d61d5ea6a\" }";
 		Map<String, Object> expectedParameters = new HashMap<>();
-		expectedParameters.put("distance", 500);
+		expectedParameters.put(ParameterKey.DISTANCE.name(), 500);
 
 		// Action
 		AgentResponse agentResult = AgentResponseParser.fromJson(json);

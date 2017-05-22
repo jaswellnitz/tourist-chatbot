@@ -1,5 +1,6 @@
 package chatbot;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +33,7 @@ public class TouristChatbot {
 		this.recommender = recommender;
 		this.userRatingHandler = ratingHandler;
 	}
-	
+
 	public ChatbotResponse processStartMessage(long userId, String userName) {
 		if (userDB.hasUser(userId)) {
 			// TODO cleanup user ratings
@@ -47,114 +48,152 @@ public class TouristChatbot {
 		return new ChatbotResponse(agentResponse.getReply());
 	}
 
-	public ChatbotResponse processInput(long userId, Object userInput) {
+	public List<ChatbotResponse> processInput(long userId, Object userInput) {
 		assert userInput != null : "Precondition failed: userInput != null";
 
 		User user = getUserFromId(userId);
 		System.out.println(userInput + ", " + user);
 		AgentResponse agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
-		ChatbotResponse chatbotResponse;
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 
 		switch (agentResponse.getAction()) {
 		case ABOUT:
 			String answer = getAboutText(user.getPrefRecommendationRadius());
-			chatbotResponse = new ChatbotResponse(answer);
+			chatbotResponses.add(new ChatbotResponse(answer));
 			break;
 		case SAVE_INTEREST:
 			saveInterests(user, agentResponse);
-			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 			break;
 		case SHOW_INFORMATION:
 			answer = getPersonalInformation(user);
-			chatbotResponse = new ChatbotResponse(answer);
+			chatbotResponses.add(new ChatbotResponse(answer));
 			break;
 		case RECOMMEND_LOCATION:
-			chatbotResponse = new ChatbotResponse(agentResponse.getReply(), "Send Location");
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply(), "Send Location"));
 			break;
 		case RECOMMEND:
 			user.setCurrentLocation((Location) userInput);
-			chatbotResponse = getRecommendation(user);
+			chatbotResponses.add(getRecommendation(user));
 			break;
 		case RECOMMENDATION_POSITIVE:
 			answer = agentResponse.getReply();
 			processFirstImpressionForPreviousPOI(user, true);
 			if (user.getPendingRecommendations().isEmpty()) {
-				chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+				chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 				agentHandler.resetContext(user.getId());
 			} else {
-				chatbotResponse = presentPendingPOIs(user);
+				chatbotResponses.add(presentPendingPOIs(user));
 			}
 			break;
 		case RECOMMENDATION_NEGATIVE:
 			answer = agentResponse.getReply();
 			processFirstImpressionForPreviousPOI(user, false);
 			if (user.getPendingRecommendations().isEmpty()) {
-				chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+				chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 				agentHandler.resetContext(user.getId());
 			} else {
-			chatbotResponse = presentPendingPOIs(user);
+				chatbotResponses.add(presentPendingPOIs(user));
 			}
 			break;
 		case RECOMMENDATION_MORE:
-			int index = Integer.valueOf((String)agentResponse.getParameters().get("number"))-1;
-			chatbotResponse = presentRecommendationResult(user, index);
+			int index = (int) (agentResponse.getParameters().get(ParameterKey.POI_INDEX.name())) - 1;
+			chatbotResponses.add(presentRecommendationResult(user, index));
 			break;
 		case SHOW_PAST_RECOMMENDATIONS:
-			chatbotResponse = showPastRecommendations(user);
+			if (user.getPositiveRecommendations().isEmpty()) {
+				chatbotResponses.addAll(showPastRecommendations(user));
+			}
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 			break;
 		case SAVE_RADIUS:
-			answer = agentResponse.getReply();
-			if (trySaveRadius(user, agentResponse)) {
-				answer = agentResponse.getReply();
-			} else {
-//				answer = "Please enter a valid input.";
-				// TODO set context correctly
+			trySaveRadius(user, agentResponse);
+			// answer = "Please enter a valid input.";
+			// TODO set context correctly
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
+			break;
+		case RATE:
+			int rateIndex = 0;
+			// TODO initiative rating
+			if (agentResponse.getParameters().containsKey(ParameterKey.POI_INDEX.name())) { // ask
+																							// at
+																							// context
+				rateIndex = (int) (agentResponse.getParameters().get(ParameterKey.POI_INDEX.name())) - 1;
 			}
-			chatbotResponse = new ChatbotResponse(answer);
+			processRating(user, rateIndex, (int) agentResponse.getParameters().get(ParameterKey.RATING));
+			// TODO error handling
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 			break;
 		case NONE:
-			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 			break;
 		default:
-			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 		}
 
-		return chatbotResponse;
+		return chatbotResponses;
 
 	}
 
-	// TODO rating
-	private ChatbotResponse showPastRecommendations(User user) {
-		String ret = "Here are the past recommendations you were interested in: ";
-		for(RecommendedPointOfInterest poi: user.getPositiveRecommendations()){
-			ret += "\n" +poi.getFormattedString();
+	private boolean processRating(User user, int rateIndex, int ratingValue) {
+		RecommendedPointOfInterest recommendedPointOfInterest = user.getUnratedPOIs().get(rateIndex);
+		user.getUnratedPOIs().remove(rateIndex);
+		Rating rating = Rating.valueOf(ratingValue);
+		if (rating != Rating.INVALID) {
+			userRatingHandler.saveRating(user.getId(), recommendedPointOfInterest.getId(), Rating.valueOf(ratingValue));
+			return true;
 		}
-		// rate
-		ChatbotResponse response = new ChatbotResponse(ret);
+		return false;
+	}
+
+	private ChatbotResponse rateFirstUnratedItem(User user) {
+		RecommendedPointOfInterest pointOfInterest = user.getUnratedPOIs().get(0);
+		String ret = "How many stars would you give " + pointOfInterest.getName();
+
+		String[] ratings = { "1", "2", "3", "4", "5" };
+
+		ChatbotResponse response = new ChatbotResponse(ret, ratings);
 		return response;
 	}
 
+	private List<ChatbotResponse> showPastRecommendations(User user) {
+		List<ChatbotResponse> responses = new ArrayList<>();
+		String reply = "Here are the past recommendations you were interested in: ";
+		for (RecommendedPointOfInterest poi : user.getPositiveRecommendations()) {
+			reply += "\n" + poi.getFormattedString();
+		}
+		responses.add(new ChatbotResponse(reply));
+		if (!user.getUnratedPOIs().isEmpty()) {
+			ChatbotResponse rate = rateFirstUnratedItem(user);
+			responses.add(rate);
+		}
+		return responses;
+	}
+
 	private void processFirstImpressionForPreviousPOI(User user, boolean positiveImpression) {
-		RecommendedPointOfInterest recPointOfInterest = user.getPendingRecommendations().get(user.getLastRecommendedIndex());
+		RecommendedPointOfInterest recPointOfInterest = user.getPendingRecommendations()
+				.get(user.getLastRecommendedIndex());
 		if (positiveImpression) {
-//			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._4);
+			// userRatingHandler.saveRating(user.getId(),
+			// recPointOfInterest.getId(), Rating._4);
 			user.addUnratedPOI(recPointOfInterest);
 			user.addPositiveRecommendations(recPointOfInterest);
 		} else {
-//			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._1);
+			// userRatingHandler.saveRating(user.getId(),
+			// recPointOfInterest.getId(), Rating._1);
 		}
 		user.getPendingRecommendations().remove(user.getLastRecommendedIndex());
 	}
 
-	private ChatbotResponse presentPendingPOIs(User user){
+	private ChatbotResponse presentPendingPOIs(User user) {
 		String[] numbers = new String[user.getPendingRecommendations().size()];
-		String answer= "Thank you! I have found these other POIs you may are interested in: ";
-		for(int i = 0; i < user.getPendingRecommendations().size(); i++){
+		String answer = "Thank you! I have found these other POIs you may are interested in: ";
+		for (int i = 0; i < user.getPendingRecommendations().size(); i++) {
 			RecommendedPointOfInterest recommendedPointOfInterest = user.getPendingRecommendations().get(i);
-			numbers[i] = String.valueOf(i+1);
-			answer += "\n" + (i+1) +": "+ recommendedPointOfInterest.getName();
-			if(recommendedPointOfInterest.getRecommendationValue() != 0){
-				answer+=", our computed recommendation value: "+ recommendedPointOfInterest.getRecommendationValue();
+			numbers[i] = String.valueOf(i + 1);
+			answer += "\n" + (i + 1) + ": " + recommendedPointOfInterest.getName();
+			if (recommendedPointOfInterest.getRecommendationValue() != 0) {
+				answer += ", our computed recommendation value: " + recommendedPointOfInterest.getRecommendationValue();
 			}
 		}
 		answer = answer + "\nDo you want to know more about any of them?";
@@ -174,17 +213,17 @@ public class TouristChatbot {
 			answer = "I didn't find any recommendations near your current location. Maybe consider extending the recommendation radius?";
 			chatbotResponse = new ChatbotResponse(answer);
 		} else {
-			chatbotResponse = presentRecommendationResult(user,0);
+			chatbotResponse = presentRecommendationResult(user, 0);
 		}
 		return chatbotResponse;
 	}
-	
-	private ChatbotResponse presentRecommendationResult(User user, int index){
-		assert index > 0 && index < user.getPendingRecommendations().size(): "Preconditon failed: index out of bounds";
-		
+
+	private ChatbotResponse presentRecommendationResult(User user, int index) {
+		assert index > 0 && index < user.getPendingRecommendations().size() : "Preconditon failed: index out of bounds";
+
 		user.setLastRecommendedIndex(index);
 		String reply = "Here we go:\n";
-		reply+= user.getPendingRecommendations().get(index).getFormattedString() + "\n";
+		reply += user.getPendingRecommendations().get(index).getFormattedString() + "\n";
 		reply += "What do you think about this place?";
 		return new ChatbotResponse(reply, "Sounds good!", "Don't like it...");
 	}
@@ -224,7 +263,7 @@ public class TouristChatbot {
 	// TODO refactor
 	private boolean trySaveRadius(User user, AgentResponse response) {
 		boolean succesful = false;
-		Object object = response.getParameters().get("distance");
+		Object object = response.getParameters().get(ParameterKey.DISTANCE.name());
 		if (object instanceof Integer) {
 			int radius = (int) object;
 			if (radius > 0) {
@@ -239,7 +278,7 @@ public class TouristChatbot {
 	private void saveInterests(User user, AgentResponse response) {
 		for (Context context : response.getContexts()) {
 			if (context.getName().equals("interview")) {
-				List<String> interests = (List<String>) context.getParameters().get("interest");
+				List<String> interests = (List<String>) context.getParameters().get(ParameterKey.INTEREST.name());
 				POIProfile profile = POIProfile.getProfileForInterests(interests);
 				user.setProfile(profile);
 				userDB.changeProfileForUser(user.getId(), profile);

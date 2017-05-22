@@ -1,5 +1,6 @@
 package chatbot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.pengrad.telegrambot.BotUtils;
@@ -42,25 +43,27 @@ public class TelegramBotHandler implements Route {
 		Update update = BotUtils.parseUpdate(request.body());
 		Message message = update.message();
 
-		ChatbotResponse chatbotResponse;
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		if (isStartMessage(message)) {
-			chatbotResponse = touristChatbot.processStartMessage(message.from().id(), message.from().firstName());
+			chatbotResponses.add(touristChatbot.processStartMessage(message.from().id(), message.from().firstName()));
 		} else {
-			Object input = null;;
-			if(message.location() != null){
+			Object input = null;
+			;
+			if (message.location() != null) {
 				input = new model.Location(message.location().latitude(), message.location().longitude());
-				SendChatAction sendChatAction = new SendChatAction(message.chat().id(), ChatAction.find_location.name());
+				SendChatAction sendChatAction = new SendChatAction(message.chat().id(),
+						ChatAction.find_location.name());
 				telegramBot.execute(sendChatAction);
-			}
-			else if(message.text() != null){
+			} else if (message.text() != null) {
 				input = message.text();
 			}
-			chatbotResponse = touristChatbot.processInput(message.from().id(), input);
+			chatbotResponses.addAll(touristChatbot.processInput(message.from().id(), input));
 		}
 
-		SendResponse sendResponse = sendMessage(message.chat().id(), chatbotResponse);
+		boolean state = sendMessage(message.chat().id(), chatbotResponses);
+		// TODO error handling
 		
-		return sendResponse.isOk();
+		return state;
 	}
 
 	private Keyboard getKeyboard(List<String> keyboardText) {
@@ -72,22 +75,27 @@ public class TelegramBotHandler implements Route {
 			}
 			keyboardButtons[i] = keyboardButton;
 		}
-		ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(keyboardButtons).oneTimeKeyboard(true).resizeKeyboard(true);
+		ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(keyboardButtons).oneTimeKeyboard(true)
+				.resizeKeyboard(true);
 		return replyKeyboardMarkup;
 	}
 
-	private SendResponse sendMessage(long chatId, ChatbotResponse chatbotResponse) {
-		SendMessage sendMessage = new SendMessage(chatId, chatbotResponse.getReply());
-		Keyboard keyboard;
-		if (chatbotResponse.changeKeyboard()) {
-			keyboard = getKeyboard(chatbotResponse.getKeyboardButtons());
-		}else{
-			keyboard = new ReplyKeyboardRemove();
+	private boolean sendMessage(long chatId, List<ChatbotResponse> chatbotResponses) {
+		boolean isOk = false;
+		for (ChatbotResponse chatbotResponse : chatbotResponses) {
+			SendMessage sendMessage = new SendMessage(chatId, chatbotResponse.getReply());
+			Keyboard keyboard;
+			if (chatbotResponse.changeKeyboard()) {
+				keyboard = getKeyboard(chatbotResponse.getKeyboardButtons());
+			} else {
+				keyboard = new ReplyKeyboardRemove();
+			}
+			sendMessage.replyMarkup(keyboard);
+			SendResponse execute = telegramBot.execute(sendMessage);
+			isOk = execute.isOk();
 		}
-		sendMessage.replyMarkup(keyboard);
-		SendResponse execute = telegramBot.execute(sendMessage);
-		
-		return execute;
+
+		return isOk;
 	}
 
 	public String getToken() {

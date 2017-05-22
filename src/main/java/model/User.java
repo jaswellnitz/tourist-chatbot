@@ -160,4 +160,8 @@ public class User implements ProfileItem {
 	public void addPositiveRecommendations(RecommendedPointOfInterest recPOI){
 		positiveRecommendations.add(recPOI);
 	}
+	
+	public List<RecommendedPointOfInterest> getUnratedPOIs(){
+		return unratedPOIs;
+	}
 }

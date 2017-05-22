@@ -2,6 +2,8 @@ package bot;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,10 +71,11 @@ public class TouristChatbotTest {
 		String input = "I want to change the recommendation radius to " + radius +" m";
 		
 		// Action
-		ChatbotResponse response = touristChatbot.processInput(user.getId(), input);
+		List<ChatbotResponse> responses = touristChatbot.processInput(user.getId(), input);
 
 		// Check
-		String answer = response.getReply();
+		assertFalse(responses.isEmpty());
+		String answer = responses.get(0).getReply();
 		assertFalse(answer.isEmpty());
 		assertTrue(touristChatbot.getActiveUsers().containsKey(user.getId()));
 		assertTrue(userDB.hasUser(user.getId()));
@@ -119,10 +122,11 @@ public class TouristChatbotTest {
 				+ "You are interested in: sightseeing, food, nature, shopping.";
 		
 		// Action
-		ChatbotResponse response = touristChatbot.processInput(user.getId(), input);
+		List<ChatbotResponse> responses = touristChatbot.processInput(user.getId(), input);
 		
 		// Check
-		String answer = response.getReply();
+		assertFalse(responses.isEmpty());
+		String answer = responses.get(0).getReply();
 		assertFalse(answer.isEmpty());
 		assertEquals(expectedAnswer, answer);
 	}

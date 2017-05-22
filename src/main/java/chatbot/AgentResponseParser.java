@@ -24,9 +24,9 @@ public class AgentResponseParser {
 						list.add(jsonElement.getAsString());
 					}
 					parameters.put(entry.getKey(), list);
-				} else if (entry.getKey().equals("distance") && entry.getValue().isJsonObject()) {
+				} else if (ParameterKey.getEnum(entry.getKey()) == ParameterKey.DISTANCE && entry.getValue().isJsonObject()) {
 					int distance = parseDistance(entry.getValue());
-					parameters.put(entry.getKey(), distance);
+					parameters.put(ParameterKey.DISTANCE.name(), distance);
 				} else {
 					parameters.put(entry.getKey(), entry.getValue().getAsString());
 				}
