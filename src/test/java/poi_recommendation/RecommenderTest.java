@@ -39,7 +39,7 @@ public class RecommenderTest {
 		user.setCurrentLocation(defaultUserLocation);
 		
 		// Action
-		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user);
+		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user, true);
 
 		// Check
 		assertFalse(recommendations.isEmpty());

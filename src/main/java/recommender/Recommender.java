@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import org.apache.mahout.cf.taste.common.NoSuchUserException;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
 import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
@@ -30,6 +31,7 @@ public class Recommender {
 	private PointConverter pointConverter;
 	private final String ratingPath;
 	public final int numRecommendations;
+	private UserRatingHandler userRatingHandler;
 	private static final String DEFAULT_RATING_PATH = "src/main/resources/ratings.csv";
 	private static final int DEFAULT_NUM_RECOMMENDATIONS = 4;
 
@@ -43,23 +45,26 @@ public class Recommender {
 		this.numRecommendations = numRecommendations;
 	}
 
-	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex){
+	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex) {
 		POIProfile originalProfile = user.getProfile();
 		POIProfile categoryProfile = POIProfile.getProfileForCategoryIndex(categoryIndex);
 		user.setProfile(categoryProfile);
-		
+
 		List<RecommendedPointOfInterest> recommendations = recommendCollaborative(user);
 		List<RecommendedPointOfInterest> toRemove = filterRecommendationsForCategory(recommendations, categoryIndex);
 		recommendations.removeAll(toRemove);
-		
-		recommendations.addAll(recommendContentBased(user,recommendations));
-		
+
+		recommendations.addAll(recommendContentBased(user, recommendations));
+
 		user.setProfile(originalProfile);
 		return recommendations;
 	}
 
-	public List<RecommendedPointOfInterest> recommend(User user) {
-		List<RecommendedPointOfInterest> recommendedItems = recommendCollaborative(user);
+	public List<RecommendedPointOfInterest> recommend(User user, boolean existingRatings) {
+		List<RecommendedPointOfInterest> recommendedItems = new ArrayList<>();
+		if (existingRatings) {
+			recommendedItems = recommendCollaborative(user);
+		}
 		recommendedItems.addAll(recommendContentBased(user, recommendedItems));
 		return recommendedItems;
 	}
@@ -91,7 +96,6 @@ public class Recommender {
 	public List<RecommendedPointOfInterest> recommendContentBased(User user) {
 		return recommendContentBased(user, new ArrayList<>());
 	}
-	
 
 	private List<RecommendedPointOfInterest> filterRecommendationsForCategory(
 			List<RecommendedPointOfInterest> recommendations, int categoryIndex) {
@@ -108,9 +112,9 @@ public class Recommender {
 	// TODO compute recommendation value
 	private List<RecommendedPointOfInterest> recommendContentBased(User user,
 			List<RecommendedPointOfInterest> alreadyRecommendedPOIs) {
-		
+
 		List<RecommendedPointOfInterest> result = new ArrayList<>();
-		
+
 		if (alreadyRecommendedPOIs.size() < numRecommendations) {
 			Location location = user.getCurrentLocation();
 			List<RecommendedPointOfInterest> pois = pointConverter.getPOIInRadius(location.getLatitude(),
@@ -134,7 +138,8 @@ public class Recommender {
 			List<Long> userIds = new ArrayList<>();
 
 			try {
-				long[] mostSimilarUserIDs = rec.mostSimilarUserIDs(id, numRecommendations-alreadyRecommendedPOIs.size());
+				long[] mostSimilarUserIDs = rec.mostSimilarUserIDs(id,
+						numRecommendations - alreadyRecommendedPOIs.size());
 				userIds = LongStream.of(mostSimilarUserIDs).boxed().collect(Collectors.toList());
 			} catch (TasteException e) {
 				e.printStackTrace();
@@ -144,7 +149,7 @@ public class Recommender {
 			result.addAll(
 					pois.stream().filter(t -> mostSimilarUserIDs.contains(t.getId())).collect(Collectors.toList()));
 		}
-		
+
 		return result;
 	}
 }

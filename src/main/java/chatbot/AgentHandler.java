@@ -49,7 +49,7 @@ public class AgentHandler {
 				Response response = client.newCall(request).execute();
 				jsonResponse = response.body().string();
 			} catch (UnknownHostException e) {
-				System.err.println("UnknownHostException - check internet connection.");
+				System.err.println("Unknown Host Exception - check internet connection.");
 				break;
 			} catch (Exception e) {
 				i++;

@@ -36,7 +36,8 @@ public class TouristChatbot {
 
 	public ChatbotResponse processStartMessage(long userId, String userName) {
 		if (userDB.hasUser(userId)) {
-			// TODO cleanup user ratings
+			// TODO complete restart necessary?
+			userRatingHandler.deleteAllUserRatings(userId);
 			userDB.deleteUser(userId);
 		}
 
@@ -73,7 +74,12 @@ public class TouristChatbot {
 			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply(), "Send Location"));
 			break;
 		case RECOMMEND:
+			if(userInput instanceof Location){
 			user.setCurrentLocation((Location) userInput);
+			}else{
+				String[] coordinates = ((String)userInput).split(",");
+				user.setCurrentLocation(Double.valueOf(coordinates[0]), Double.valueOf(coordinates[1]));
+			}
 			chatbotResponses.add(getRecommendation(user));
 			break;
 		case RECOMMENDATION_POSITIVE:
@@ -97,7 +103,7 @@ public class TouristChatbot {
 			}
 			break;
 		case RECOMMENDATION_MORE:
-			int index = (int) (agentResponse.getParameters().get(ParameterKey.POI_INDEX.name())) - 1;
+			int index = Integer.valueOf(((String)agentResponse.getParameters().get(ParameterKey.POI_INDEX.name()))) - 1;
 			chatbotResponses.add(presentRecommendationResult(user, index));
 			break;
 		case SHOW_PAST_RECOMMENDATIONS:
@@ -118,7 +124,7 @@ public class TouristChatbot {
 			if (agentResponse.getParameters().containsKey(ParameterKey.POI_INDEX.name())) { // ask
 																							// at
 																							// context
-				rateIndex = (int) (agentResponse.getParameters().get(ParameterKey.POI_INDEX.name())) - 1;
+				rateIndex = Integer.valueOf(((String)agentResponse.getParameters().get(ParameterKey.POI_INDEX.name()))) - 1;
 			}
 			processRating(user, rateIndex, (int) agentResponse.getParameters().get(ParameterKey.RATING));
 			// TODO error handling
@@ -174,13 +180,13 @@ public class TouristChatbot {
 		RecommendedPointOfInterest recPointOfInterest = user.getPendingRecommendations()
 				.get(user.getLastRecommendedIndex());
 		if (positiveImpression) {
-			// userRatingHandler.saveRating(user.getId(),
-			// recPointOfInterest.getId(), Rating._4);
+			 userRatingHandler.saveRating(user.getId(),
+			 recPointOfInterest.getId(), Rating._4);
 			user.addUnratedPOI(recPointOfInterest);
 			user.addPositiveRecommendations(recPointOfInterest);
 		} else {
-			// userRatingHandler.saveRating(user.getId(),
-			// recPointOfInterest.getId(), Rating._1);
+			 userRatingHandler.saveRating(user.getId(),
+			 recPointOfInterest.getId(), Rating._1);
 		}
 		user.getPendingRecommendations().remove(user.getLastRecommendedIndex());
 	}
@@ -205,7 +211,7 @@ public class TouristChatbot {
 	}
 
 	private ChatbotResponse getRecommendation(User user) {
-		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user);
+		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user, userRatingHandler.hasRatingForUser(user.getId()));
 		ChatbotResponse chatbotResponse;
 		String answer;
 		user.setPendingRecommendations(recommendations);
@@ -219,7 +225,7 @@ public class TouristChatbot {
 	}
 
 	private ChatbotResponse presentRecommendationResult(User user, int index) {
-		assert index > 0 && index < user.getPendingRecommendations().size() : "Preconditon failed: index out of bounds";
+		assert index >= 0 && index < user.getPendingRecommendations().size() : "Preconditon failed: index out of bounds";
 
 		user.setLastRecommendedIndex(index);
 		String reply = "Here we go:\n";
