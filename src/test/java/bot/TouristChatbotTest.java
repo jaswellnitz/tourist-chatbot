@@ -145,20 +145,30 @@ public class TouristChatbotTest {
 
 	@Test
 	public void testShowRecommendations() {
-		// implement
+		// Prepare
+		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, "test", "", "", 20, "", new POIProfile());
+		user.addPositiveRecommendations(recPOI);
+		touristChatbot.getActiveUsers().put(user.getId(), user);
+		
+		// Action
+		List<ChatbotResponse> responses = touristChatbot.processInput(user.getId(), "Show me my past recommendations");
+		
+		// Check
+		assertTrue
 	}
 
 	@Test
 	public void testShowRecommendationsWithRating() {
-
+		// TODO implement
 	}
 
 	@Test
 	public void testRate() {
-
+		// TODO implement
 	}
 
 	@Test
+	// TODO check persistency
 	public void testRecommendPositive() {
 		// Prepare
 		String input = "I need a recommendation";
