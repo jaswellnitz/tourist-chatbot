@@ -130,4 +130,29 @@ public class TouristChatbotTest {
 		assertFalse(answer.isEmpty());
 		assertEquals(expectedAnswer, answer);
 	}
+	
+	@Test
+	public void testShowRecommendations(){
+//		implement
+	}
+	
+	@Test 
+	public void testShowRecommendationsWithRating(){
+		
+	}
+	
+	@Test
+	public void testRate(){
+		
+	}
+	
+	@Test
+	public void testRecommendPositive(){
+		
+	}
+	
+	@Test
+	public void testRecommenedNegative(){
+		
+	}
 }

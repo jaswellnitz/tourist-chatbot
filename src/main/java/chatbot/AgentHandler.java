@@ -48,21 +48,20 @@ public class AgentHandler {
 			try {
 				Response response = client.newCall(request).execute();
 				jsonResponse = response.body().string();
-			}
-			catch (UnknownHostException e){
+			} catch (UnknownHostException e) {
+				System.err.println("UnknownHostException - check internet connection.");
+				break;
+			} catch (Exception e) {
 				i++;
 				tryAgain = i < maxTryCount;
-				if(tryAgain){
-					System.err.println("UnknownHostException - try again to connect...");
+				if (tryAgain) {
+					System.err.println("try again to connect...");
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
 				}
-			}
-			 catch (IOException e) {
-				e.printStackTrace();
 			}
 		} while (tryAgain);
 
