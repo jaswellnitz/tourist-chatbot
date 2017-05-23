@@ -146,7 +146,8 @@ public class TouristChatbotTest {
 	@Test
 	public void testShowRecommendations() {
 		// Prepare
-		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, "test", "", "", 20, "", new POIProfile());
+		String poiName = "POI TEST";
+		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, poiName, "", "", 20, "", new POIProfile());
 		user.addPositiveRecommendations(recPOI);
 		touristChatbot.getActiveUsers().put(user.getId(), user);
 		
@@ -154,7 +155,8 @@ public class TouristChatbotTest {
 		List<ChatbotResponse> responses = touristChatbot.processInput(user.getId(), "Show me my past recommendations");
 		
 		// Check
-		assertTrue
+		assertEquals(1,responses.size());
+		assertTrue(responses.get(0).getReply().contains(poiName));
 	}
 
 	@Test
