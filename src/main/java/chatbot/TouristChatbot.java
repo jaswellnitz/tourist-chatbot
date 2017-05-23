@@ -128,7 +128,7 @@ public class TouristChatbot {
 			// TODO error handling
 			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 			break;
-		case NONE:
+		case GREETINGS:
 			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 			if(agentResponse.getContexts().isEmpty() && !user.getUnratedPOIs().isEmpty()){
 				chatbotResponses.add(rateFirstUnratedItem(user));
