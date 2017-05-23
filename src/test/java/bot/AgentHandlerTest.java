@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import chatbot.AgentHandler;
 import chatbot.AgentResponse;
+import chatbot.ParameterKey;
 
 public class AgentHandlerTest {
 	
@@ -52,7 +53,7 @@ public class AgentHandlerTest {
 		assertEquals("welcome-followup",agentResult.getContexts().get(0).getName());
 	}
 	@Test
-	public void resetContext(){
+	public void testResetContext(){
 		// Prepare
 		long sessionId = 1234567890;
 		AgentResponse previousResponse = agentHandler.sendEvent("WELCOME", sessionId, true);
@@ -64,6 +65,23 @@ public class AgentHandlerTest {
 		// Check
 		assertTrue(agentResponse.getContexts().isEmpty());
 		assertTrue(agentResponse.getParameters().isEmpty());
+	}
+	
+	@Test
+	public void testSetContext(){
+		// Prepare
+		long sessionId = 1234567890;
+		String context = "rate";
+		String expectedRating = "5";
+		
+		// Action
+		AgentResponse setContext = agentHandler.setContext(context, sessionId);
+		AgentResponse agentResponse = agentHandler.sendUserInput(expectedRating, sessionId);
+		
+		// Check
+		assertEquals(context,setContext.getContexts().get(0).getName());
+		String rating = (String)agentResponse.getParameters().get(ParameterKey.RATING.name());
+		assertEquals(expectedRating,rating);
 	}
 	
 	

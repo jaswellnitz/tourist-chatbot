@@ -147,28 +147,73 @@ public class TouristChatbotTest {
 	public void testShowRecommendations() {
 		// Prepare
 		String poiName = "POI TEST";
-		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, poiName, "", "", 20, "", new POIProfile());
+		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, poiName, "", "", 20, "",
+				new POIProfile());
 		user.addPositiveRecommendations(recPOI);
 		touristChatbot.getActiveUsers().put(user.getId(), user);
-		
+
 		// Action
 		List<ChatbotResponse> responses = touristChatbot.processInput(user.getId(), "Show me my past recommendations");
-		
+
 		// Check
-		assertEquals(1,responses.size());
+		assertEquals(1, responses.size());
 		assertTrue(responses.get(0).getReply().contains(poiName));
 	}
 
 	@Test
 	public void testShowRecommendationsWithRating() {
-		// TODO implement
+		// Prepare
+		String poiName = "POI TEST";
+		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, poiName, "", "", 20, "",
+				new POIProfile());
+		userRatingHandler.saveRating(user.getId(), recPOI.getId(), Rating._4);
+		user.addPositiveRecommendations(recPOI);
+		user.addUnratedPOI(recPOI);
+		touristChatbot.getActiveUsers().put(user.getId(), user);
+
+		// Action
+		List<ChatbotResponse> responses = touristChatbot.processInput(user.getId(), "Show me my past recommendations");
+
+		// Check
+		assertEquals(2, responses.size());
+		assertTrue(responses.get(0).getReply().contains(poiName));
+		
+		// Action
+		touristChatbot.processInput(user.getId(), "3");
+		
+		// Check
+		User activeUser = touristChatbot.getActiveUsers().get(user.getId());
+		assertEquals(Rating._3,userRatingHandler.getUserRatingForItem(user.getId(), recPOI.getId()));
+		assertTrue(activeUser.getUnratedPOIs().isEmpty());
 	}
 
 	@Test
-	public void testRate() {
-		// TODO implement
+	public void testRating(){
+		// Prepare
+		String poiName = "POI TEST";
+		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, poiName, "", "", 20, "",
+				new POIProfile());
+		userRatingHandler.saveRating(user.getId(), recPOI.getId(), Rating._4);
+		user.addUnratedPOI(recPOI);
+		touristChatbot.getActiveUsers().put(user.getId(), user);
+		
+		// Action
+		List<ChatbotResponse> responses = touristChatbot.processInput(user.getId(), "Hey");
+		
+		// Check
+		assertEquals(2,responses.size());
+		// Rating count is 5
+		assertEquals(5, responses.get(1).getKeyboardButtons().size());
+		
+		// Action
+		touristChatbot.processInput(user.getId(), "5");
+		
+		// Check
+		User activeUser = touristChatbot.getActiveUsers().get(user.getId());
+		assertEquals(Rating._5,userRatingHandler.getUserRatingForItem(user.getId(), recPOI.getId()));
+		assertTrue(activeUser.getUnratedPOIs().isEmpty());
 	}
-
+	
 	@Test
 	// TODO check persistency
 	public void testRecommendPositive() {

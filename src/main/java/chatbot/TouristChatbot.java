@@ -122,19 +122,18 @@ public class TouristChatbot {
 			break;
 		case RATE:
 			int rateIndex = 0;
-			// TODO initiative rating
-			if (agentResponse.getParameters().containsKey(ParameterKey.POI_INDEX.name())) { // ask
-																							// at
-																							// context
-				rateIndex = Integer.valueOf(((String) agentResponse.getParameters().get(ParameterKey.POI_INDEX.name())))
-						- 1;
-			}
-			processRating(user, rateIndex, (int) agentResponse.getParameters().get(ParameterKey.RATING));
+//			rateIndex = Integer.valueOf(((String) agentResponse.getParameters().get(ParameterKey.POI_INDEX.name()))) -1;
+			int rating = Integer.valueOf((String) agentResponse.getParameters().get(ParameterKey.RATING.name()));
+			processRating(user, rateIndex, rating);
 			// TODO error handling
 			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
 			break;
 		case NONE:
 			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
+			if(agentResponse.getContexts().isEmpty() && !user.getUnratedPOIs().isEmpty()){
+				chatbotResponses.add(rateFirstUnratedItem(user));
+				agentHandler.setContext("Rate", user.getId());
+			}
 			break;
 		default:
 			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
@@ -145,11 +144,11 @@ public class TouristChatbot {
 	}
 
 	private boolean processRating(User user, int rateIndex, int ratingValue) {
-		RecommendedPointOfInterest recommendedPointOfInterest = user.getUnratedPOIs().get(rateIndex);
-		user.getUnratedPOIs().remove(rateIndex);
 		Rating rating = Rating.valueOf(ratingValue);
 		if (rating != Rating.INVALID) {
+			RecommendedPointOfInterest recommendedPointOfInterest = user.getUnratedPOIs().get(rateIndex);
 			userRatingHandler.saveRating(user.getId(), recommendedPointOfInterest.getId(), Rating.valueOf(ratingValue));
+			user.getUnratedPOIs().remove(rateIndex);
 			return true;
 		}
 		return false;
@@ -157,7 +156,7 @@ public class TouristChatbot {
 
 	private ChatbotResponse rateFirstUnratedItem(User user) {
 		RecommendedPointOfInterest pointOfInterest = user.getUnratedPOIs().get(0);
-		String ret = "How many stars would you give " + pointOfInterest.getName();
+		String ret = "By the way, how many stars would you give " + pointOfInterest.getName() + "?";
 
 		String[] ratings = { "1", "2", "3", "4", "5" };
 
@@ -177,6 +176,20 @@ public class TouristChatbot {
 			responses.add(rate);
 		}
 		return responses;
+	}
+
+	private ChatbotResponse showUnratedRecommendations(User user) {
+		List<ChatbotResponse> responses = new ArrayList<>();
+		String reply = "Here are the recommendations you were interested in and haven't rated yet: ";
+		for (RecommendedPointOfInterest poi : user.getPositiveRecommendations()) {
+			reply += "\n" + poi.getFormattedString();
+		}
+		responses.add(new ChatbotResponse(reply));
+		if (!user.getUnratedPOIs().isEmpty()) {
+			ChatbotResponse rate = rateFirstUnratedItem(user);
+			responses.add(rate);
+		}
+		return responses.get(0);
 	}
 
 	private void processFirstImpressionForPreviousPOI(User user, boolean positiveImpression) {
