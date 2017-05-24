@@ -1,8 +1,5 @@
 package chatbot;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -20,50 +17,33 @@ public class AgentHandler {
 	}
 
 	public AgentResponse sendEvent(String event, long sessionId, boolean resetContext) {
-		return sendQuery(event, "", "",sessionId, resetContext);
+		return sendQuery(event, "", "", sessionId, resetContext);
 	}
 
 	public AgentResponse sendEvent(String event, long sessionId) {
-		return sendQuery(event, "","", sessionId, false);
+		return sendQuery(event, "", "", sessionId, false);
 	}
 
 	public AgentResponse sendUserInput(String userInput, long sessionId) {
-		return sendQuery("", userInput, "",sessionId, false);
+		return sendQuery("", userInput, "", sessionId, false);
 	}
 
 	public AgentResponse resetContext(long sessionId) {
-		return sendQuery("", "reset", "",sessionId, true);
+		return sendQuery("", "reset", "", sessionId, true);
 	}
 
 	// TODO error handling
-	private AgentResponse sendQuery(String event, String userInput, String context, long sessionId, boolean resetContext) {
-		String url = buildQuery(event, userInput, context,sessionId, resetContext);
+	private AgentResponse sendQuery(String event, String userInput, String context, long sessionId,
+			boolean resetContext) {
+		String url = buildQuery(event, userInput, context, sessionId, resetContext);
 		Request request = new Request.Builder().header("Authorization", "Bearer " + clientAccessToken).url(url).build();
 		String jsonResponse = null;
-		int maxTryCount = 3;
-		int i = 0;
-		boolean tryAgain;
-		do {
-			tryAgain = false;
-			try {
-				Response response = client.newCall(request).execute();
-				jsonResponse = response.body().string();
-			} catch (UnknownHostException e) {
-				System.err.println("Unknown Host Exception - check internet connection.");
-				break;
-			} catch (Exception e) {
-				i++;
-				tryAgain = i < maxTryCount;
-				if (tryAgain) {
-					System.err.println("try again to connect...");
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-				}
-			}
-		} while (tryAgain);
+		try {
+			Response response = client.newCall(request).execute();
+			jsonResponse = response.body().string();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return AgentResponseParser.fromJson(jsonResponse);
 	}
@@ -82,7 +62,7 @@ public class AgentHandler {
 		if (resetContext) {
 			urlBuilder.addQueryParameter("resetContexts", String.valueOf(resetContext));
 		}
-		if(!context.isEmpty()){
+		if (!context.isEmpty()) {
 			urlBuilder.addQueryParameter("contexts", "Rate");
 		}
 
@@ -95,7 +75,7 @@ public class AgentHandler {
 	}
 
 	public AgentResponse setContext(String context, long sessionId) {
-		return sendQuery("","dummy",context,sessionId,false);
+		return sendQuery("", "dummy", context, sessionId, false);
 	}
 
 }

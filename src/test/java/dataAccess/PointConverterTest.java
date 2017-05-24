@@ -1,4 +1,4 @@
-package data_access;
+package dataAccess;
 
 import static org.junit.Assert.*;
 
@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import data_access.PointConverter;
+import dataAccess.PointConverter;
 import model.POIProfile;
 import model.RecommendedPointOfInterest;
 import model.Preference;
@@ -16,7 +16,7 @@ public class PointConverterTest {
 	
 	@Before
 	public void setUp(){
-		pointConverter = new PointConverter();
+		pointConverter = new PointConverter(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")));
 	}
 	
 	@Test

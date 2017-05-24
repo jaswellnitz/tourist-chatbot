@@ -1,12 +1,17 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 
-public class POIProfile {
+public class POIProfile implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1718108343723888942L;
 	private final Preference sightseeing;
 	private final Preference culture;
 	private final Preference food;
@@ -85,26 +90,11 @@ public class POIProfile {
 	
 	public static POIProfile getProfileForInterests(List<String> interests){
 		Preference[] preference = {Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED};
-		for(String interest: interests){
-			switch(interest){
-			case "sightseeing":
-				preference[0] = Preference.TRUE;
-				break;
-			case "culture":
-				preference[1] = Preference.TRUE;
-				break;
-			case "food":
-				preference[2] = Preference.TRUE;
-				break;
-			case "nightlife":
-				preference[3] = Preference.TRUE;
-				break;
-			case "nature":
-				preference[4] = Preference.TRUE;
-				break;
-			case "shopping":
-				preference[5] = Preference.TRUE;
-				break;
+		List<String> categories = Arrays.asList(new String[]{"sightseeing","culture","food","nightlife","nature","shopping"});
+		for(String interest:interests){
+			if(categories.contains(interest)){
+				int index = categories.indexOf(interest);
+				preference[index] = Preference.TRUE;
 			}
 		}
 		return new POIProfile(preference[0],preference[1],preference[2],preference[3],preference[4],preference[5]);
@@ -137,12 +127,12 @@ public class POIProfile {
 	
 	@Override
 	public String toString() {
-		String result = "";
+		StringBuilder bld = new StringBuilder();
 		for (Preference category : categories) {
-			result += category.getFieldName() + ",";
+			bld.append(category.getFieldName());
+			bld.append(",");
 		}
-		result = result.substring(0, result.length() - 1);
-		return result;
+		return bld.substring(0, bld.length()-1);
 	}
 
 

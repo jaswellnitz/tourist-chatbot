@@ -16,10 +16,10 @@ import com.google.common.io.Files;
 import chatbot.AgentHandler;
 import chatbot.ChatbotResponse;
 import chatbot.TouristChatbot;
-import data_access.DatabaseAccess;
-import data_access.PointConverter;
-import data_access.UserDB;
-import data_access.UserRatingHandler;
+import dataAccess.DatabaseAccess;
+import dataAccess.PointConverter;
+import dataAccess.UserDB;
+import dataAccess.UserRatingHandler;
 import model.POIProfile;
 import model.Preference;
 import model.Rating;
@@ -41,9 +41,10 @@ public class TouristChatbotTest {
 	@Before
 	public void setUp() throws IOException {
 		ratingTestFile = new File(TEST_PATH);
-		this.userDB = new UserDB(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")), new PointConverter());
+		PointConverter pointConverter = new PointConverter(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")));
+		this.userDB = new UserDB(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")), pointConverter);
 		agentHandler = new AgentHandler(System.getenv("API_AI_ACCESS_TOKEN"));
-		Recommender recommender = new Recommender(new PointConverter());
+		Recommender recommender = new Recommender(pointConverter);
 		this.userRatingHandler = new UserRatingHandler(TEST_PATH);
 		this.touristChatbot = new TouristChatbot(agentHandler, recommender, userDB, userRatingHandler);
 		user = new User(1234567890, "Testuser");

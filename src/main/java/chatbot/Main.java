@@ -7,10 +7,10 @@ import static spark.Spark.port;
 
 import com.pengrad.telegrambot.request.SetWebhook;
 
-import data_access.DatabaseAccess;
-import data_access.PointConverter;
-import data_access.UserDB;
-import data_access.UserRatingHandler;
+import dataAccess.DatabaseAccess;
+import dataAccess.PointConverter;
+import dataAccess.UserDB;
+import dataAccess.UserRatingHandler;
 import recommender.Recommender;
 
 // Entry Point: enables Telegram webhook

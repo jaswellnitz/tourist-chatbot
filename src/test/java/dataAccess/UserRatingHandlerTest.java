@@ -1,4 +1,4 @@
-package data_access;
+package dataAccess;
 
 import static org.junit.Assert.*;
 
@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.google.common.io.Files;
 
-import data_access.UserRatingHandler;
+import dataAccess.UserRatingHandler;
 import model.POIProfile;
 import model.Preference;
 import model.Rating;

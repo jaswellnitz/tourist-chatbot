@@ -43,11 +43,9 @@ public class AgentResponseParserTest {
 		AgentResponse agentResult = AgentResponseParser.fromJson(json);
 
 		// Check
-		assertEquals("agent", agentResult.getSource());
 		assertEquals("who are you", agentResult.getResolvedQuery());
 		assertEquals(Action.ABOUT, agentResult.getAction());
 		assertEquals("9196295d-f6f3-4d41-9750-b19d61d5ea6a", agentResult.getSessionId());
-		assertFalse(agentResult.isActionIncomplete());
 		assertEquals("Hey there, I am your friendly tourist chatbot!", agentResult.getReply());
 		assertEquals(expectedParameters, agentResult.getParameters());
 		assertEquals(expectedContext, agentResult.getContexts());
@@ -73,9 +71,7 @@ public class AgentResponseParserTest {
 		AgentResponse agentResult = AgentResponseParser.fromJson(json);
 
 		// Check
-		assertEquals("agent", agentResult.getSource());
 		assertEquals("", agentResult.getResolvedQuery());
-		assertFalse(agentResult.isActionIncomplete());
 		assertEquals(Action.NONE, agentResult.getAction());
 		assertEquals("9196295d-f6f3-4d41-9750-b19d61d5ea6a", agentResult.getSessionId());
 		assertEquals("I missed what you said. Say it again?", agentResult.getReply());
@@ -98,10 +94,8 @@ public class AgentResponseParserTest {
 		AgentResponse agentResult = AgentResponseParser.fromJson(json);
 
 		// Check
-		assertEquals("domains", agentResult.getSource());
 		assertEquals("Hello", agentResult.getResolvedQuery());
 		assertEquals(Action.NONE, agentResult.getAction());
-		assertFalse(agentResult.isActionIncomplete());
 		assertEquals("Hey!", agentResult.getReply());
 		assertEquals(expectedParameters, agentResult.getParameters());
 		assertEquals(expectedContext, agentResult.getContexts());

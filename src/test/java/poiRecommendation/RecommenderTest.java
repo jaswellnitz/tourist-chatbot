@@ -1,6 +1,8 @@
-package poi_recommendation;
+package poiRecommendation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,11 +12,12 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import data_access.PointConverter;
+import dataAccess.DatabaseAccess;
+import dataAccess.PointConverter;
 import model.Location;
 import model.POIProfile;
-import model.RecommendedPointOfInterest;
 import model.Preference;
+import model.RecommendedPointOfInterest;
 import model.User;
 import recommender.Recommender;
 
@@ -27,7 +30,7 @@ public class RecommenderTest {
 	@Before
 	public void setUp() throws Exception {
 		numRecommendations = 3;
-		recommender = new Recommender(new PointConverter(), testRatingPath, numRecommendations);
+		recommender = new Recommender(new PointConverter(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"))), testRatingPath, numRecommendations);
 		this.defaultUserLocation = new Location(41.4034984, 2.1740598);
 	}
 

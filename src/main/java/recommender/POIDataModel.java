@@ -22,10 +22,11 @@ import model.ProfileItem;
 // TODO: implement all methods and constructors
 public class POIDataModel extends AbstractDataModel implements DataModel {
 
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -8542663924097410194L;
 	private final List<ProfileItem> profileItems;
 	private DataModel delegate;
 

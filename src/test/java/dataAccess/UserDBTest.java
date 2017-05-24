@@ -1,14 +1,14 @@
-package data_access;
+package dataAccess;
 
 import static org.junit.Assert.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import dataAccess.DatabaseAccess;
+import dataAccess.PointConverter;
+import dataAccess.UserDB;
 import model.POIProfile;
 import model.Preference;
 import model.RecommendedPointOfInterest;
@@ -23,7 +23,7 @@ public class UserDBTest {
 	@Before
 	public void setUp() {
 		this.dbAccess = new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"));
-		this.userDB = new UserDB(dbAccess, new PointConverter());
+		this.userDB = new UserDB(dbAccess, new PointConverter(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"))));
 		POIProfile profile = new POIProfile(Preference.TRUE,Preference.TRUE, Preference.FALSE, Preference.NOT_RATED,Preference.NOT_RATED, Preference.TRUE);
 		this.expectedUser = new User(100l, "Testuser", 500, profile);
 		RecommendedPointOfInterest sagradaFamilia = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",

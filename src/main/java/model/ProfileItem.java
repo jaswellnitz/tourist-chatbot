@@ -1,6 +1,8 @@
 package model;
 
-public interface ProfileItem {
+import java.io.Serializable;
+
+public interface ProfileItem extends Serializable {
 	
 	long getId();
 	

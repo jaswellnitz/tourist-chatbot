@@ -3,6 +3,7 @@ package model;
 // Recommended Point of Interest
 public class RecommendedPointOfInterest implements ProfileItem {
 
+	private static final long serialVersionUID = -8542663924097410195L;
 	private final long id;
 	private final String name;
 	private final String address;
@@ -129,7 +130,7 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		if(!openingHours.isEmpty()){
 			ret += openingHours +", ";
 		}
-		if(recommendationValue != 0.0){
+		if(recommendationValue > 0.1){
 			ret += "your computed preference value: " + recommendationValue + ", ";
 		}
 

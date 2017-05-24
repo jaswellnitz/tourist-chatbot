@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import data_access.UserDB;
-import data_access.UserRatingHandler;
+import dataAccess.UserDB;
+import dataAccess.UserRatingHandler;
 import model.Location;
 import model.POIProfile;
 import model.Rating;
@@ -71,7 +71,7 @@ public class TouristChatbot {
 			chatbotResponses.add(new ChatbotResponse(answer));
 			break;
 		case RECOMMEND_LOCATION:
-			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply(), "Send Location"));
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply(), "Send Current Location"));
 			break;
 		case RECOMMEND:
 			if (userInput instanceof Location) {
@@ -83,7 +83,6 @@ public class TouristChatbot {
 			chatbotResponses.add(getRecommendation(user));
 			break;
 		case RECOMMENDATION_POSITIVE:
-			answer = agentResponse.getReply();
 			processFirstImpressionForPreviousPOI(user, true);
 			if (user.getPendingRecommendations().isEmpty()) {
 				chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
@@ -93,7 +92,6 @@ public class TouristChatbot {
 			}
 			break;
 		case RECOMMENDATION_NEGATIVE:
-			answer = agentResponse.getReply();
 			processFirstImpressionForPreviousPOI(user, false);
 			if (user.getPendingRecommendations().isEmpty()) {
 				chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
@@ -200,7 +198,7 @@ public class TouristChatbot {
 			RecommendedPointOfInterest recommendedPointOfInterest = user.getPendingRecommendations().get(i);
 			numbers[i] = String.valueOf(i + 1);
 			answer += "\n" + (i + 1) + ": " + recommendedPointOfInterest.getName();
-			if (recommendedPointOfInterest.getRecommendationValue() != 0) {
+			if (recommendedPointOfInterest.getRecommendationValue() > 0.1) {
 				answer += ", our computed recommendation value: " + recommendedPointOfInterest.getRecommendationValue();
 			}
 		}

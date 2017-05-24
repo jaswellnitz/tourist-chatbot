@@ -9,8 +9,7 @@ import java.util.Map.Entry;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import util.JsonUtil;
+import com.google.gson.JsonParser;
 
 public class AgentResponseParser {
 
@@ -51,20 +50,14 @@ public class AgentResponseParser {
 
 	public static AgentResponse fromJson(String jsonResponse) {
 		assert jsonResponse != null : "Precondition failed: jsonResponse != null";
-		JsonObject responseObject = JsonUtil.parseToJson(jsonResponse).getAsJsonObject();
+		JsonObject responseObject = new JsonParser().parse(jsonResponse).getAsJsonObject().getAsJsonObject();
 		JsonObject resultObject = responseObject.get("result").getAsJsonObject();
 		Map<String, Object> parameters = parseParameters(resultObject);
-		boolean actionIncomplete = false;
-
-		if (resultObject.has("actionIncomplete")) {
-			actionIncomplete = resultObject.get("actionIncomplete").getAsBoolean();
-		}
 
 		String sessionId = "";
 		if (responseObject.has("sessionId")) {
 			sessionId = responseObject.get("sessionId").getAsString();
 		}
-		String source = resultObject.get("source").getAsString();
 		String resolvedQuery = resultObject.get("resolvedQuery").getAsString();
 		Action action = Action.getEnum(resultObject.get("action").getAsString());
 		String reply = resultObject.get("fulfillment").getAsJsonObject().get("speech").getAsString();
@@ -81,8 +74,7 @@ public class AgentResponseParser {
 				contexts.add(new Context(name, contextParameters, lifespan));
 			}
 		}
-		return new AgentResponse(source, resolvedQuery, action, parameters, contexts, reply, sessionId,
-				actionIncomplete);
+		return new AgentResponse(resolvedQuery, action, parameters, contexts, reply, sessionId);
 	}
 
 }

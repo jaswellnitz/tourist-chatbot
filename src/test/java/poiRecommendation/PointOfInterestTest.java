@@ -1,4 +1,4 @@
-package poi_recommendation;
+package poiRecommendation;
 
 import static org.junit.Assert.*;
 

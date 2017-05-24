@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import org.apache.mahout.cf.taste.common.NoSuchUserException;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
 import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
@@ -18,8 +17,7 @@ import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
-import data_access.PointConverter;
-import data_access.UserRatingHandler;
+import dataAccess.PointConverter;
 import model.Location;
 import model.POIProfile;
 import model.Preference;
@@ -31,7 +29,6 @@ public class Recommender {
 	private PointConverter pointConverter;
 	private final String ratingPath;
 	public final int numRecommendations;
-	private UserRatingHandler userRatingHandler;
 	private static final String DEFAULT_RATING_PATH = "src/main/resources/ratings.csv";
 	private static final int DEFAULT_NUM_RECOMMENDATIONS = 4;
 
@@ -45,6 +42,7 @@ public class Recommender {
 		this.numRecommendations = numRecommendations;
 	}
 
+	// TODO category specific recommendation
 	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex) {
 		POIProfile originalProfile = user.getProfile();
 		POIProfile categoryProfile = POIProfile.getProfileForCategoryIndex(categoryIndex);

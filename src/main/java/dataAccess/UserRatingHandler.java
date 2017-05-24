@@ -1,4 +1,4 @@
-package data_access;
+package dataAccess;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,12 +16,7 @@ import model.Rating;
 
 public class UserRatingHandler {
 
-	private final static String DEFAULT_RATING_PATH = "src/main/resources/ratings.csv";
 	private String ratingPath;
-
-	public UserRatingHandler() {
-		this(DEFAULT_RATING_PATH);
-	}
 
 	public UserRatingHandler(String ratingPath) {
 		this.ratingPath = ratingPath;

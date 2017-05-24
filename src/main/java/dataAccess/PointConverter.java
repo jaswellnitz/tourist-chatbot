@@ -1,4 +1,4 @@
-package data_access;
+package dataAccess;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,12 +12,6 @@ import model.Preference;
 public class PointConverter {
 
 	private DatabaseAccess databaseAccess;
-
-	// dependency injection
-	@Deprecated
-	public PointConverter() {
-		this(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")));
-	}
 
 	public PointConverter(DatabaseAccess db) {
 		databaseAccess = db;
@@ -42,38 +36,35 @@ public class PointConverter {
 				+ ".tags-> 'tourism' as tourism, " + table + ".tags-> 'amenity' as amenity, " + table
 				+ ".tags-> 'leisure' as leisure, " + table + ".tags-> 'cuisine' as cuisine, " + table
 				+ ".tags-> 'historic' as historic, " + table + ".tags-> 'shop' as shop," + table
-				+ ".tags-> 'beach' as beach, " + table
-				+ ".tags-> 'addr:street' as street, " + table
+				+ ".tags-> 'beach' as beach, " + table + ".tags-> 'addr:street' as street, " + table
 				+ ".tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
 				+ x + ", " + y + ")), 4326)) as distance, " + table + ".tags-> 'opening_hours' as openingHours";
 		return query;
 	}
-	
-	private String getSelectQuery(String table){
+
+	private String getSelectQuery(String table) {
 		String query = "SELECT " + table + ".id, " + table + ".tags-> 'name' as _name, " + table
 				+ ".tags-> 'tourism' as tourism, " + table + ".tags-> 'amenity' as amenity, " + table
 				+ ".tags-> 'leisure' as leisure, " + table + ".tags-> 'cuisine' as cuisine, " + table
 				+ ".tags-> 'historic' as historic, " + table + ".tags-> 'shop' as shop," + table
-				+ ".tags-> 'beach' as beach, " + table
-				+ ".tags-> 'addr:street' as street, " + table
+				+ ".tags-> 'beach' as beach, " + table + ".tags-> 'addr:street' as street, " + table
 				+ ".tags->'addr:housenumber' as housenumber, " + table + ".tags-> 'opening_hours' as openingHours";
 		return query;
 	}
 
 	private String getConditionQueryForGeneralPOISearch(String table, String x, String y, int radius) {
 		String query = "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
-				+ ")), 4326), " + radius + ") and " + table + ".tags ? 'name' and " + table 
+				+ ")), 4326), " + radius + ") and " + table + ".tags ? 'name' and " + table
 				+ ".tags ?| ARRAY['tourism','amenity','leisure','cuisine','beach','historic','shop']";
 		return query;
 	}
-	
-	public RecommendedPointOfInterest getPOIForId(long itemId){
+
+	public RecommendedPointOfInterest getPOIForId(long itemId) {
 		String query = getSelectQuery("ways") + " FROM ways inner join nodes on ways.nodes[1]=nodes.id "
-				+ "WHERE ways.id=" + itemId + " UNION ALL "
-				+ getSelectQuery("nodes") + " FROM nodes "
+				+ "WHERE ways.id=" + itemId + " UNION ALL " + getSelectQuery("nodes") + " FROM nodes "
 				+ "WHERE nodes.id=" + itemId + ";";
 
-		List<RecommendedPointOfInterest> pois = getPOIForQuery(query,false);
+		List<RecommendedPointOfInterest> pois = getPOIForQuery(query, false);
 		assert pois.size() == 1 : "Postcondition failed: Multiple Items with same id found.";
 		return pois.get(0);
 	}
@@ -91,7 +82,7 @@ public class PointConverter {
 				+ "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
 				+ ")), 4326), " + radius + ") and nodes.id=" + itemId + ";";
 
-		List<RecommendedPointOfInterest> pois = getPOIForQuery(query,true);
+		List<RecommendedPointOfInterest> pois = getPOIForQuery(query, true);
 		assert pois.size() <= 1 : "Postcondition failed: Multiple Items with same id found.";
 		return pois;
 	}
@@ -117,8 +108,8 @@ public class PointConverter {
 					String houseNumber = resultSet.getString("housenumber");
 					houseNumber = houseNumber == null ? "" : houseNumber;
 					int distance = -1;
-					if(inRadius){
-					 distance = (int) Math.round(resultSet.getDouble("distance"));
+					if (inRadius) {
+						distance = (int) Math.round(resultSet.getDouble("distance"));
 					}
 					String openingHours = resultSet.getString("openingHours");
 					openingHours = openingHours == null ? "" : openingHours;
@@ -162,6 +153,8 @@ public class PointConverter {
 				case "picnic_site":
 					nature = Preference.TRUE;
 					break;
+				default:
+					break;
 				}
 			}
 
@@ -202,30 +195,21 @@ public class PointConverter {
 				case "casino":
 					nightlife = Preference.TRUE;
 					break;
+				default:
+					break;
 				}
 			}
 
 			String shopTag = set.getString("shop");
-			if (shopTag != null) {
-				switch (shopTag) {
-				case "mall":
-					shopping = Preference.TRUE;
-					break;
-				case "marketplace":
-					shopping= Preference.TRUE;
-				}
+			if (shopTag != null && (shopTag.equals("mall") || shopTag.equals("marketplace"))) {
+				shopping = Preference.TRUE;
 			}
+
 			String leisureTag = set.getString("leisure");
-			if (leisureTag != null) {
-				switch (leisureTag) {
-				case "park":
+			if (leisureTag != null && (leisureTag.equals("park") || leisureTag.equals("nature_reserve"))) {
 					nature = Preference.TRUE;
-					break;
-				case "nature_reserve":
-					nature = Preference.TRUE;
-					break;
-				}
 			}
+
 			String cuisineTag = set.getString("cuisine");
 			if (cuisineTag != null) {
 				food = Preference.TRUE;
