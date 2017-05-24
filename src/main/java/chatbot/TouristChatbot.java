@@ -221,7 +221,7 @@ public class TouristChatbot {
 				toRemove.add(recommendation);
 			}
 		}
-		recommendations.remove(toRemove);
+		recommendations.removeAll(toRemove);
 		
 		ChatbotResponse chatbotResponse;
 		String answer;
