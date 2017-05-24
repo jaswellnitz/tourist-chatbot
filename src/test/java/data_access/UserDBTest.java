@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import model.POIProfile;
 import model.Preference;
+import model.RecommendedPointOfInterest;
 import model.User;
 
 public class UserDBTest {
@@ -22,9 +23,13 @@ public class UserDBTest {
 	@Before
 	public void setUp() {
 		this.dbAccess = new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"));
-		this.userDB = new UserDB(dbAccess);
+		this.userDB = new UserDB(dbAccess, new PointConverter());
 		POIProfile profile = new POIProfile(Preference.TRUE,Preference.TRUE, Preference.FALSE, Preference.NOT_RATED,Preference.NOT_RATED, Preference.TRUE);
 		this.expectedUser = new User(100l, "Testuser", 500, profile);
+		RecommendedPointOfInterest sagradaFamilia = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
+new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
+		expectedUser.addUnratedPOI(sagradaFamilia);
+		expectedUser.addPositiveRecommendations(sagradaFamilia);
 	}
 
 	@After
@@ -32,6 +37,37 @@ public class UserDBTest {
 		long id = expectedUser.getId();
 		if (userDB.hasUser(id))
 			userDB.deleteUser(id);
+	}
+	
+	@Test
+	public void testAddRecommendation(){
+		// Prepare
+		userDB.storeUser(expectedUser);
+		RecommendedPointOfInterest casaVella = new RecommendedPointOfInterest(2987711249l, "Casa Vella", "","", 0, "",
+				new POIProfile(Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
+		expectedUser.addPositiveRecommendations(casaVella);
+		expectedUser.addUnratedPOI(casaVella);
+		
+		// Action
+		userDB.addRecommendation(expectedUser.getId(), casaVella.getId());
+		
+		// Check
+		User actualUser = userDB.getUser(expectedUser.getId());
+		assertEquals(expectedUser,actualUser);
+	}
+	
+	@Test
+	public void testDeleteUnratedPOI(){
+		// Prepare
+		userDB.storeUser(expectedUser);
+		expectedUser.getUnratedPOIs().remove(0);
+
+		// Action
+		userDB.deleteFirstUnratedRecommendation(expectedUser.getId());
+		
+		// Check
+		User actualUser = userDB.getUser(expectedUser.getId());
+		assertEquals(expectedUser,actualUser);
 	}
 
 	@Test
@@ -80,8 +116,8 @@ public class UserDBTest {
 	@Test
 	public void testGetUser() {
 		// Prepare
-		long id = expectedUser.getId();
 		userDB.storeUser(expectedUser);
+		long id = expectedUser.getId();
 
 		// Action
 		User user = userDB.getUser(id);

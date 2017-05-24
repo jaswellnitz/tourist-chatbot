@@ -93,8 +93,6 @@ public class RecommendedPointOfInterest implements ProfileItem {
 				return false;
 		} else if (!address.equals(other.address))
 			return false;
-		if (distanceToUser != other.distanceToUser)
-			return false;
 		if (id != other.id)
 			return false;
 		if (name == null) {
@@ -119,11 +117,15 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		return id + "(: " + name + ", " + address + ", " + distanceToUser + ", " + openingHours + "," + recommendationValue +")";
 	}
 	
-	public String getFormattedString(){
-		String ret = name +": distance to your current location - " + distanceToUser + " m, ";
+	public String getFormattedString(boolean showDistance){
+		String ret = name+ ": ";
+		if(showDistance && distanceToUser != -1){
+			ret+="distance to your current location " + distanceToUser + " m, ";
+		}
 		if(!address.isEmpty()){
 			ret += address + ", ";
 		}
+	
 		if(!openingHours.isEmpty()){
 			ret += openingHours +", ";
 		}

@@ -1,5 +1,6 @@
 package data_access;
 
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,16 +12,20 @@ import com.google.common.collect.Multiset.Entry;
 
 import model.POIProfile;
 import model.Preference;
+import model.RecommendedPointOfInterest;
 import model.User;
 
 public class UserDB {
 
 	private DatabaseAccess dbAccess;
+	private PointConverter pointConverter;
 
-	public UserDB(DatabaseAccess dbAccess) {
+	public UserDB(DatabaseAccess dbAccess, PointConverter pointConverter) {
 		this.dbAccess = dbAccess;
+		this.pointConverter = pointConverter;
 	}
 
+	
 	public boolean hasUser(long userId) {
 		String query = "select * from users where id = " + userId;
 
@@ -34,6 +39,19 @@ public class UserDB {
 
 		return hasNext;
 	}
+	
+	public boolean addRecommendation(long userId, long recommendationId){
+		Map<String, String> param = new HashMap<String, String>();
+		param.put("recommendations", "recommendations || "+ recommendationId+"::bigint");
+		param.put("unrated", "unrated || "+ recommendationId+"::bigint");
+		return updateUser(userId, param);
+	}
+	
+	public boolean deleteFirstUnratedRecommendation(long userId){
+		Map<String, String> param = new HashMap<String, String>();
+		param.put("unrated","unrated[2:array_length(unrated,1)]");
+		return updateUser(userId, param);
+	}
 
 	public boolean changeRadiusForUser(long userId, int radius) {
 		String radiusParam = "radius";
@@ -45,7 +63,7 @@ public class UserDB {
 	public boolean changeProfileForUser(long userId, POIProfile profile){
 		String profileParam = "profile";
 		Map<String, String> param = new HashMap<String, String>();
-		param.put(profileParam, profile.toString());
+		param.put(profileParam, "'"+profile.toString()+"'");
 		return updateUser(userId, param);
 	}
 
@@ -53,7 +71,7 @@ public class UserDB {
 		String query = "update users set";
 
 		for (Map.Entry<String, String> entry : parameters.entrySet()) {
-			query += " " + entry.getKey() + "= '" + entry.getValue() + "',";
+			query += " " + entry.getKey() + "=" + entry.getValue() + ",";
 		}
 		query = query.substring(0, query.length() - 1) + " where id = " + userId + ";";
 
@@ -68,10 +86,26 @@ public class UserDB {
 	}
 
 	public boolean storeUser(User user) {
-		String query = "INSERT into users (id, name, radius, profile) values (" + user.getId() + ",'" + user.getName() + "',"
-				+ user.getPrefRecommendationRadius() + ",'" +user.getProfile().toString()+"')";
+		String posRec = preparePSQLArray(user.getPositiveRecommendations());
+		String unrated = preparePSQLArray(user.getUnratedPOIs());
+		String query = "INSERT into users (id, name, radius, profile, recommendations,unrated) values (" + user.getId() + ",'" + user.getName() + "',"
+				+ user.getPrefRecommendationRadius() + ",'" +user.getProfile().toString()+"'" + "," + posRec +"," + unrated + ")";
 		int rowCount = dbAccess.executeUpdate(query);
 		return rowCount == 1;
+	}
+	
+	private String preparePSQLArray(List<RecommendedPointOfInterest> pois){
+		String ret = "";
+		if(pois.isEmpty()){
+			ret = "ARRAY[]::bigint[]";
+		}else{
+			ret = "ARRAY[";
+			for(RecommendedPointOfInterest rec: pois){
+				ret +=  rec.getId() +",";
+			}
+			ret =ret.substring(0, ret.length()-1) +"]";
+		}
+		return ret;
 	}
 
 	public User getUser(long userId) {
@@ -87,7 +121,17 @@ public class UserDB {
 				int radius = resultSet.getInt("radius");
 				String profile = resultSet.getString("profile");
 				POIProfile poiProfile = convertToProfile(profile.split(","));
-				users.add(new User(id, name, radius, poiProfile));
+				resultSet.getArray("recommendations").getArray().getClass();
+				Long[] positiveRec = (Long[])resultSet.getArray("recommendations").getArray();
+				Long[] unrated = (Long[])resultSet.getArray("unrated").getArray();
+				User user = new User(id, name, radius, poiProfile);
+				for(long poiId: positiveRec){
+					user.addPositiveRecommendations(pointConverter.getPOIForId(poiId));
+				}
+				for(long poiId: unrated){
+					user.addUnratedPOI(pointConverter.getPOIForId(poiId));
+				}
+				users.add(user);
 			}
 			dbAccess.close();
 		} catch (Exception e) {

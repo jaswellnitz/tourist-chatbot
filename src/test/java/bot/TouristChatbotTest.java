@@ -41,7 +41,7 @@ public class TouristChatbotTest {
 	@Before
 	public void setUp() throws IOException {
 		ratingTestFile = new File(TEST_PATH);
-		this.userDB = new UserDB(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")));
+		this.userDB = new UserDB(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")), new PointConverter());
 		agentHandler = new AgentHandler(System.getenv("API_AI_ACCESS_TOKEN"));
 		Recommender recommender = new Recommender(new PointConverter());
 		this.userRatingHandler = new UserRatingHandler(TEST_PATH);
@@ -146,9 +146,8 @@ public class TouristChatbotTest {
 	@Test
 	public void testShowRecommendations() {
 		// Prepare
-		String poiName = "POI TEST";
-		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, poiName, "", "", 20, "",
-				new POIProfile());
+		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
+				new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
 		user.addPositiveRecommendations(recPOI);
 		touristChatbot.getActiveUsers().put(user.getId(), user);
 
@@ -157,18 +156,18 @@ public class TouristChatbotTest {
 
 		// Check
 		assertEquals(1, responses.size());
-		assertTrue(responses.get(0).getReply().contains(poiName));
+		assertTrue(responses.get(0).getReply().contains(recPOI.getName()));
 	}
 
 	@Test
 	public void testShowRecommendationsWithRating() {
 		// Prepare
-		String poiName = "POI TEST";
-		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, poiName, "", "", 20, "",
-				new POIProfile());
+		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
+				new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
 		userRatingHandler.saveRating(user.getId(), recPOI.getId(), Rating._4);
 		user.addPositiveRecommendations(recPOI);
 		user.addUnratedPOI(recPOI);
+		userDB.addRecommendation(user.getId(), recPOI.getId());
 		touristChatbot.getActiveUsers().put(user.getId(), user);
 
 		// Action
@@ -176,7 +175,7 @@ public class TouristChatbotTest {
 
 		// Check
 		assertEquals(2, responses.size());
-		assertTrue(responses.get(0).getReply().contains(poiName));
+		assertTrue(responses.get(0).getReply().contains(recPOI.getName()));
 		
 		// Action
 		touristChatbot.processInput(user.getId(), "3");
@@ -185,16 +184,20 @@ public class TouristChatbotTest {
 		User activeUser = touristChatbot.getActiveUsers().get(user.getId());
 		assertEquals(Rating._3,userRatingHandler.getUserRatingForItem(user.getId(), recPOI.getId()));
 		assertTrue(activeUser.getUnratedPOIs().isEmpty());
+		User storedUser = userDB.getUser(user.getId());
+		assertEquals(activeUser.getPositiveRecommendations(),storedUser.getPositiveRecommendations());
+		assertEquals(activeUser.getUnratedPOIs(),storedUser.getUnratedPOIs());
 	}
 
 	@Test
 	public void testRating(){
 		// Prepare
-		String poiName = "POI TEST";
-		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(1, poiName, "", "", 20, "",
-				new POIProfile());
+		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
+				new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
 		userRatingHandler.saveRating(user.getId(), recPOI.getId(), Rating._4);
 		user.addUnratedPOI(recPOI);
+		user.addPositiveRecommendations(recPOI);
+		userDB.addRecommendation(user.getId(), recPOI.getId());
 		touristChatbot.getActiveUsers().put(user.getId(), user);
 		
 		// Action
@@ -212,6 +215,9 @@ public class TouristChatbotTest {
 		User activeUser = touristChatbot.getActiveUsers().get(user.getId());
 		assertEquals(Rating._5,userRatingHandler.getUserRatingForItem(user.getId(), recPOI.getId()));
 		assertTrue(activeUser.getUnratedPOIs().isEmpty());
+		User storedUser = userDB.getUser(user.getId());
+		assertEquals(activeUser.getPositiveRecommendations(),storedUser.getPositiveRecommendations());
+		assertEquals(activeUser.getUnratedPOIs(),storedUser.getUnratedPOIs());
 	}
 	
 	@Test
@@ -243,6 +249,9 @@ public class TouristChatbotTest {
 		assertEquals(pendingRecommendations.get(0), posiveRecommendations.get(0));
 		assertEquals(pendingRecommendations.get(0), activeUser.getUnratedPOIs().get(0));
 		assertEquals(Rating._4, userRatingHandler.getUserRatingForItem(user.getId(), recPOI.getId()));
+		User storedUser = userDB.getUser(user.getId());
+		assertEquals(activeUser.getPositiveRecommendations(),storedUser.getPositiveRecommendations());
+		assertEquals(activeUser.getUnratedPOIs(),storedUser.getUnratedPOIs());
 	}
 
 	@Test
@@ -270,6 +279,9 @@ public class TouristChatbotTest {
 		assertTrue(activeUser.getPositiveRecommendations().isEmpty());
 		assertTrue(activeUser.getUnratedPOIs().isEmpty());
 		assertEquals(Rating._1, userRatingHandler.getUserRatingForItem(activeUser.getId(), recPOI.getId()));
+		User storedUser = userDB.getUser(user.getId());
+		assertEquals(activeUser.getPositiveRecommendations(),storedUser.getPositiveRecommendations());
+		assertEquals(activeUser.getUnratedPOIs(),storedUser.getUnratedPOIs());
 	}
 
 	@Test
@@ -301,6 +313,9 @@ public class TouristChatbotTest {
 		assertEquals(poi2, activeUser.getPositiveRecommendations().get(0));
 		assertEquals(poi2, activeUser.getUnratedPOIs().get(0));
 		assertEquals(Rating._4, userRatingHandler.getUserRatingForItem(user.getId(), poi2.getId()));
+		User storedUser = userDB.getUser(user.getId());
+		assertEquals(activeUser.getPositiveRecommendations(),storedUser.getPositiveRecommendations());
+		assertEquals(activeUser.getUnratedPOIs(),storedUser.getUnratedPOIs());
 	}
 
 	@Test
@@ -333,5 +348,8 @@ public class TouristChatbotTest {
 		for (RecommendedPointOfInterest recPOI : allRecommendations) {
 			assertEquals(Rating._4, userRatingHandler.getUserRatingForItem(user.getId(), recPOI.getId()));
 		}
+		User storedUser = userDB.getUser(user.getId());
+		assertEquals(activeUser.getPositiveRecommendations(),storedUser.getPositiveRecommendations());
+		assertEquals(activeUser.getUnratedPOIs(),storedUser.getUnratedPOIs());
 	}
 }

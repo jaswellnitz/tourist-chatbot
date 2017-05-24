@@ -23,7 +23,6 @@ public class PointConverter {
 		databaseAccess = db;
 	}
 
-	// TODO better return Set instead of List because order is not important
 	public List<RecommendedPointOfInterest> getPOIInRadius(double latitude, double longitude, int radius) {
 		// Flip coordinates for PostGis, see:
 		// http://postgis.net/2013/08/18/tip_lon_lat/
@@ -35,7 +34,7 @@ public class PointConverter {
 				+ getSelectQuery("nodes", x, y) + " FROM nodes "
 				+ getConditionQueryForGeneralPOISearch("nodes", x, y, radius) + ";";
 
-		return getPOIForQuery(query);
+		return getPOIForQuery(query, true);
 	}
 
 	private String getSelectQuery(String table, String x, String y) {
@@ -49,12 +48,34 @@ public class PointConverter {
 				+ x + ", " + y + ")), 4326)) as distance, " + table + ".tags-> 'opening_hours' as openingHours";
 		return query;
 	}
+	
+	private String getSelectQuery(String table){
+		String query = "SELECT " + table + ".id, " + table + ".tags-> 'name' as _name, " + table
+				+ ".tags-> 'tourism' as tourism, " + table + ".tags-> 'amenity' as amenity, " + table
+				+ ".tags-> 'leisure' as leisure, " + table + ".tags-> 'cuisine' as cuisine, " + table
+				+ ".tags-> 'historic' as historic, " + table + ".tags-> 'shop' as shop," + table
+				+ ".tags-> 'beach' as beach, " + table
+				+ ".tags-> 'addr:street' as street, " + table
+				+ ".tags->'addr:housenumber' as housenumber, " + table + ".tags-> 'opening_hours' as openingHours";
+		return query;
+	}
 
 	private String getConditionQueryForGeneralPOISearch(String table, String x, String y, int radius) {
 		String query = "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
 				+ ")), 4326), " + radius + ") and " + table + ".tags ? 'name' and " + table 
 				+ ".tags ?| ARRAY['tourism','amenity','leisure','cuisine','beach','historic','shop']";
 		return query;
+	}
+	
+	public RecommendedPointOfInterest getPOIForId(long itemId){
+		String query = getSelectQuery("ways") + " FROM ways inner join nodes on ways.nodes[1]=nodes.id "
+				+ "WHERE ways.id=" + itemId + " UNION ALL "
+				+ getSelectQuery("nodes") + " FROM nodes "
+				+ "WHERE nodes.id=" + itemId + ";";
+
+		List<RecommendedPointOfInterest> pois = getPOIForQuery(query,false);
+		assert pois.size() == 1 : "Postcondition failed: Multiple Items with same id found.";
+		return pois.get(0);
 	}
 
 	public List<RecommendedPointOfInterest> getPOIForId(long itemId, double latitude, double longitude, int radius) {
@@ -70,12 +91,12 @@ public class PointConverter {
 				+ "WHERE ST_DWithin(geography(nodes.geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
 				+ ")), 4326), " + radius + ") and nodes.id=" + itemId + ";";
 
-		List<RecommendedPointOfInterest> pois = getPOIForQuery(query);
+		List<RecommendedPointOfInterest> pois = getPOIForQuery(query,true);
 		assert pois.size() <= 1 : "Postcondition failed: Multiple Items with same id found.";
 		return pois;
 	}
 
-	private List<RecommendedPointOfInterest> getPOIForQuery(String query) {
+	private List<RecommendedPointOfInterest> getPOIForQuery(String query, boolean inRadius) {
 		ResultSet resultSet = databaseAccess.executeQuery(query);
 		List<RecommendedPointOfInterest> pois = new ArrayList<>();
 
@@ -95,7 +116,10 @@ public class PointConverter {
 					street = street == null ? "" : street;
 					String houseNumber = resultSet.getString("housenumber");
 					houseNumber = houseNumber == null ? "" : houseNumber;
-					int distance = (int) Math.round(resultSet.getDouble("distance"));
+					int distance = -1;
+					if(inRadius){
+					 distance = (int) Math.round(resultSet.getDouble("distance"));
+					}
 					String openingHours = resultSet.getString("openingHours");
 					openingHours = openingHours == null ? "" : openingHours;
 					pois.add(new RecommendedPointOfInterest(id, name, street, houseNumber, distance, openingHours,

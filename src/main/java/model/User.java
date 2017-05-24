@@ -14,7 +14,6 @@ public class User implements ProfileItem {
 	private Location currentLocation;
 	private List<RecommendedPointOfInterest> pendingRecommendations;
 	private int lastRecommendedIndex;
-	// TODO unify recommendation handling
 	private List<RecommendedPointOfInterest> unratedPOIs;
 	private List<RecommendedPointOfInterest> positiveRecommendations;
 	
@@ -76,15 +75,20 @@ public class User implements ProfileItem {
 	}
 	
 	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((currentLocation == null) ? 0 : currentLocation.hashCode());
 		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + lastRecommendedIndex;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((pendingRecommendations == null) ? 0 : pendingRecommendations.hashCode());
+		result = prime * result + ((positiveRecommendations == null) ? 0 : positiveRecommendations.hashCode());
 		result = prime * result + prefRecommendationRadius;
 		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
+		result = prime * result + ((unratedPOIs == null) ? 0 : unratedPOIs.hashCode());
 		return result;
 	}
 
@@ -104,10 +108,22 @@ public class User implements ProfileItem {
 			return false;
 		if (id != other.id)
 			return false;
+		if (lastRecommendedIndex != other.lastRecommendedIndex)
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (pendingRecommendations == null) {
+			if (other.pendingRecommendations != null)
+				return false;
+		} else if (!pendingRecommendations.equals(other.pendingRecommendations))
+			return false;
+		if (positiveRecommendations == null) {
+			if (other.positiveRecommendations != null)
+				return false;
+		} else if (!positiveRecommendations.equals(other.positiveRecommendations))
 			return false;
 		if (prefRecommendationRadius != other.prefRecommendationRadius)
 			return false;
@@ -115,6 +131,11 @@ public class User implements ProfileItem {
 			if (other.profile != null)
 				return false;
 		} else if (!profile.equals(other.profile))
+			return false;
+		if (unratedPOIs == null) {
+			if (other.unratedPOIs != null)
+				return false;
+		} else if (!unratedPOIs.equals(other.unratedPOIs))
 			return false;
 		return true;
 	}

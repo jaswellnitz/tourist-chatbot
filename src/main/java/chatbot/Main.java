@@ -33,9 +33,9 @@ public class Main {
 		String clientAccess = System.getenv("API_AI_ACCESS_TOKEN");
 		String telegramToken = System.getenv("TELEGRAM_TOKEN");
 		DatabaseAccess dbAccess = new DatabaseAccess(dbUrl);
-		UserDB userDB = new UserDB(dbAccess);
 		PointConverter pointConverter = new PointConverter(dbAccess);
 		Recommender recommender = new Recommender(pointConverter);
+		UserDB userDB = new UserDB(dbAccess,pointConverter);
 		AgentHandler agentConnector = new AgentHandler(clientAccess);
 		UserRatingHandler userRatingHandler = new UserRatingHandler("src/main/resources/ratings.csv");
 		TouristChatbot touristChatbot = new TouristChatbot(agentConnector, recommender, userDB, userRatingHandler);
