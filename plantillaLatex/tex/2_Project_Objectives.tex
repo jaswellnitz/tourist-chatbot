@@ -1,0 +1,13 @@
+\capitulo{2}{Project Objectives}
+
+This project aims to develop a chatbot that is able to present customized tourist recommendations to its users via an instant messaging application. In the presented version of the application, the messenger Telegram is used to interact with the user. 
+The following steps and objectives must be realized to develop the chatbot:
+\begin{itemize}
+\item A Java web server is set up which is connected to Telegram through its webhook API to enable user interaction. The application is deployed to a platform-as-a-service cloud server to enable the webhook integration.
+ 
+\item Design of a conversational interface: the conversation flow between user and chatbot is mapped to the natural language processing platform api.ai which then parses the user input into formalized data. api.ai is accessed by the application through a REST-like HTTP endpoint. The parsed input is interpreted by the chatbot and triggers the desired behaviour, such as recommendation or storage of important user information.
+
+\item A recommender system must be implemented to provide personalized tourist recommendations. The recommender is based on data the user has shared with the chatbot and additional data of similar users. To overcome the problem of initially sparse user data, different recommendation methods are combined as well as retrieving existing user data from other sources and/or generating data.
+
+\item Retrieval of tourist data from the geographic information database OpenStreetMaps: the data is filtered so that only data of touristic importance is evaluated by the recommender and presented to the user. It is prepared in a way that similarity measures can be made between user interests and the point of interest inherent properties.
+\end{itemize}
