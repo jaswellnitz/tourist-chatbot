@@ -32,13 +32,16 @@ public class Main {
 		String dbUrl = System.getenv("JDBC_DATABASE_URL");
 		String clientAccess = System.getenv("API_AI_ACCESS_TOKEN");
 		String telegramToken = System.getenv("TELEGRAM_TOKEN");
+		String foursquareClientId =  System.getenv("F_CLIENT_ID");
+		String foursquareClientSecret = System.getenv("F_CLIENT_SECRET");
 		DatabaseAccess dbAccess = new DatabaseAccess(dbUrl);
 		PointConverter pointConverter = new PointConverter(dbAccess);
 		Recommender recommender = new Recommender(pointConverter);
 		UserDB userDB = new UserDB(dbAccess,pointConverter);
 		AgentHandler agentConnector = new AgentHandler(clientAccess);
+		ImageRequester imageRequester = new ImageRequester(foursquareClientId, foursquareClientSecret);
 		UserRatingHandler userRatingHandler = new UserRatingHandler("src/main/resources/ratings.csv");
-		TouristChatbot touristChatbot = new TouristChatbot(agentConnector, recommender, userDB, userRatingHandler);
+		TouristChatbot touristChatbot = new TouristChatbot(agentConnector, imageRequester, recommender, userDB, userRatingHandler);
 		TelegramBotHandler botHandler = new TelegramBotHandler(telegramToken, touristChatbot);
 		return botHandler;
 	}

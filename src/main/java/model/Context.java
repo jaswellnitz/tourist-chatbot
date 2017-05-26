@@ -1,4 +1,4 @@
-package chatbot;
+package model;
 
 import java.util.Map;
 

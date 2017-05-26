@@ -1,4 +1,4 @@
-package chatbot;
+package model;
 
 public enum ParameterKey {
 	DISTANCE, RATING, POI_INDEX, INTEREST, NONE;

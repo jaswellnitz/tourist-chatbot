@@ -1,4 +1,4 @@
-package chatbot;
+package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +8,6 @@ public class ChatbotResponse {
 
 	private final String reply;
 	private final List<String> keyboardButtons;
-	private boolean triggerRecommendation;
 
 	public ChatbotResponse(String reply, String... keyboardButtons) {
 		this.reply = reply;
@@ -17,7 +16,6 @@ public class ChatbotResponse {
 		} else {
 			this.keyboardButtons = new ArrayList<>();
 		}
-		triggerRecommendation = false;
 	}
 
 	public String getReply() {
@@ -31,12 +29,8 @@ public class ChatbotResponse {
 	public List<String> getKeyboardButtons() {
 		return keyboardButtons;
 	}
-
-	public boolean triggerRecommendation() {
-		return triggerRecommendation;
-	}
-
-	public void setTriggerRecommendation(boolean trigger) {
-		triggerRecommendation = trigger;
+	
+	public boolean sendPhoto(){
+		return reply.startsWith("https://") && reply.endsWith(".jpg");
 	}
 }

@@ -20,7 +20,10 @@ import spark.Route;
 import com.pengrad.telegrambot.TelegramBotAdapter;
 import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
+
+import model.ChatbotResponse;
 
 // Receives Updates from Telegram and passes text messages to api.ai
 public class TelegramBotHandler implements Route {
@@ -59,7 +62,7 @@ public class TelegramBotHandler implements Route {
 
 		boolean state = sendMessage(message.chat().id(), chatbotResponses);
 		// TODO error handling
-		
+
 		return state;
 	}
 
@@ -80,16 +83,23 @@ public class TelegramBotHandler implements Route {
 	private boolean sendMessage(long chatId, List<ChatbotResponse> chatbotResponses) {
 		boolean isOk = false;
 		for (ChatbotResponse chatbotResponse : chatbotResponses) {
-			SendMessage sendMessage = new SendMessage(chatId, chatbotResponse.getReply());
-			Keyboard keyboard;
-			if (chatbotResponse.changeKeyboard()) {
-				keyboard = getKeyboard(chatbotResponse.getKeyboardButtons());
+
+			if (chatbotResponse.sendPhoto()) {
+				SendPhoto sendPhoto = new SendPhoto(chatId, chatbotResponse.getReply());
+				SendResponse execute = telegramBot.execute(sendPhoto);
+				isOk = execute.isOk();
 			} else {
-				keyboard = new ReplyKeyboardRemove();
+				SendMessage sendMessage = new SendMessage(chatId, chatbotResponse.getReply());
+				Keyboard keyboard;
+				if (chatbotResponse.changeKeyboard()) {
+					keyboard = getKeyboard(chatbotResponse.getKeyboardButtons());
+				} else {
+					keyboard = new ReplyKeyboardRemove();
+				}
+				sendMessage.replyMarkup(keyboard);
+				SendResponse execute = telegramBot.execute(sendMessage);
+				isOk = execute.isOk();
 			}
-			sendMessage.replyMarkup(keyboard);
-			SendResponse execute = telegramBot.execute(sendMessage);
-			isOk = execute.isOk();
 		}
 
 		return isOk;

@@ -7,8 +7,12 @@ import java.util.concurrent.TimeUnit;
 
 import dataAccess.UserDB;
 import dataAccess.UserRatingHandler;
+import model.AgentResponse;
+import model.ChatbotResponse;
+import model.Context;
 import model.Location;
 import model.POIProfile;
+import model.ParameterKey;
 import model.Rating;
 import model.RecommendedPointOfInterest;
 import model.User;
@@ -23,8 +27,9 @@ public class TouristChatbot {
 	private UserDB userDB;
 	private Recommender recommender;
 	private UserRatingHandler userRatingHandler;
+	private ImageRequester imageRequester;
 
-	public TouristChatbot(AgentHandler agentHandler, Recommender recommender, UserDB userDB,
+	public TouristChatbot(AgentHandler agentHandler, ImageRequester imageRequester, Recommender recommender, UserDB userDB,
 			UserRatingHandler ratingHandler) {
 		this.agentHandler = agentHandler;
 		this.activeUsers = ExpiringMap.builder().maxSize(100).expirationPolicy(ExpirationPolicy.ACCESSED)
@@ -32,6 +37,7 @@ public class TouristChatbot {
 		this.userDB = userDB;
 		this.recommender = recommender;
 		this.userRatingHandler = ratingHandler;
+		this.imageRequester = imageRequester;
 	}
 
 	public ChatbotResponse processStartMessage(long userId, String userName) {
@@ -80,7 +86,7 @@ public class TouristChatbot {
 				String[] coordinates = ((String) userInput).split(",");
 				user.setCurrentLocation(Double.valueOf(coordinates[0]), Double.valueOf(coordinates[1]));
 			}
-			chatbotResponses.add(getRecommendation(user));
+			chatbotResponses.addAll(getRecommendation(user));
 			break;
 		case RECOMMENDATION_POSITIVE:
 			processFirstImpressionForPreviousPOI(user, true);
@@ -103,7 +109,7 @@ public class TouristChatbot {
 		case RECOMMENDATION_MORE:
 			int index = Integer.valueOf(((String) agentResponse.getParameters().get(ParameterKey.POI_INDEX.name())))
 					- 1;
-			chatbotResponses.add(presentRecommendationResult(user, index));
+			chatbotResponses.addAll(presentRecommendationResult(user, index));
 			break;
 		case SHOW_PAST_RECOMMENDATIONS:
 			if (!user.getPositiveRecommendations().isEmpty()) {
@@ -210,7 +216,7 @@ public class TouristChatbot {
 		return activeUsers;
 	}
 
-	private ChatbotResponse getRecommendation(User user) {
+	private List<ChatbotResponse> getRecommendation(User user) {
 		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user,
 				userRatingHandler.hasRatingForUser(user.getId()));
 		List<RecommendedPointOfInterest> toRemove = new ArrayList<>(); 
@@ -221,27 +227,34 @@ public class TouristChatbot {
 		}
 		recommendations.removeAll(toRemove);
 		
-		ChatbotResponse chatbotResponse;
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		String answer;
 		if (recommendations.isEmpty()) {
 			answer = "I didn't find any recommendations near your current location. Maybe consider extending the recommendation radius?";
-			chatbotResponse = new ChatbotResponse(answer);
+			chatbotResponses.add(new ChatbotResponse(answer));
 		} else {
 			user.setPendingRecommendations(recommendations);
-			chatbotResponse = presentRecommendationResult(user, 0);
+			chatbotResponses.addAll(presentRecommendationResult(user, 0));
 		}
-		return chatbotResponse;
+		return chatbotResponses;
 	}
 
-	private ChatbotResponse presentRecommendationResult(User user, int index) {
+	private List<ChatbotResponse> presentRecommendationResult(User user, int index) {
 		assert index >= 0
 				&& index < user.getPendingRecommendations().size() : "Preconditon failed: index out of bounds";
 
 		user.setLastRecommendedIndex(index);
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		String reply = "Here we go:\n";
-		reply += user.getPendingRecommendations().get(index).getFormattedString(true) + "\n";
+		RecommendedPointOfInterest recommendedPointOfInterest = user.getPendingRecommendations().get(index);
+		String imageURL = imageRequester.getImageURL(recommendedPointOfInterest.getName(), recommendedPointOfInterest.getLocation());
+		if(!imageURL.isEmpty()){
+			chatbotResponses.add(new ChatbotResponse(imageURL));
+		}
+		reply += recommendedPointOfInterest.getFormattedString(true) + "\n";
 		reply += "What do you think about this place?";
-		return new ChatbotResponse(reply, "Sounds good!", "Don't like it...");
+		chatbotResponses.add(new ChatbotResponse(reply, "Sounds good!", "Don't like it..."));
+		return chatbotResponses;
 	}
 
 	private String getPersonalInformation(User user) {

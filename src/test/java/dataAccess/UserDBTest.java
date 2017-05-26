@@ -9,6 +9,7 @@ import org.junit.Test;
 import dataAccess.DatabaseAccess;
 import dataAccess.PointConverter;
 import dataAccess.UserDB;
+import model.Location;
 import model.POIProfile;
 import model.Preference;
 import model.RecommendedPointOfInterest;
@@ -26,7 +27,8 @@ public class UserDBTest {
 		this.userDB = new UserDB(dbAccess, new PointConverter(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"))));
 		POIProfile profile = new POIProfile(Preference.TRUE,Preference.TRUE, Preference.FALSE, Preference.NOT_RATED,Preference.NOT_RATED, Preference.TRUE);
 		this.expectedUser = new User(100l, "Testuser", 500, profile);
-		RecommendedPointOfInterest sagradaFamilia = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
+		Location location = new Location(41.4034984,2.1740598);
+		RecommendedPointOfInterest sagradaFamilia = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família",location, "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
 new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
 		expectedUser.addUnratedPOI(sagradaFamilia);
 		expectedUser.addPositiveRecommendations(sagradaFamilia);
@@ -43,7 +45,8 @@ new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FA
 	public void testAddRecommendation(){
 		// Prepare
 		userDB.storeUser(expectedUser);
-		RecommendedPointOfInterest casaVella = new RecommendedPointOfInterest(2987711249l, "Casa Vella", "","", 0, "",
+		Location location = new Location(41.2730278,1.880012);
+		RecommendedPointOfInterest casaVella = new RecommendedPointOfInterest(2987711249l, "Casa Vella", location,"","", 0, "",
 				new POIProfile(Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
 		expectedUser.addPositiveRecommendations(casaVella);
 		expectedUser.addUnratedPOI(casaVella);

@@ -7,16 +7,22 @@ import org.junit.Before;
 import org.junit.Test;
 
 import dataAccess.PointConverter;
+import model.Location;
 import model.POIProfile;
 import model.RecommendedPointOfInterest;
 import model.Preference;
 
 public class PointConverterTest {
 	private PointConverter pointConverter;
+	private RecommendedPointOfInterest sagradaFamilia;
 	
 	@Before
 	public void setUp(){
 		pointConverter = new PointConverter(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL")));
+		Location location = new Location(41.4034984,2.1740598);
+		POIProfile profile = new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE);
+		this.sagradaFamilia = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", location,"Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",profile);
+		
 	}
 	
 	@Test
@@ -26,8 +32,7 @@ public class PointConverterTest {
 		long itemId = 359086841;
 		double lat = 41.4034984;
 		double lon = 2.1740598;
-		POIProfile profile = new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE);
-		RecommendedPointOfInterest sagradaFamilia = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",profile);
+	
 		
 		// Action
 		List<RecommendedPointOfInterest> poi = pointConverter.getPOIForId(itemId, lat, lon, radius);
@@ -58,8 +63,6 @@ public class PointConverterTest {
 		int radius = 50;
 		double lat = 41.4034984;
 		double lon = 2.1740598;
-		POIProfile profile = new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE);
-		RecommendedPointOfInterest sagradaFamilia = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",profile);
 		
 		// Action
 		List<RecommendedPointOfInterest> poiInRadius = pointConverter.getPOIInRadius(lat, lon, radius);

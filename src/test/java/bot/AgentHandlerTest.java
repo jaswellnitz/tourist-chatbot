@@ -6,8 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import chatbot.AgentHandler;
-import chatbot.AgentResponse;
-import chatbot.ParameterKey;
+import model.AgentResponse;
+import model.ParameterKey;
 
 public class AgentHandlerTest {
 	
