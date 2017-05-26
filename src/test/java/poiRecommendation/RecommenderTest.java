@@ -62,7 +62,7 @@ public class RecommenderTest {
 		int categoryIndex = 3;
 
 		// Action
-		List<RecommendedPointOfInterest> recommendations = recommender.recommendForCategory(user, categoryIndex);
+		List<RecommendedPointOfInterest> recommendations = recommender.recommendForCategory(user, categoryIndex, true);
 
 		// Check
 		assertFalse(recommendations.isEmpty());

@@ -29,8 +29,8 @@ public class TouristChatbot {
 	private UserRatingHandler userRatingHandler;
 	private ImageRequester imageRequester;
 
-	public TouristChatbot(AgentHandler agentHandler, ImageRequester imageRequester, Recommender recommender, UserDB userDB,
-			UserRatingHandler ratingHandler) {
+	public TouristChatbot(AgentHandler agentHandler, ImageRequester imageRequester, Recommender recommender,
+			UserDB userDB, UserRatingHandler ratingHandler) {
 		this.agentHandler = agentHandler;
 		this.activeUsers = ExpiringMap.builder().maxSize(100).expirationPolicy(ExpirationPolicy.ACCESSED)
 				.expiration(1, TimeUnit.DAYS).build();
@@ -86,7 +86,16 @@ public class TouristChatbot {
 				String[] coordinates = ((String) userInput).split(",");
 				user.setCurrentLocation(Double.valueOf(coordinates[0]), Double.valueOf(coordinates[1]));
 			}
-			chatbotResponses.addAll(getRecommendation(user));
+			String interest = "";
+			for(Context context: agentResponse.getContexts()){
+				if(context.getName().equals("recommendation")){
+					if (context.getParameters().containsKey(ParameterKey.INTEREST.name())) {
+						interest = (String) context.getParameters().get(ParameterKey.INTEREST.name());
+						break;
+					}
+				}
+			}
+			chatbotResponses.addAll(getRecommendation(user, interest));
 			break;
 		case RECOMMENDATION_POSITIVE:
 			processFirstImpressionForPreviousPOI(user, true);
@@ -107,9 +116,9 @@ public class TouristChatbot {
 			}
 			break;
 		case RECOMMENDATION_MORE:
-			int index = Integer.valueOf(((String) agentResponse.getParameters().get(ParameterKey.POI_INDEX.name())))
+			int ind = Integer.valueOf(((String) agentResponse.getParameters().get(ParameterKey.POI_INDEX.name())))
 					- 1;
-			chatbotResponses.addAll(presentRecommendationResult(user, index));
+			chatbotResponses.addAll(presentRecommendationResult(user, ind));
 			break;
 		case SHOW_PAST_RECOMMENDATIONS:
 			if (!user.getPositiveRecommendations().isEmpty()) {
@@ -133,7 +142,7 @@ public class TouristChatbot {
 			break;
 		case GREETINGS:
 			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
-			if(agentResponse.getContexts().isEmpty() && !user.getUnratedPOIs().isEmpty()){
+			if (agentResponse.getContexts().isEmpty() && !user.getUnratedPOIs().isEmpty()) {
 				chatbotResponses.add(rateFirstUnratedItem(user));
 				agentHandler.setContext("Rate", user.getId());
 			}
@@ -147,7 +156,7 @@ public class TouristChatbot {
 	}
 
 	private boolean processRating(User user, int rateIndex, int ratingValue) {
-		assert !user.getUnratedPOIs().isEmpty(): "Precondition failed: !user.getUnratedPOIs().isEmpty()";
+		assert !user.getUnratedPOIs().isEmpty() : "Precondition failed: !user.getUnratedPOIs().isEmpty()";
 		Rating rating = Rating.valueOf(ratingValue);
 		if (rating != Rating.INVALID) {
 			RecommendedPointOfInterest recommendedPointOfInterest = user.getUnratedPOIs().get(rateIndex);
@@ -216,17 +225,22 @@ public class TouristChatbot {
 		return activeUsers;
 	}
 
-	private List<ChatbotResponse> getRecommendation(User user) {
-		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user,
-				userRatingHandler.hasRatingForUser(user.getId()));
-		List<RecommendedPointOfInterest> toRemove = new ArrayList<>(); 
-		for(RecommendedPointOfInterest recommendation:recommendations){
-			if(user.getPositiveRecommendations().contains(recommendation)){
+	private List<ChatbotResponse> getRecommendation(User user, String interest) {
+		List<RecommendedPointOfInterest> recommendations = new ArrayList<>();
+		boolean hasRatingForUser = userRatingHandler.hasRatingForUser(user.getId());
+		if (interest.isEmpty()) {
+			recommendations = recommender.recommend(user, hasRatingForUser);
+		} else {
+			recommendations = recommender.recommendForCategory(user, POIProfile.getCategoryIndex(interest), hasRatingForUser);
+		}
+		List<RecommendedPointOfInterest> toRemove = new ArrayList<>();
+		for (RecommendedPointOfInterest recommendation : recommendations) {
+			if (user.getPositiveRecommendations().contains(recommendation)) {
 				toRemove.add(recommendation);
 			}
 		}
 		recommendations.removeAll(toRemove);
-		
+
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		String answer;
 		if (recommendations.isEmpty()) {
@@ -247,8 +261,9 @@ public class TouristChatbot {
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		String reply = "Here we go:\n";
 		RecommendedPointOfInterest recommendedPointOfInterest = user.getPendingRecommendations().get(index);
-		String imageURL = imageRequester.getImageURL(recommendedPointOfInterest.getName(), recommendedPointOfInterest.getLocation());
-		if(!imageURL.isEmpty()){
+		String imageURL = imageRequester.getImageURL(recommendedPointOfInterest.getName(),
+				recommendedPointOfInterest.getLocation());
+		if (!imageURL.isEmpty()) {
 			chatbotResponses.add(new ChatbotResponse(imageURL));
 		}
 		reply += recommendedPointOfInterest.getFormattedString(true) + "\n";

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class POIProfile implements Serializable {
 
 	/**
@@ -87,22 +86,31 @@ public class POIProfile implements Serializable {
 		return new POIProfile(preference[0], preference[1], preference[2], preference[3], preference[4], preference[5]);
 	}
 
-	
-	public static POIProfile getProfileForInterests(List<String> interests){
-		Preference[] preference = {Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED,Preference.NOT_RATED};
-		List<String> categories = Arrays.asList(new String[]{"sightseeing","culture","food","nightlife","nature","shopping"});
-		for(String interest:interests){
-			if(categories.contains(interest)){
-				int index = categories.indexOf(interest);
+	public static int getCategoryIndex(String interest) {
+		List<String> categories = Arrays
+				.asList(new String[] { "sightseeing", "culture", "food", "nightlife", "nature", "shopping" });
+		int index = -1;
+		if (categories.contains(interest)) {
+			index = categories.indexOf(interest);
+		}
+		return index;
+	}
+
+	public static POIProfile getProfileForInterests(List<String> interests) {
+		Preference[] preference = { Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED,
+				Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED };
+		for (String interest : interests) {
+			int index = getCategoryIndex(interest);
+			if (index >= 0) {
 				preference[index] = Preference.TRUE;
 			}
 		}
-		return new POIProfile(preference[0],preference[1],preference[2],preference[3],preference[4],preference[5]);
+		return new POIProfile(preference[0], preference[1], preference[2], preference[3], preference[4], preference[5]);
 	}
-	
-	public List<String> getInterestsFromProfile(){
+
+	public List<String> getInterestsFromProfile() {
 		List<String> interests = new ArrayList<>();
-		
+
 		if (hasSightseeing().toBoolean()) {
 			interests.add("sightseeing");
 		}
@@ -123,8 +131,7 @@ public class POIProfile implements Serializable {
 		}
 		return interests;
 	}
-	
-	
+
 	@Override
 	public String toString() {
 		StringBuilder bld = new StringBuilder();
@@ -132,9 +139,8 @@ public class POIProfile implements Serializable {
 			bld.append(category.getFieldName());
 			bld.append(",");
 		}
-		return bld.substring(0, bld.length()-1);
+		return bld.substring(0, bld.length() - 1);
 	}
-
 
 	@Override
 	public int hashCode() {

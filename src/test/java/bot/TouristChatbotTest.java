@@ -354,4 +354,24 @@ public class TouristChatbotTest {
 		assertEquals(activeUser.getPositiveRecommendations(),storedUser.getPositiveRecommendations());
 		assertEquals(activeUser.getUnratedPOIs(),storedUser.getUnratedPOIs());
 	}
+	
+	@Test
+	public void testRecommendCategory() {
+		// Prepare
+		String input = "I want to do some shopping";
+		String coordinates = "41.403706,2.173504";
+
+		// Action
+		touristChatbot.processInput(user.getId(), input);
+		touristChatbot.processInput(user.getId(), coordinates);
+		User activeUser = touristChatbot.getActiveUsers().get(user.getId());
+
+
+		// Check
+		activeUser = touristChatbot.getActiveUsers().get(user.getId());
+		List<RecommendedPointOfInterest> pendingRecommendations = activeUser.getPendingRecommendations();
+		for(RecommendedPointOfInterest recPOI: pendingRecommendations){
+			assertTrue(recPOI.getProfile().hasShopping().toBoolean());
+		}
+	}
 }
