@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.Location;
 import model.POIProfile;
 import model.RecommendedPointOfInterest;
 import model.Preference;
@@ -30,26 +31,25 @@ public class PointConverter {
 
 		return getPOIForQuery(query, true);
 	}
+	
 
 	private String getSelectQuery(String table, String x, String y) {
-		String query = "SELECT " + table + ".id, " + table + ".tags-> 'name' as _name, " + table
-				+ ".tags-> 'tourism' as tourism, " + table + ".tags-> 'amenity' as amenity, " + table
-				+ ".tags-> 'leisure' as leisure, " + table + ".tags-> 'cuisine' as cuisine, " + table
-				+ ".tags-> 'historic' as historic, " + table + ".tags-> 'shop' as shop," + table
-				+ ".tags-> 'beach' as beach, " + table + ".tags-> 'addr:street' as street, " + table
-				+ ".tags->'addr:housenumber' as housenumber, ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
-				+ x + ", " + y + ")), 4326)) as distance, " + table + ".tags-> 'opening_hours' as openingHours";
-		return query;
-	}
-
-	private String getSelectQuery(String table) {
-		String query = "SELECT " + table + ".id, " + table + ".tags-> 'name' as _name, " + table
+		String query = "SELECT ST_Y(geom) as lat, ST_X(geom) as lon, " 
+				+ table + ".id, " + table + ".tags-> 'name' as _name, " + table
 				+ ".tags-> 'tourism' as tourism, " + table + ".tags-> 'amenity' as amenity, " + table
 				+ ".tags-> 'leisure' as leisure, " + table + ".tags-> 'cuisine' as cuisine, " + table
 				+ ".tags-> 'historic' as historic, " + table + ".tags-> 'shop' as shop," + table
 				+ ".tags-> 'beach' as beach, " + table + ".tags-> 'addr:street' as street, " + table
 				+ ".tags->'addr:housenumber' as housenumber, " + table + ".tags-> 'opening_hours' as openingHours";
+				if(!x.isEmpty() && !y.isEmpty()){
+					query +=  ", ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
+							+ x + ", " + y + ")), 4326)) as distance";
+				}
 		return query;
+	}
+
+	private String getSelectQuery(String table) {
+		return getSelectQuery(table,"","");
 	}
 
 	private String getConditionQueryForGeneralPOISearch(String table, String x, String y, int radius) {
@@ -100,21 +100,8 @@ public class PointConverter {
 
 				POIProfile profile = mapTagsToCategories(resultSet);
 				if (profile.isPOI()) {
-					long id = resultSet.getLong("id");
-					String name = resultSet.getString("_name");
-					name = name == null ? "" : name;
-					String street = resultSet.getString("street");
-					street = street == null ? "" : street;
-					String houseNumber = resultSet.getString("housenumber");
-					houseNumber = houseNumber == null ? "" : houseNumber;
-					int distance = -1;
-					if (inRadius) {
-						distance = (int) Math.round(resultSet.getDouble("distance"));
-					}
-					String openingHours = resultSet.getString("openingHours");
-					openingHours = openingHours == null ? "" : openingHours;
-					pois.add(new RecommendedPointOfInterest(id, name, street, houseNumber, distance, openingHours,
-							profile));
+					RecommendedPointOfInterest pointOfInterest = createPOIFromResultSet(resultSet, profile, inRadius);
+					pois.add(pointOfInterest);
 				}
 			}
 			databaseAccess.close();
@@ -123,6 +110,29 @@ public class PointConverter {
 		}
 
 		return pois;
+	}
+
+	private RecommendedPointOfInterest createPOIFromResultSet(ResultSet resultSet, POIProfile profile, boolean inRadius)
+			throws SQLException {
+		long id = resultSet.getLong("id");
+		double lat = resultSet.getDouble("lat");
+		double lon = resultSet.getDouble("lon");
+		Location location = new Location(lat, lon);
+		String name = resultSet.getString("_name");
+		name = name == null ? "" : name;
+		String street = resultSet.getString("street");
+		street = street == null ? "" : street;
+		String houseNumber = resultSet.getString("housenumber");
+		houseNumber = houseNumber == null ? "" : houseNumber;
+		int distance = -1;
+		if (inRadius) {
+			distance = (int) Math.round(resultSet.getDouble("distance"));
+		}
+		String openingHours = resultSet.getString("openingHours");
+		openingHours = openingHours == null ? "" : openingHours;
+		RecommendedPointOfInterest pointOfInterest = new RecommendedPointOfInterest(id, name,location, street, houseNumber, distance, openingHours,
+				profile);
+		return pointOfInterest;
 	}
 
 	private POIProfile mapTagsToCategories(ResultSet set) {

@@ -42,17 +42,22 @@ public class Recommender {
 		this.numRecommendations = numRecommendations;
 	}
 
-	// TODO category specific recommendation
-	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex) {
+	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex,
+			boolean existingRatings) {
 		POIProfile originalProfile = user.getProfile();
 		POIProfile categoryProfile = POIProfile.getProfileForCategoryIndex(categoryIndex);
 		user.setProfile(categoryProfile);
+		List<RecommendedPointOfInterest> recommendations = new ArrayList<>();
 
-		List<RecommendedPointOfInterest> recommendations = recommendCollaborative(user);
-		List<RecommendedPointOfInterest> toRemove = filterRecommendationsForCategory(recommendations, categoryIndex);
-		recommendations.removeAll(toRemove);
+		if (existingRatings) {
+			recommendations = recommendCollaborative(user);
+			List<RecommendedPointOfInterest> toRemove = filterRecommendationsForCategory(recommendations,
+					categoryIndex);
+			recommendations.removeAll(toRemove);
+		}
 
-		recommendations.addAll(recommendContentBased(user, recommendations));
+		List<RecommendedPointOfInterest> recommendContentBased = recommendContentBased(user, recommendations);
+		recommendations.addAll(recommendContentBased);
 
 		user.setProfile(originalProfile);
 		return recommendations;

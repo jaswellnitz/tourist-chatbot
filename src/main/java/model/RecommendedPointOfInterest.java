@@ -1,6 +1,5 @@
 package model;
 
-// Recommended Point of Interest
 public class RecommendedPointOfInterest implements ProfileItem {
 
 	private static final long serialVersionUID = -8542663924097410195L;
@@ -9,24 +8,21 @@ public class RecommendedPointOfInterest implements ProfileItem {
 	private final String address;
 	private final String openingHours;
 	private final POIProfile profile;
+	private final Location location;
 	private final int distanceToUser;
 	private float recommendationValue;
 	private final static int UNSET_RECOMMENDATION_VALUE = 0;
 	
-	public RecommendedPointOfInterest(long id, String name, String streetName, String houseNumber, int distance,
+	public RecommendedPointOfInterest(long id, String name, Location location, String streetName, String houseNumber, int distance,
 			String openingHours, POIProfile profile){
-		this(id,name,streetName,houseNumber,distance,openingHours, profile,UNSET_RECOMMENDATION_VALUE);
-	}
-
-	public RecommendedPointOfInterest(long id, String name, String streetName, String houseNumber, int distance,
-			String openingHours, POIProfile profile, int recommendationValue) {
 		this.id = id;
 		this.name = name != null? name: "";
 		this.address = parseAddress(streetName, houseNumber);
 		this.distanceToUser = distance;
 		this.openingHours = openingHours != null? openingHours: "";
 		this.profile = profile;
-		this.recommendationValue = recommendationValue;
+		this.recommendationValue = UNSET_RECOMMENDATION_VALUE;
+		this.location = location;
 	}
 
 	public final String parseAddress(String streetName, String houseNumber) {
@@ -67,16 +63,16 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		return openingHours;
 	}
 
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
-		result = prime * result + distanceToUser;
 		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
 		result = prime * result + ((openingHours == null) ? 0 : openingHours.hashCode());
+		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
 		return result;
 	}
 
@@ -99,7 +95,8 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		if (name == null) {
 			if (other.name != null)
 				return false;
-		}
+		} else if (!name.equals(other.name))
+			return false;
 		if (openingHours == null) {
 			if (other.openingHours != null)
 				return false;
@@ -143,6 +140,10 @@ public class RecommendedPointOfInterest implements ProfileItem {
 
 	public void setRecommendationValue(float recommendationValue) {
 		this.recommendationValue = recommendationValue;
+	}
+	
+	public Location getLocation(){
+		return location;
 	}
 
 }

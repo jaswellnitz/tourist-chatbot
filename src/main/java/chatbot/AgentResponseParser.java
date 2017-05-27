@@ -11,6 +11,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import model.AgentResponse;
+import model.Context;
+import model.ParameterKey;
+
 public class AgentResponseParser {
 
 	private static Map<String, Object> parseParameters(JsonObject resultObject) {
@@ -48,9 +52,8 @@ public class AgentResponseParser {
 
 	}
 
-	public static AgentResponse fromJson(String jsonResponse) {
-		assert jsonResponse != null : "Precondition failed: jsonResponse != null";
-		JsonObject responseObject = new JsonParser().parse(jsonResponse).getAsJsonObject().getAsJsonObject();
+	public static AgentResponse fromJson(JsonObject responseObject) {
+		assert responseObject != null : "Precondition failed: responseObject != null";
 		JsonObject resultObject = responseObject.get("result").getAsJsonObject();
 		Map<String, Object> parameters = parseParameters(resultObject);
 

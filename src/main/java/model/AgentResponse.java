@@ -1,7 +1,9 @@
-package chatbot;
+package model;
 
 import java.util.List;
 import java.util.Map;
+
+import chatbot.Action;
 
 // according to https://docs.api.ai/docs/query
 public class AgentResponse {

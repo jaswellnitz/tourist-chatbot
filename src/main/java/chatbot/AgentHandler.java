@@ -1,19 +1,19 @@
 package chatbot;
 
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.gson.JsonObject;
+
+import model.AgentResponse;
+import util.ServiceRequester;
 
 // Sends requests to api.ai agent via its http api 
-public class AgentHandler {
-
-	private OkHttpClient client;
+public class AgentHandler extends ServiceRequester{
 	private String clientAccessToken;
 
 	public AgentHandler(String clientAccess) {
-		this.client = new OkHttpClient();
-		clientAccessToken = clientAccess;
+		this.clientAccessToken = clientAccess;
 	}
 
 	public AgentResponse sendEvent(String event, long sessionId, boolean resetContext) {
@@ -32,50 +32,42 @@ public class AgentHandler {
 		return sendQuery("", "reset", "", sessionId, true);
 	}
 
-	// TODO error handling
+	public AgentResponse setContext(String context, long sessionId) {
+		return sendQuery("", "dummy", context, sessionId, false);
+	}
+
 	private AgentResponse sendQuery(String event, String userInput, String context, long sessionId,
 			boolean resetContext) {
+		
 		String url = buildQuery(event, userInput, context, sessionId, resetContext);
-		Request request = new Request.Builder().header("Authorization", "Bearer " + clientAccessToken).url(url).build();
-		String jsonResponse = null;
-		try {
-			Response response = client.newCall(request).execute();
-			jsonResponse = response.body().string();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return AgentResponseParser.fromJson(jsonResponse);
+		JsonObject jsonObject= sendQuery("Authorization", "Bearer " + clientAccessToken, url);
+		
+		return AgentResponseParser.fromJson(jsonObject);
 	}
 
 	private String buildQuery(String event, String userInput, String context, long sessionId, boolean resetContext) {
-		HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.api.ai/v1/query").newBuilder();
+		Map<String,String> map= new HashMap<>();
 		if (!event.isEmpty()) {
-			urlBuilder.addQueryParameter("e", event);
+			map.put("e", event);
 		}
 		if (!userInput.isEmpty()) {
-			urlBuilder.addQueryParameter("query", userInput);
+			map.put("query", userInput);
 		}
-		urlBuilder.addQueryParameter("v", "20150910");
-		urlBuilder.addQueryParameter("lang", "en");
+		map.put("v", "20150910");
+		map.put("lang", "en");
 
 		if (resetContext) {
-			urlBuilder.addQueryParameter("resetContexts", String.valueOf(resetContext));
+			map.put("resetContexts", String.valueOf(resetContext));
 		}
 		if (!context.isEmpty()) {
-			urlBuilder.addQueryParameter("contexts", "Rate");
+			map.put("contexts", context);
 		}
 
 		String sessionIdStr = String.valueOf(sessionId);
 		if (sessionIdStr.length() < 10) {
 			sessionIdStr = String.format("%10s", sessionIdStr).replace(" ", "0");
 		}
-		urlBuilder.addQueryParameter("sessionId", sessionIdStr);
-		return urlBuilder.build().toString();
+		map.put("sessionId", sessionIdStr);
+		return buildQuery("https://api.api.ai/v1/query",map);
 	}
-
-	public AgentResponse setContext(String context, long sessionId) {
-		return sendQuery("", "dummy", context, sessionId, false);
-	}
-
 }

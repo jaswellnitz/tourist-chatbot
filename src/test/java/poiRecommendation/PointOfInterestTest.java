@@ -12,7 +12,7 @@ public class PointOfInterestTest {
 	public void testPOIEmptyConstructor() {
 		
 		// Action
-		RecommendedPointOfInterest poi = new RecommendedPointOfInterest(100, null, null, null, 0, null,null);
+		RecommendedPointOfInterest poi = new RecommendedPointOfInterest(100, null,null, null, null, 0, null,null);
 		
 		// Check
 		assertEquals("", poi.getAddress());

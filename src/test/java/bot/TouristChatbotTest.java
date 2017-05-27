@@ -14,12 +14,14 @@ import org.junit.Test;
 import com.google.common.io.Files;
 
 import chatbot.AgentHandler;
-import chatbot.ChatbotResponse;
+import chatbot.ImageRequester;
 import chatbot.TouristChatbot;
 import dataAccess.DatabaseAccess;
 import dataAccess.PointConverter;
 import dataAccess.UserDB;
 import dataAccess.UserRatingHandler;
+import model.ChatbotResponse;
+import model.Location;
 import model.POIProfile;
 import model.Preference;
 import model.Rating;
@@ -35,6 +37,7 @@ public class TouristChatbotTest {
 	private AgentHandler agentHandler;
 	private File ratingTestFile;
 	private UserRatingHandler userRatingHandler;
+	private RecommendedPointOfInterest recPOI;
 	private static final String TEST_PATH = "src/test/resources/test.csv";
 	private static final String DEFAULT_RATING_PATH = "src/main/resources/ratings.csv";
 
@@ -46,11 +49,15 @@ public class TouristChatbotTest {
 		agentHandler = new AgentHandler(System.getenv("API_AI_ACCESS_TOKEN"));
 		Recommender recommender = new Recommender(pointConverter);
 		this.userRatingHandler = new UserRatingHandler(TEST_PATH);
-		this.touristChatbot = new TouristChatbot(agentHandler, recommender, userDB, userRatingHandler);
+		ImageRequester imageRequester = new ImageRequester(System.getenv("F_CLIENT_ID"), System.getenv("F_CLIENT_SECRET"));
+		this.touristChatbot = new TouristChatbot(agentHandler, imageRequester, recommender, userDB, userRatingHandler);
 		user = new User(1234567890, "Testuser");
 		userDB.storeUser(user);
 		agentHandler.resetContext(user.getId());
 		Files.copy(new File(DEFAULT_RATING_PATH), ratingTestFile);
+		Location location = new Location(41.4034984,2.1740598);
+		this.recPOI = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família",location, "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
+				new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
 	}
 
 	@After
@@ -147,8 +154,6 @@ public class TouristChatbotTest {
 	@Test
 	public void testShowRecommendations() {
 		// Prepare
-		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
-				new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
 		user.addPositiveRecommendations(recPOI);
 		touristChatbot.getActiveUsers().put(user.getId(), user);
 
@@ -163,8 +168,6 @@ public class TouristChatbotTest {
 	@Test
 	public void testShowRecommendationsWithRating() {
 		// Prepare
-		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
-				new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
 		userRatingHandler.saveRating(user.getId(), recPOI.getId(), Rating._4);
 		user.addPositiveRecommendations(recPOI);
 		user.addUnratedPOI(recPOI);
@@ -193,8 +196,6 @@ public class TouristChatbotTest {
 	@Test
 	public void testRating(){
 		// Prepare
-		RecommendedPointOfInterest recPOI = new RecommendedPointOfInterest(359086841l, "Basílica de la Sagrada Família", "Carrer de Mallorca","403", 0, "Mo-Su 09:00-20:00",
-				new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FALSE, Preference.FALSE, Preference.FALSE));
 		userRatingHandler.saveRating(user.getId(), recPOI.getId(), Rating._4);
 		user.addUnratedPOI(recPOI);
 		user.addPositiveRecommendations(recPOI);
@@ -352,5 +353,25 @@ public class TouristChatbotTest {
 		User storedUser = userDB.getUser(user.getId());
 		assertEquals(activeUser.getPositiveRecommendations(),storedUser.getPositiveRecommendations());
 		assertEquals(activeUser.getUnratedPOIs(),storedUser.getUnratedPOIs());
+	}
+	
+	@Test
+	public void testRecommendCategory() {
+		// Prepare
+		String input = "I want to do some shopping";
+		String coordinates = "41.403706,2.173504";
+
+		// Action
+		touristChatbot.processInput(user.getId(), input);
+		touristChatbot.processInput(user.getId(), coordinates);
+		User activeUser = touristChatbot.getActiveUsers().get(user.getId());
+
+
+		// Check
+		activeUser = touristChatbot.getActiveUsers().get(user.getId());
+		List<RecommendedPointOfInterest> pendingRecommendations = activeUser.getPendingRecommendations();
+		for(RecommendedPointOfInterest recPOI: pendingRecommendations){
+			assertTrue(recPOI.getProfile().hasShopping().toBoolean());
+		}
 	}
 }
