@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import dataAccess.RatingDB;
 import dataAccess.UserDB;
-import dataAccess.UserRatingHandler;
 import model.AgentResponse;
 import model.ChatbotResponse;
 import model.Context;
@@ -26,23 +26,23 @@ public class TouristChatbot {
 	private final Map<Long, User> activeUsers;
 	private UserDB userDB;
 	private Recommender recommender;
-	private UserRatingHandler userRatingHandler;
 	private ImageRequester imageRequester;
+	private RatingDB ratingsDB;
 
 	public TouristChatbot(AgentHandler agentHandler, ImageRequester imageRequester, Recommender recommender,
-			UserDB userDB, UserRatingHandler ratingHandler) {
+			UserDB userDB, RatingDB ratingsDB) {
 		this.agentHandler = agentHandler;
 		this.activeUsers = ExpiringMap.builder().maxSize(100).expirationPolicy(ExpirationPolicy.ACCESSED)
 				.expiration(1, TimeUnit.DAYS).build();
 		this.userDB = userDB;
 		this.recommender = recommender;
-		this.userRatingHandler = ratingHandler;
 		this.imageRequester = imageRequester;
+		this.ratingsDB = ratingsDB;
 	}
 
 	public ChatbotResponse processStartMessage(long userId, String userName) {
 		if (userDB.hasUser(userId)) {
-			userRatingHandler.deleteAllUserRatings(userId);
+			ratingsDB.deleteAllUserRatings(userId);
 			userDB.deleteUser(userId);
 		}
 
@@ -160,7 +160,7 @@ public class TouristChatbot {
 		Rating rating = Rating.valueOf(ratingValue);
 		if (rating != Rating.INVALID) {
 			RecommendedPointOfInterest recommendedPointOfInterest = user.getUnratedPOIs().get(rateIndex);
-			userRatingHandler.saveRating(user.getId(), recommendedPointOfInterest.getId(), Rating.valueOf(ratingValue));
+			ratingsDB.updateRating(user.getId(), recommendedPointOfInterest.getId(), Rating.valueOf(ratingValue));
 			user.getUnratedPOIs().remove(rateIndex);
 			userDB.deleteFirstUnratedRecommendation(user.getId());
 			return true;
@@ -196,12 +196,12 @@ public class TouristChatbot {
 		RecommendedPointOfInterest recPointOfInterest = user.getPendingRecommendations()
 				.get(user.getLastRecommendedIndex());
 		if (positiveImpression) {
-			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._4);
+			ratingsDB.saveRating(user.getId(), recPointOfInterest.getId(), Rating._4);
 			user.addUnratedPOI(recPointOfInterest);
 			user.addPositiveRecommendations(recPointOfInterest);
 			userDB.addRecommendation(user.getId(), recPointOfInterest.getId());
 		} else {
-			userRatingHandler.saveRating(user.getId(), recPointOfInterest.getId(), Rating._1);
+			ratingsDB.saveRating(user.getId(), recPointOfInterest.getId(), Rating._1);
 		}
 		user.getPendingRecommendations().remove(user.getLastRecommendedIndex());
 	}
@@ -227,11 +227,10 @@ public class TouristChatbot {
 
 	private List<ChatbotResponse> getRecommendation(User user, String interest) {
 		List<RecommendedPointOfInterest> recommendations = new ArrayList<>();
-		boolean hasRatingForUser = userRatingHandler.hasRatingForUser(user.getId());
 		if (interest.isEmpty()) {
-			recommendations = recommender.recommend(user, hasRatingForUser);
+			recommendations = recommender.recommend(user);
 		} else {
-			recommendations = recommender.recommendForCategory(user, POIProfile.getCategoryIndex(interest), hasRatingForUser);
+			recommendations = recommender.recommendForCategory(user, POIProfile.getCategoryIndex(interest));
 		}
 		List<RecommendedPointOfInterest> toRemove = new ArrayList<>();
 		for (RecommendedPointOfInterest recommendation : recommendations) {

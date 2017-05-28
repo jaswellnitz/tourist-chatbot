@@ -18,6 +18,7 @@ public class UserRatingHandler {
 
 	private String ratingPath;
 
+	@Deprecated
 	public UserRatingHandler(String ratingPath) {
 		this.ratingPath = ratingPath;
 

@@ -7,10 +7,9 @@ import static spark.Spark.port;
 
 import com.pengrad.telegrambot.request.SetWebhook;
 
-import dataAccess.DatabaseAccess;
-import dataAccess.PointConverter;
+import dataAccess.PointDB;
+import dataAccess.RatingDB;
 import dataAccess.UserDB;
-import dataAccess.UserRatingHandler;
 import recommender.Recommender;
 
 // Entry Point: enables Telegram webhook
@@ -29,19 +28,18 @@ public class Main {
 	}
 
 	private static TelegramBotHandler initBotHandler() {
-		String dbUrl = System.getenv("JDBC_DATABASE_URL");
+		String dbUrl = System.getenv("DATABASE_URL");
 		String clientAccess = System.getenv("API_AI_ACCESS_TOKEN");
 		String telegramToken = System.getenv("TELEGRAM_TOKEN");
 		String foursquareClientId =  System.getenv("F_CLIENT_ID");
 		String foursquareClientSecret = System.getenv("F_CLIENT_SECRET");
-		DatabaseAccess dbAccess = new DatabaseAccess(dbUrl);
-		PointConverter pointConverter = new PointConverter(dbAccess);
-		Recommender recommender = new Recommender(pointConverter);
-		UserDB userDB = new UserDB(dbAccess,pointConverter);
+		PointDB pointConverter = new PointDB(dbUrl);
+		RatingDB ratingDB = new RatingDB(dbUrl);
+		Recommender recommender = new Recommender(pointConverter, ratingDB);
+		UserDB userDB = new UserDB(dbUrl,pointConverter);
 		AgentHandler agentConnector = new AgentHandler(clientAccess);
 		ImageRequester imageRequester = new ImageRequester(foursquareClientId, foursquareClientSecret);
-		UserRatingHandler userRatingHandler = new UserRatingHandler("src/main/resources/ratings.csv");
-		TouristChatbot touristChatbot = new TouristChatbot(agentConnector, imageRequester, recommender, userDB, userRatingHandler);
+		TouristChatbot touristChatbot = new TouristChatbot(agentConnector, imageRequester, recommender, userDB, ratingDB);
 		TelegramBotHandler botHandler = new TelegramBotHandler(telegramToken, touristChatbot);
 		return botHandler;
 	}

@@ -1,23 +1,25 @@
 package recommender;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import org.apache.mahout.cf.taste.common.TasteException;
-import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
+import org.apache.mahout.cf.taste.impl.model.jdbc.PostgreSQLJDBCDataModel;
+import org.apache.mahout.cf.taste.impl.model.jdbc.ReloadFromJDBCDataModel;
 import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
 import org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity;
 import org.apache.mahout.cf.taste.model.DataModel;
+import org.apache.mahout.cf.taste.model.JDBCDataModel;
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
-import dataAccess.PointConverter;
+import dataAccess.PointDB;
+import dataAccess.RatingDB;
 import model.Location;
 import model.POIProfile;
 import model.Preference;
@@ -26,30 +28,28 @@ import model.ProfileItem;
 import model.User;
 
 public class Recommender {
-	private PointConverter pointConverter;
-	private final String ratingPath;
+	private PointDB pointConverter;
 	public final int numRecommendations;
-	private static final String DEFAULT_RATING_PATH = "src/main/resources/ratings.csv";
+	private RatingDB ratingDB;
 	private static final int DEFAULT_NUM_RECOMMENDATIONS = 4;
 
-	public Recommender(PointConverter pointConverter) {
-		this(pointConverter, DEFAULT_RATING_PATH, DEFAULT_NUM_RECOMMENDATIONS);
+	public Recommender(PointDB pointConverter, RatingDB ratingDB) {
+		this(pointConverter, ratingDB, DEFAULT_NUM_RECOMMENDATIONS);
 	}
 
-	public Recommender(PointConverter pointConverter, String ratingPath, int numRecommendations) {
+	public Recommender(PointDB pointConverter, RatingDB ratingDB, int numRecommendations) {
 		this.pointConverter = pointConverter;
-		this.ratingPath = ratingPath;
 		this.numRecommendations = numRecommendations;
+		this.ratingDB = ratingDB;
 	}
 
-	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex,
-			boolean existingRatings) {
+	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex) {
 		POIProfile originalProfile = user.getProfile();
 		POIProfile categoryProfile = POIProfile.getProfileForCategoryIndex(categoryIndex);
 		user.setProfile(categoryProfile);
 		List<RecommendedPointOfInterest> recommendations = new ArrayList<>();
-
-		if (existingRatings) {
+		
+		if (ratingDB.hasRatingForUser(user.getId())) {
 			recommendations = recommendCollaborative(user);
 			List<RecommendedPointOfInterest> toRemove = filterRecommendationsForCategory(recommendations,
 					categoryIndex);
@@ -63,9 +63,9 @@ public class Recommender {
 		return recommendations;
 	}
 
-	public List<RecommendedPointOfInterest> recommend(User user, boolean existingRatings) {
+	public List<RecommendedPointOfInterest> recommend(User user) {
 		List<RecommendedPointOfInterest> recommendedItems = new ArrayList<>();
-		if (existingRatings) {
+		if (ratingDB.hasRatingForUser(user.getId())) {
 			recommendedItems = recommendCollaborative(user);
 		}
 		recommendedItems.addAll(recommendContentBased(user, recommendedItems));
@@ -76,7 +76,7 @@ public class Recommender {
 		List<RecommendedPointOfInterest> recommendedPOI = new ArrayList<>();
 		Location location = user.getCurrentLocation();
 		try {
-			DataModel model = new FileDataModel(new File(ratingPath));
+			DataModel model = new PostgreSQLJDBCDataModel(ratingDB.getDataSource(),"ratings", "userId", "pointId", "ratings", null);
 			UserSimilarity similarity = new LogLikelihoodSimilarity(model);
 			UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.1, similarity, model);
 			UserBasedRecommender recommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
@@ -155,4 +155,5 @@ public class Recommender {
 
 		return result;
 	}
+	
 }

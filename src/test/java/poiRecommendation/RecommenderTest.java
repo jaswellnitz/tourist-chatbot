@@ -9,29 +9,43 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.mahout.cf.taste.eval.RecommenderIRStatsEvaluator;
+import org.apache.mahout.cf.taste.impl.eval.GenericRecommenderIRStatsEvaluator;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import dataAccess.DatabaseAccess;
-import dataAccess.PointConverter;
+import dataAccess.PointDB;
+import dataAccess.RatingDB;
 import model.Location;
 import model.POIProfile;
 import model.Preference;
+import model.Rating;
 import model.RecommendedPointOfInterest;
 import model.User;
 import recommender.Recommender;
 
 public class RecommenderTest {
 	private Recommender recommender;
-	private static final String testRatingPath = "src/test/resources/ratings.csv";
 	private Location defaultUserLocation;
 	private int numRecommendations;
+	private RatingDB ratingDB;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		numRecommendations = 3;
-		recommender = new Recommender(new PointConverter(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"))), testRatingPath, numRecommendations);
+		String url = System.getenv("DATABASE_URL");
+		this.ratingDB = new RatingDB(url);
+		recommender = new Recommender(new PointDB(url), ratingDB,numRecommendations);
 		this.defaultUserLocation = new Location(41.4034984, 2.1740598);
+		ratingDB.saveRating(998, 2200465185l, Rating._4);
+		ratingDB.saveRating(999, 249401770, Rating._4);
+	}
+	
+	@After
+	public void tearDown(){
+		ratingDB.deleteAllUserRatings(998);
+		ratingDB.deleteAllUserRatings(999);
 	}
 
 	@Test
@@ -42,7 +56,7 @@ public class RecommenderTest {
 		user.setCurrentLocation(defaultUserLocation);
 		
 		// Action
-		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user, true);
+		List<RecommendedPointOfInterest> recommendations = recommender.recommend(user);
 
 		// Check
 		assertFalse(recommendations.isEmpty());
@@ -62,7 +76,7 @@ public class RecommenderTest {
 		int categoryIndex = 3;
 
 		// Action
-		List<RecommendedPointOfInterest> recommendations = recommender.recommendForCategory(user, categoryIndex, true);
+		List<RecommendedPointOfInterest> recommendations = recommender.recommendForCategory(user, categoryIndex);
 
 		// Check
 		assertFalse(recommendations.isEmpty());
@@ -111,33 +125,6 @@ public class RecommenderTest {
 		assertFalse(recommendations.isEmpty());
 		RecommendedPointOfInterest pointOfInterest = recommendations.get(0);
 		assertEquals(Preference.TRUE, pointOfInterest.getProfile().hasFood());
-	}
-
-	// dropped rating from original data 1011,66713401,4
-	@Test
-	public void testRecommendCollaborativePOIDropExistingRating() {
-		// Prepare
-		long userId = 1011;
-		User user = new User(userId, "");
-		user.setCurrentLocation(defaultUserLocation);
-		long droppedId = 66713401;
-		int originalRating = 4;
-		double eps = 0.5;
-
-		// Action
-		List<RecommendedPointOfInterest> recommendations = recommender.recommendCollaborative(user);
-
-		// Check
-		assertFalse(recommendations.isEmpty());
-
-		List<Long> ids = new ArrayList<>();
-		for (RecommendedPointOfInterest poi : recommendations) {
-			ids.add(poi.getId());
-		}
-		assertTrue(ids.contains(droppedId));
-		RecommendedPointOfInterest recommendedPointOfInterest = recommendations.get(ids.indexOf(droppedId));
-		double recommendationValue = recommendedPointOfInterest.getRecommendationValue();
-		assertTrue(originalRating - eps < recommendationValue && recommendationValue < originalRating + eps);
 	}
 
 	@Test
@@ -322,5 +309,39 @@ public class RecommenderTest {
 		RecommendedPointOfInterest poi2 = recommendations.get(1);
 		assertEquals(Preference.TRUE, poi1.getProfile().hasShopping());
 		assertEquals(Preference.TRUE, poi2.getProfile().hasShopping());
+	}
+	
+	
+	@Test
+	public void evaluateRecommendation(){
+		   RecommenderIRStatsEvaluator evaluator = new GenericRecommenderIRStatsEvaluator();
+	}
+	
+	
+	// dropped rating from original data 1011,66713401,4
+	//@Test
+	public void evaluateCollaborativePOIDropExistingRating() {
+		// Prepare
+		long userId = 1011;
+		User user = new User(userId, "");
+		user.setCurrentLocation(defaultUserLocation);
+		long droppedId = 66713401;
+		int originalRating = 4;
+		double eps = 0.5;
+
+		// Action
+		List<RecommendedPointOfInterest> recommendations = recommender.recommendCollaborative(user);
+
+		// Check
+		assertFalse(recommendations.isEmpty());
+
+		List<Long> ids = new ArrayList<>();
+		for (RecommendedPointOfInterest poi : recommendations) {
+			ids.add(poi.getId());
+		}
+		assertTrue(ids.contains(droppedId));
+		RecommendedPointOfInterest recommendedPointOfInterest = recommendations.get(ids.indexOf(droppedId));
+		double recommendationValue = recommendedPointOfInterest.getRecommendationValue();
+		assertTrue(originalRating - eps < recommendationValue && recommendationValue < originalRating + eps);
 	}
 }

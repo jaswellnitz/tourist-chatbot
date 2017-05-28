@@ -10,12 +10,10 @@ import model.POIProfile;
 import model.RecommendedPointOfInterest;
 import model.Preference;
 
-public class PointConverter {
+public class PointDB extends DatabaseManager {
 
-	private DatabaseAccess databaseAccess;
-
-	public PointConverter(DatabaseAccess db) {
-		databaseAccess = db;
+	public PointDB(String databaseUrl) {
+		super(databaseUrl);
 	}
 
 	public List<RecommendedPointOfInterest> getPOIInRadius(double latitude, double longitude, int radius) {
@@ -31,25 +29,24 @@ public class PointConverter {
 
 		return getPOIForQuery(query, true);
 	}
-	
 
 	private String getSelectQuery(String table, String x, String y) {
-		String query = "SELECT ST_Y(geom) as lat, ST_X(geom) as lon, " 
-				+ table + ".id, " + table + ".tags-> 'name' as _name, " + table
-				+ ".tags-> 'tourism' as tourism, " + table + ".tags-> 'amenity' as amenity, " + table
-				+ ".tags-> 'leisure' as leisure, " + table + ".tags-> 'cuisine' as cuisine, " + table
-				+ ".tags-> 'historic' as historic, " + table + ".tags-> 'shop' as shop," + table
-				+ ".tags-> 'beach' as beach, " + table + ".tags-> 'addr:street' as street, " + table
-				+ ".tags->'addr:housenumber' as housenumber, " + table + ".tags-> 'opening_hours' as openingHours";
-				if(!x.isEmpty() && !y.isEmpty()){
-					query +=  ", ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point("
-							+ x + ", " + y + ")), 4326)) as distance";
-				}
+		String query = "SELECT ST_Y(geom) as lat, ST_X(geom) as lon, " + table + ".id, " + table
+				+ ".tags-> 'name' as _name, " + table + ".tags-> 'tourism' as tourism, " + table
+				+ ".tags-> 'amenity' as amenity, " + table + ".tags-> 'leisure' as leisure, " + table
+				+ ".tags-> 'cuisine' as cuisine, " + table + ".tags-> 'historic' as historic, " + table
+				+ ".tags-> 'shop' as shop," + table + ".tags-> 'beach' as beach, " + table
+				+ ".tags-> 'addr:street' as street, " + table + ".tags->'addr:housenumber' as housenumber, " + table
+				+ ".tags-> 'opening_hours' as openingHours";
+		if (!x.isEmpty() && !y.isEmpty()) {
+			query += ", ST_Distance(geography(geom), ST_SetSRID(geography(ST_Point(" + x + ", " + y
+					+ ")), 4326)) as distance";
+		}
 		return query;
 	}
 
 	private String getSelectQuery(String table) {
-		return getSelectQuery(table,"","");
+		return getSelectQuery(table, "", "");
 	}
 
 	private String getConditionQueryForGeneralPOISearch(String table, String x, String y, int radius) {
@@ -88,14 +85,14 @@ public class PointConverter {
 	}
 
 	private List<RecommendedPointOfInterest> getPOIForQuery(String query, boolean inRadius) {
-		ResultSet resultSet = databaseAccess.executeQuery(query);
 		List<RecommendedPointOfInterest> pois = new ArrayList<>();
 
-		if (resultSet == null) {
-			return pois;
-		}
+		try (ResultSet resultSet = executeQuery(query)) {
 
-		try {
+			if (resultSet == null) {
+				return pois;
+			}
+
 			while (resultSet.next()) {
 
 				POIProfile profile = mapTagsToCategories(resultSet);
@@ -104,10 +101,10 @@ public class PointConverter {
 					pois.add(pointOfInterest);
 				}
 			}
-			databaseAccess.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		close();
 
 		return pois;
 	}
@@ -130,8 +127,8 @@ public class PointConverter {
 		}
 		String openingHours = resultSet.getString("openingHours");
 		openingHours = openingHours == null ? "" : openingHours;
-		RecommendedPointOfInterest pointOfInterest = new RecommendedPointOfInterest(id, name,location, street, houseNumber, distance, openingHours,
-				profile);
+		RecommendedPointOfInterest pointOfInterest = new RecommendedPointOfInterest(id, name, location, street,
+				houseNumber, distance, openingHours, profile);
 		return pointOfInterest;
 	}
 
@@ -217,7 +214,7 @@ public class PointConverter {
 
 			String leisureTag = set.getString("leisure");
 			if (leisureTag != null && (leisureTag.equals("park") || leisureTag.equals("nature_reserve"))) {
-					nature = Preference.TRUE;
+				nature = Preference.TRUE;
 			}
 
 			String cuisineTag = set.getString("cuisine");

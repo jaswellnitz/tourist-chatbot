@@ -6,8 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import dataAccess.DatabaseAccess;
-import dataAccess.PointConverter;
+import dataAccess.PointDB;
 import dataAccess.UserDB;
 import model.Location;
 import model.POIProfile;
@@ -19,12 +18,11 @@ public class UserDBTest {
 
 	private UserDB userDB;
 	private User expectedUser;
-	private DatabaseAccess dbAccess;
 
 	@Before
 	public void setUp() {
-		this.dbAccess = new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"));
-		this.userDB = new UserDB(dbAccess, new PointConverter(new DatabaseAccess(System.getenv("JDBC_DATABASE_URL"))));
+		String url = System.getenv("DATABASE_URL");
+		this.userDB = new UserDB(url, new PointDB(url));
 		POIProfile profile = new POIProfile(Preference.TRUE,Preference.TRUE, Preference.FALSE, Preference.NOT_RATED,Preference.NOT_RATED, Preference.TRUE);
 		this.expectedUser = new User(100l, "Testuser", 500, profile);
 		Location location = new Location(41.4034984,2.1740598);
@@ -36,9 +34,9 @@ new POIProfile(Preference.TRUE, Preference.TRUE, Preference.FALSE, Preference.FA
 
 	@After
 	public void tearDown() {
-		long id = expectedUser.getId();
-		if (userDB.hasUser(id))
-			userDB.deleteUser(id);
+		if(userDB.hasUser(expectedUser.getId())){
+			userDB.deleteUser(expectedUser.getId());
+		}
 	}
 	
 	@Test

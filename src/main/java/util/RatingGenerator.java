@@ -1,11 +1,17 @@
 package util;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import dataAccess.RatingDB;
 import dataAccess.UserRatingHandler;
 
 import java.util.Random;
@@ -129,7 +135,11 @@ public class RatingGenerator {
 		return users;
 	}
 
-	public static void main(String... args) {
+	public static void main(String... args) throws IOException {
+		generateRatings();
+	}
+
+	private static void generateRatings() {
 		UserRatingHandler userDataHandler = new UserRatingHandler("src/main/resources/generatedRatings.csv");
 		List<List<Long>> categories = createPOICategories();
 

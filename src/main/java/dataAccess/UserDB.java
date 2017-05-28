@@ -12,41 +12,40 @@ import model.Preference;
 import model.RecommendedPointOfInterest;
 import model.User;
 
-public class UserDB {
+public class UserDB extends DatabaseManager {
 
-	private DatabaseAccess dbAccess;
-	private PointConverter pointConverter;
+	private PointDB pointConverter;
 
-	public UserDB(DatabaseAccess dbAccess, PointConverter pointConverter) {
-		this.dbAccess = dbAccess;
+	public UserDB(String dbUrl, PointDB pointConverter) {
+		super(dbUrl);
 		this.pointConverter = pointConverter;
 	}
 
-	
 	public boolean hasUser(long userId) {
 		String query = "select * from users where id = " + userId;
 
-		ResultSet resultSet = dbAccess.executeQuery(query);
+		ResultSet resultSet = executeQuery(query);
 		boolean hasNext = false;
 		try {
 			hasNext = resultSet.next();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		close();
 
 		return hasNext;
 	}
-	
-	public boolean addRecommendation(long userId, long recommendationId){
+
+	public boolean addRecommendation(long userId, long recommendationId) {
 		Map<String, String> param = new HashMap<String, String>();
-		param.put("recommendations", "recommendations || "+ recommendationId+"::bigint");
-		param.put("unrated", "unrated || "+ recommendationId+"::bigint");
+		param.put("recommendations", "recommendations || " + recommendationId + "::bigint");
+		param.put("unrated", "unrated || " + recommendationId + "::bigint");
 		return updateUser(userId, param);
 	}
-	
-	public boolean deleteFirstUnratedRecommendation(long userId){
+
+	public boolean deleteFirstUnratedRecommendation(long userId) {
 		Map<String, String> param = new HashMap<String, String>();
-		param.put("unrated","unrated[2:array_length(unrated,1)]");
+		param.put("unrated", "unrated[2:array_length(unrated,1)]");
 		return updateUser(userId, param);
 	}
 
@@ -56,11 +55,11 @@ public class UserDB {
 		param.put(radiusParam, String.valueOf(radius));
 		return updateUser(userId, param);
 	}
-	
-	public boolean changeProfileForUser(long userId, POIProfile profile){
+
+	public boolean changeProfileForUser(long userId, POIProfile profile) {
 		String profileParam = "profile";
 		Map<String, String> param = new HashMap<String, String>();
-		param.put(profileParam, "'"+profile.toString()+"'");
+		param.put(profileParam, "'" + profile.toString() + "'");
 		return updateUser(userId, param);
 	}
 
@@ -72,46 +71,46 @@ public class UserDB {
 		}
 		query = query.substring(0, query.length() - 1) + " where id = " + userId + ";";
 
-		int rowCount = dbAccess.executeUpdate(query);
+		int rowCount = executeUpdate(query);
 		return rowCount == 1;
 	}
 
 	public boolean deleteUser(long userId) {
 		String query = "DELETE from users where id = " + userId + ";";
-		int rowCount = dbAccess.executeUpdate(query);
+		int rowCount = executeUpdate(query);
 		return rowCount == 1;
 	}
 
 	public boolean storeUser(User user) {
 		String posRec = preparePSQLArray(user.getPositiveRecommendations());
 		String unrated = preparePSQLArray(user.getUnratedPOIs());
-		String query = "INSERT into users (id, name, radius, profile, recommendations,unrated) values (" + user.getId() + ",'" + user.getName() + "',"
-				+ user.getPrefRecommendationRadius() + ",'" +user.getProfile().toString()+"'" + "," + posRec +"," + unrated + ")";
-		int rowCount = dbAccess.executeUpdate(query);
+		String query = "INSERT into users (id, name, radius, profile, recommendations,unrated) values (" + user.getId()
+				+ ",'" + user.getName() + "'," + user.getPrefRecommendationRadius() + ",'"
+				+ user.getProfile().toString() + "'" + "," + posRec + "," + unrated + ")";
+		int rowCount = executeUpdate(query);
 		return rowCount == 1;
 	}
-	
-	private String preparePSQLArray(List<RecommendedPointOfInterest> pois){
+
+	private String preparePSQLArray(List<RecommendedPointOfInterest> pois) {
 		String ret = "";
-		if(pois.isEmpty()){
+		if (pois.isEmpty()) {
 			ret = "ARRAY[]::bigint[]";
-		}else{
+		} else {
 			ret = "ARRAY[";
-			for(RecommendedPointOfInterest rec: pois){
-				ret +=  rec.getId() +",";
+			for (RecommendedPointOfInterest rec : pois) {
+				ret += rec.getId() + ",";
 			}
-			ret =ret.substring(0, ret.length()-1) +"]";
+			ret = ret.substring(0, ret.length() - 1) + "]";
 		}
 		return ret;
 	}
 
 	public User getUser(long userId) {
 		String query = "select * from users where id = " + userId;
-
-		ResultSet resultSet = dbAccess.executeQuery(query);
-		assert resultSet != null : "Postcondition failed: no user found for id " + userId;
 		List<User> users = new ArrayList<>();
-		try {
+
+		try(ResultSet resultSet = executeQuery(query)){
+		assert resultSet != null : "Postcondition failed: no user found for id " + userId;
 			while (resultSet.next()) {
 				long id = resultSet.getLong("id");
 				String name = resultSet.getString("name");
@@ -130,10 +129,10 @@ public class UserDB {
 				}
 				users.add(user);
 			}
-			dbAccess.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		close();
 		assert users.size() == 1 : "Postcondition failed: getUser from UserDB for id " + userId;
 
 		return users.get(0);
