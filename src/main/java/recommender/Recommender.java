@@ -8,6 +8,7 @@ import java.util.stream.LongStream;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.jdbc.PostgreSQLJDBCDataModel;
 import org.apache.mahout.cf.taste.impl.model.jdbc.ReloadFromJDBCDataModel;
+import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood;
 import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
 import org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity;
@@ -31,7 +32,7 @@ public class Recommender {
 	private PointDB pointConverter;
 	public final int numRecommendations;
 	private RatingDB ratingDB;
-	private static final int DEFAULT_NUM_RECOMMENDATIONS = 4;
+	private static final int DEFAULT_NUM_RECOMMENDATIONS = 3;
 
 	public Recommender(PointDB pointConverter, RatingDB ratingDB) {
 		this(pointConverter, ratingDB, DEFAULT_NUM_RECOMMENDATIONS);
@@ -78,7 +79,7 @@ public class Recommender {
 		try {
 			DataModel model = new PostgreSQLJDBCDataModel(ratingDB.getDataSource(),"ratings", "userId", "pointId", "ratings", null);
 			UserSimilarity similarity = new LogLikelihoodSimilarity(model);
-			UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.1, similarity, model);
+			UserNeighborhood neighborhood = new NearestNUserNeighborhood(5, similarity, model);
 			UserBasedRecommender recommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
 			List<RecommendedItem> recommendations = recommender.recommend(user.getId(), numRecommendations);
 			for (RecommendedItem recommendation : recommendations) {

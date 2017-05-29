@@ -310,38 +310,4 @@ public class RecommenderTest {
 		assertEquals(Preference.TRUE, poi1.getProfile().hasShopping());
 		assertEquals(Preference.TRUE, poi2.getProfile().hasShopping());
 	}
-	
-	
-	@Test
-	public void evaluateRecommendation(){
-		   RecommenderIRStatsEvaluator evaluator = new GenericRecommenderIRStatsEvaluator();
-	}
-	
-	
-	// dropped rating from original data 1011,66713401,4
-	//@Test
-	public void evaluateCollaborativePOIDropExistingRating() {
-		// Prepare
-		long userId = 1011;
-		User user = new User(userId, "");
-		user.setCurrentLocation(defaultUserLocation);
-		long droppedId = 66713401;
-		int originalRating = 4;
-		double eps = 0.5;
-
-		// Action
-		List<RecommendedPointOfInterest> recommendations = recommender.recommendCollaborative(user);
-
-		// Check
-		assertFalse(recommendations.isEmpty());
-
-		List<Long> ids = new ArrayList<>();
-		for (RecommendedPointOfInterest poi : recommendations) {
-			ids.add(poi.getId());
-		}
-		assertTrue(ids.contains(droppedId));
-		RecommendedPointOfInterest recommendedPointOfInterest = recommendations.get(ids.indexOf(droppedId));
-		double recommendationValue = recommendedPointOfInterest.getRecommendationValue();
-		assertTrue(originalRating - eps < recommendationValue && recommendationValue < originalRating + eps);
-	}
 }
