@@ -1,8 +1,9 @@
 \documentclass[a4paper,11pt,oneside]{memoir}
 
-% Castellano
-\usepackage[spanish,es-tabla]{babel}
-\selectlanguage{spanish}
+% English
+% !TeX spellcheck = en_EN
+\usepackage[english]{babel}
+\selectlanguage{english}
 \usepackage[utf8]{inputenc}
 \usepackage{placeins}
 
@@ -19,6 +20,18 @@
 
 % Ecuaciones
 \usepackage{amsmath}
+
+% Code
+\usepackage{listings}
+\lstset{
+	language=bash,
+    breaklines=true,
+    breakatwhitespace=true,
+    aboveskip=5mm,
+  	belowskip=5mm,
+  	alsoletter=_-|"/:.,
+  	escapeinside={(*@}{@*)}
+}
 
 % Rutas de fichero / paquete
 \newcommand{\ruta}[1]{{\sffamily #1}}
@@ -338,9 +351,9 @@
 
 
 % Datos de portada
-\title{título del TFG \\Documentación Técnica}
-\author{nombre alumno}
-\tutor{nombre tutor}
+\title{Development of a Chatbot for Tourist Recommendations \\Technical Documentation}
+\author{Jasmin Wellnitz}
+\tutor{Bruno Baruque Zanón}
 \date{\today}
 
 \begin{document}
@@ -382,7 +395,7 @@
 \include{./tex/A_Plan_proyecto}
 \include{./tex/B_Requisitos}
 \include{./tex/C_Diseno}
-\include{./tex/D_Manual_programador}
+\include{./tex/D_Technical_Documentation}
 \include{./tex/E_Manual_usuario}
 
 
