@@ -1,2 +1,13 @@
 target
 config.properties
+latex/memoir
+latex/*.aux
+latex/*.log
+latex/*.toc
+latex/*.out
+latex/*.synctex.gz
+latex/*/*.aux
+latex/*/*.log
+latex/*/*.toc
+latex/*/*.synctex.gz
+latex/*/*.out
