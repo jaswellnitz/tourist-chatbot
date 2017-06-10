@@ -1,83 +1,77 @@
 \capitulo{3}{Theoretical Concepts}
 
-En aquellos proyectos que necesiten para su comprensión y desarrollo de unos conceptos teóricos de una determinada materia o de un determinado dominio de conocimiento, debe existir un apartado que sintetice dichos conceptos.
 
-Algunos conceptos teóricos de \LaTeX \footnote{Créditos a los proyectos de Álvaro López Cantero: Configurador de Presupuestos y Roberto Izquierdo Amo: PLQuiz}.
+This section explains the most relevant theoretical concepts that were applied during the course of this project to provide a fundamental understanding of the application’s main components, or more precisely the chatbot, the recommender as well as the geographic database. 
 
-\section{Secciones}
+\section{Chatbots}
+A chatbot is a computer program that interacts with its user via a chat interface. About 60 years ago, the first steps in the development of chatbots were taken by the computer scientists Alan Turing and Joseph Weizenbaum, proposing the concept of computers communicating like humans do. One of the first natural language processing programs was ELIZA, developed by Joseph Weizenbaum in 1966. Although some users were tricked into thinking that ELIZA was an actual human conversation partner \cite{weizenbaum66}, this basic example was stretched to its limit quickly because of its simple rule-based structure. However, the fascination of computers being a conversation partner remained one of the big objectives of modern artificial intelligence.
 
-Las secciones se incluyen con el comando section.
-
-\subsection{Subsecciones}
-
-Además de secciones tenemos subsecciones.
-
-\subsubsection{Subsubsecciones}
-
-Y subsecciones. 
+The topic’s big revival occurred with the introduction of mobile devices in the early 2000s. All of the sudden, developers were faced with the task of transforming their well-known desktop applications and websites into apps to make them suitable for a mobile market. Still, in the last couple of years it turned out that users actually do not like to use a variety of apps, but rather concentrate on only a few, mainly messaging apps. That is how in 2016, the idea of the conversational interface resurged when many global big-players like Google, Facebook, Microsoft, IBM or Amazon decided to take part in the development of conversational interfaces3. 
+After explaining briefly the importance of chatbots over the years, the following part is going to define the different terms Natural Language Processing, Conversational Interface and Chatbots to outline the differences between them. After that, the key concepts needed to model a conversation flow are introduced.
 
 
-\section{Referencias}
+\subsection{Natural Language Processing, Conversational Interface and Chatbots}
 
-Las referencias se incluyen en el texto usando cite \cite{wiki:latex}. Para citar webs, artículos o libros \cite{koza92}.
+\textbf{Natural Language Processing} is a component in the field of Artificial Intelligence in which natural language is analyzed and processed in a way that computers can use converted information easily in further algorithms \cite{collobert08}. A sub-discipline of Natural Language Processing is the so-called Natural Language Understanding (NLU).
+
+Nowadays, many big players provide free to use natural language understanding platforms that make the development of conversational interfaces possible. One of these NLP-NLU platforms is api.ai which translates human language into a formal representation using machine learning techniques as well the later explained NLU concepts entities, intents and contexts \cite{apiai:concepts}.
+
+Using a \textbf{conversational interface}, people are enabled to interact with virtual assistants, smart devices and social robot via their natural language \cite{mctear16}. Conversational interfaces are considered as the third wave of user experience, after the terminal and the graphical user interface. The aim is that by having a conversational interface, users do not have to adapt to the computer, but the computer has to adapt to the human way of communicating.
+
+There are two basic types of conversational interfaces: voice assistants such as Apple's \textit{Siri} or Amazon's \textit{Alexa} that communicate using spoken language and \textbf{chatbots}, enabling communication via typing \cite{fastcodedesign:conversationalinterface}. Basically, in chatbots pattern matching is used to interpret the user's inputs and templates are used to provide the system's output.
+ 
+
+\subsection{Concepts}
+
+The conversational interface used in this project is developed using the NLP-NLU platform api.ai that relies on certain key concepts that are explained in the following.
+
+Using api.ai, an agent is modeled to parse the user’s natural input into structured data. In an agent, the conversation flow with the user is specified using the key components entities, intents and context. After designing the agent, it can be integrated into many different platforms and thus providing an application’s conversational interface.
+
+Using api.ai, an \textbf{agent} is modeled to parse the user’s natural input into structured data. In an agent, the conversation flow with the user is specified using the key components entities, intents and context. After designing the agent, it can be integrated into many different platforms and thus providing an application’s conversational interface \cite{apiai:agents}.
 
 
-\section{Imágenes}
+The agent relies on \textbf{machine learning} algorithms to understand the user input and extract relevant data. Before being confronted with the actual user, input examples are to be specified. Based on these examples, the agent’s machine learning model decides which path of the conversation flow is chosen. As usual in machine learning, the agent learns to adapt better to the user as it is provided constantly with real-life conversations \cite{apiai:ml}. 
 
-Se pueden incluir imágenes con los comandos standard de \LaTeX, pero esta plantilla dispone de comandos propios como por ejemplo el siguiente:
+The main components used in modeling the conversation flow are entities, intents and context.  \textbf{Entities} are domain objects an application takes actions on. They can be considered as parameters of an action to be taken. In api.ai, there are several already defined system entities, e.g. specifying parameters of time, units and geography. Additionally, the developer can define his own entities \cite{apiai:entities}. 
 
-\imagen{escudoInfor}{Autómata para una expresión vacía}
+In an api.ai agent, user requests are mapped to  \textbf{intents}. By matching the user input with previously specified examples, intents are extracted and used to trigger an action. In our tourist chatbot example, a typical intent would be “Give Recommendation” if the user asks for a tourist recommendation nearby \cite{apiai:intents}.
+ 
+When defining an intent, the developer has the option to set an output context.  \textbf{Contexts} manage the conversation flow by distinguishing the state the conversation is in. Based on the state, the agent may take different decisions on the same user input \cite{apiai:contexts}. 
 
 
+\section{Recommender Systems}
 
-\section{Listas de items}
+With the advent of business in the Internet, so-called Recommender Systems were introduced and gained importance since the nineties \cite{aggarwal16}.  A Recommender System aims to predict and quantify how a user reacts to a certain item. A variety of recommendation algorithms exists, all of them based on collected user preference data (e.g. item ratings). The most famous approaches are \textit{collaborative} and \textit{content-based filtering} that were also used in this project to recommend \textit{Points of Interests} to the users based on their travel interests. In the following, the applied methods are introduced.
 
-Existen tres posibilidades:
+\subsection{Content-based Filtering}
+Content-based recommendation systems calculate recommendations based on the properties and characteristics of an item. In general terms, an item is recommended to a user if he is interested in its properties.  To define the similarity of items, an item profile is designed representing its important characteristics. In our tourist example, the item profile contains tourist categories based on OpenStreetMap tags. Then, user profiles are created containing the same categories as the item profile, indicating which characteristics a user prefers in an item. Usually, this user profile is filled by examining the user ratings and extracting the characteristic for the already rated items.
+The preference for a user liking a certain item is then calculated by comparing its profile with the item profiles. To do so, different measures can be applied, one of the most famous being the cosine distance \cite{rajaraman16}. 
+ 
+\subsection{Collaborative Filtering}
+While the previously presented approach concentrates on the similarity between items for recommendation, collaborative filtering is based on the similarity between users. An item is recommended to a user when similar users have showed an interest in it before. Instead of profiles representing preferences, the only needed data for this approach is the matrix of user ratings. There are different measures to determine if two users are similar weighting user ratings differently, such as the \textit{cosine distance} or \textit{the jaccard distance}. The collaborative filtering mechanism is very successful as it often provides recommendations outside the expected scope of user interests. However, in order to work correctly, a large amount of user ratings is needed.
 
-\begin{itemize}
-	\item primer item.
-	\item segundo item.
-\end{itemize}
+\subsection{Hybrid Approaches}
+Due to the fact that collaborative filtering suffers from the so-called \textit{cold start problem} (that is not performing well when there is only sparse user data), it is often combined with other approaches. One of the most common solutions is falling back to content-based algorithms when user ratings are not significant and hence building up the user rating database. In this project, a hybrid mechanism is applied, although some modifications of the traditional content-based approach were made. The detailed way of proceeding and made adaptions are explained in detail in chapter \ref{ch:RA}.
 
-\begin{enumerate}
-	\item primer item.
-	\item segundo item.
-\end{enumerate}
+\section{Geographic Information Processing}
 
+\subsection{Point of Interest}
+In the context of geographic information, the expression Point of Interest \cite{osm:poi}  is often used to describe a map feature that has a certain significance. It is a broad term that reaches from functional services like post offices or car parks to tourist attractions. One of this project’s main elements is to extract essential tourist information from the vast amount of geographic data, meaning finding relevant points of interests and outputting them in a comprehensible way for the user.  
+
+\subsection{Geographic Database Systems}
+The geographic information used in this project is stored in a geographic or spatial database. While the most common kind of databases nowadays is relational, they are unable to handle geographic data because of its complexity \cite{rigaux02}. This is why for this task spatial database systems are used which provide geospatial data types in its data model and query language \cite{gueting94}. The objects in the database contain a spatial or geometric attribute which describes their location, shape, orientation and size.
+
+In this project, geographic information from \textit{OpenStreetMap} is used and stored in a spatial database using \textit{PostGis}.
+
+\subsection{OpenStreetMap Data Model}
+
+To extract our needed points of interest from the raw geographic data, the underlying data structure of the OpenStreetMap information is examined, consisting of the following four principal elements \cite{osm:elements}: 
 \begin{description}
-	\item[Primer item] más información sobre el primer item.
-	\item[Segundo item] más información sobre el segundo item.
-\end{description}
-	
-\begin{itemize}
-\item 
-\end{itemize}
+\item[Nodes] Points with a geographic position that are used to represent map features without a size, such as points of interest or mountain peaks. 
+\item[Ways] Ordered lists of nodes that are used both for representing linear features such as streets and rivers, and areas, like forests, parks, parking areas and lakes.
+\item[Relations] Ordered lists of nodes, ways and relations, so-called members. Relations are used for representing the relationship of existing nodes and ways, e.g. long-distance motorways of areas with holes.
+\item[Tags] Key-Value pairs storing metadata of the geographic objects they are attached to (namely node, way or relation). Tags can include type, name and a broad variety of map features.
+\end{description} 
 
-\section{Tablas}
 
-Igualmente se pueden usar los comandos específicos de \LaTeX o bien usar alguno de los comandos de la plantilla.
-
-\tablaSmall{Herramientas y tecnologías utilizadas en cada parte del proyecto}{l c c c c}{herramientasportipodeuso}
-{ \multicolumn{1}{l}{Herramientas} & App AngularJS & API REST & BD & Memoria \\}{ 
-HTML5 & X & & &\\
-CSS3 & X & & &\\
-BOOTSTRAP & X & & &\\
-JavaScript & X & & &\\
-AngularJS & X & & &\\
-Bower & X & & &\\
-PHP & & X & &\\
-Karma + Jasmine & X & & &\\
-Slim framework & & X & &\\
-Idiorm & & X & &\\
-Composer & & X & &\\
-JSON & X & X & &\\
-PhpStorm & X & X & &\\
-MySQL & & & X &\\
-PhpMyAdmin & & & X &\\
-Git + BitBucket & X & X & X & X\\
-Mik\TeX{} & & & & X\\
-\TeX{}Maker & & & & X\\
-Astah & & & & X\\
-Balsamiq Mockups & X & & &\\
-VersionOne & X & X & X & X\\
-} 
+Principally, the data structures \textit{Nodes}, \textit{Ways} and \textit{Tags} are investigated in detail to construct the wanted \textit{Points of Interests}. The exact proceeding of extracting the needed information from this data model is explained in depth in chapter \ref{ch:RA}.  
