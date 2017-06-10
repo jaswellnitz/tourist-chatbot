@@ -1,4 +1,4 @@
-package dataAccess;
+package util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

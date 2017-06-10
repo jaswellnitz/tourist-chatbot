@@ -1,6 +1,8 @@
 package poiRecommendation;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.eval.IRStatistics;
@@ -47,6 +49,7 @@ public class RecommenderEvaluation {
 				"ratings", null);
 		double bestFMeasure = 0.0;
 		double prec = 0.0;
+		Map<String,Double> performances = new HashMap<>();
 		double rec = 0.0;
 		String combo = "";
 		for(int i = 0; i < COUNT; i++){
@@ -55,7 +58,8 @@ public class RecommenderEvaluation {
 				RecommenderBuilder recommenderBuilder = getRecommenderBuilder(i, j);
 				IRStatistics irStatistics = evaluator.evaluate(recommenderBuilder, null, model, null, 1,
 						GenericRecommenderIRStatsEvaluator.CHOOSE_THRESHOLD, 1.0);
-				double fMeasure = irStatistics.getFNMeasure(0.75);
+				double fMeasure = irStatistics.getF1Measure();;
+				performances.put(i+","+j, irStatistics.getF1Measure());
 				if(fMeasure  > bestFMeasure) {
 					bestFMeasure = fMeasure;
 					prec = irStatistics.getPrecision();
@@ -69,6 +73,9 @@ public class RecommenderEvaluation {
 		System.out.println("Precision:"+prec);
 		System.out.println("Recall:"+rec);
 		System.out.println("F-Measure:"+bestFMeasure);
+		System.out.println("All performances:");
+		System.out.println(performances);
+		
 	}
 
 	private static RecommenderBuilder getRecommenderBuilder(final int sim, final int nhood) {

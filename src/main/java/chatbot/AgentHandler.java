@@ -6,7 +6,6 @@ import java.util.Map;
 import com.google.gson.JsonObject;
 
 import model.AgentResponse;
-import util.ServiceRequester;
 
 // Sends requests to api.ai agent via its http api 
 public class AgentHandler extends ServiceRequester{

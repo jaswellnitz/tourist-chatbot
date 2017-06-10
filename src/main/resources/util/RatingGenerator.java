@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import dataAccess.RatingDB;
-import dataAccess.UserRatingHandler;
 
 import java.util.Random;
 
