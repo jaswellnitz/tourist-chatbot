@@ -1,0 +1,1 @@
+This part of the repository contains the documentation of the project as .doc files. These files are considered as drafts of the different sections of the documentation. The final version of the documentation can be found in the latex folder.
