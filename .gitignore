@@ -11,3 +11,9 @@ latex/*/*.log
 latex/*/*.toc
 latex/*/*.synctex.gz
 latex/*/*.out
+
+latex/*.bbl
+latex/*.blg
+latex/*.dvi
+latex/*.lof
+latex/*.lot

@@ -199,3 +199,45 @@ git push heroku master
 \end{lstlisting}
 
 \section{Tests}
+Tests were made during this project to ensure the project’s quality. For this reason, several measures were taken to concentrate on different aspects of quality assurance. 
+
+\subsection{Automation Testing using JUnit}
+Java’s unit testing framework JUnit is used to design automated tests. Using JUnit, the test-driven development paradigm was applied in this project to ensure the code’s correctness constantly during development. The tests can be found in the project folder tree navigating to \textit{src/test/java}. The folder is subdivided into the packages \textit{bot, dataAccess, poiRecommendation} which match the main components in the project. In this project, two different kinds of tests were designed:
+\begin{description}
+\item[Unit tests] that concentrate on ensuring the proper functioning of the code on a class level. 
+\item[Integration tests] covering the essential use cases of the chatbot (including all of the system’s relevant components and therefore demonstrating the proper interaction of the components). These integration tests can be found in the JUnit test class \textit{src/test/java/bot/TouristChatbotTest}
+\end{description}
+
+The code coverage tool \href{http://www.eclemma.org/}{EclEmma} is used to show how much of the source code is actually tested by the JUnit tests. EclEmma is integrated into the IDE Eclipse. The following results are obtained by executing all of the project’s JUnit tests:
+
+\imagen{eclemma}{Code Coverage Analysis Result}
+
+As we can see, 80 \% of the productive source code is tested. The test coverage mainly centers on the proper functioning of the service classes of the chatbot, meaning the classes that provide important functionalities and are error prune due to their complex structure. On the other hand, model classes are not as extensively tested as most of them follow a simple design, providing only getter, setter and field-based equals implementations. Furthermore, classes using code from external libraries are not a focus of the tests as it is assumed that their proper functioning is ensured by the developers of the respective libraries (e.g. hooking the application to the Telegram bot by using a third party Telegram library). 
+
+\subsection{Recommender Evaluation}
+To ensure that the computed recommendations of the chatbot are actually adjusted the users’ preferences, an evaluation is made using the \textit{Mahout} framework. The evaluation is limited to the user-based part of the recommender which is based on user ratings. The reason for this is that the content-based mechanism is used as a fallback that provides recommendation when the user data is too sparse for the user-based recommender to perform properly. In fact, the content-based mechanism is not really a recommender but rather a similarity measure. The proper functioning of this mechanism is tested using unit tests (see the JUnit test class \textit{RecommenderTest}).
+
+The actual recommender evaluation can be found in \textit{src/test/java/poiRecommendation/RecommenderEvaluation}. Mahout’s \textit{RecommenderIRStatsEvaluator} is used which splits the available user data automatically into training and test sets. To evaluate the recommender performance, information retrieval metrics are computed. More precisely, the metrics precision and recall are examined as well as the F-Measure which is a harmonic mean of the other mentioned metrics \cite{rijsbergen79}.
+
+\begin{equation}
+Precision=\frac{|\text{relevant items retrieved}|}{|\text{items retrieved}|}
+\end{equation}
+\begin{equation}
+Recall=\frac{|\text{relevant items retrieved}|}{|\text{relevant items in collection}|}
+\end{equation}
+\begin{equation}
+F-Measure=2 * \frac{\text{precision}*\text{recall}}{\text{precision}+\text{recall}}
+\end{equation}
+
+During the recommender development, Mahout provides a variety of similarity and neighborhood functions to choose from. Depending on the applied functions, the recommender computes the similarity between two items differently and considers different items to be suitable for a similarity measure. Using the evaluation results, the combinations of the following similarity and neighborhood functions can be tested to determine which one of them performs best on the given data.  The following table shows the f-measures of the 16 investigated combinations:
+
+\tablaSmall{F-Measures of the recommenders using different similarity and neighborhood functions}{p{3cm} p{1.5cm} p{1.5cm} p{1.5cm} p{1.5cm}}{f-measurerecommendation}
+{ \multicolumn{1}{l}{ } & Threshold User & Nearest 2 User & Nearest 5 User & Nearest 10 User \\}{ 
+Euclidean Distance & 0.5 & 0.4 & 0.5 & 0.5 \\
+Pearson Correlation & NaN & NaN & NaN & NaN \\
+Loglikelihood & 0.55 & 0.29 & 0.73 & 0.5 \\
+Spearman Correlation & NaN & NaN & NaN & NaN \\
+} 
+
+It quickly becomes clear that the Pearson Correlation Similarity and Spearman Correlation Similarity are not suitable for this recommender as they do not output valid performance results at all. A reason for this is that the applied user data is too sparse to achieve significant results using these similarity functions. The best f-measure is achieved by a recommender using Loglikelihood Similarity and Nearest-5-User as neighborhood function. Examining this recommender’s performance in detail, we see that it achieves a precision value of 0.8 and a recall of 0.67.
+As we can see, the precision value is higher than the recall value. The precision tells us the fraction of retrieved items that are relevant whereas the recall tells us the fraction of relevant items that are retrieved. In this project, the precision value is considered as more important than the recall value as the user has to be provided with recommendations that fit his interests. Yet, the fact that the user-based recommender may not find all possible recommendations for the user, is rather negligible as the content-based mechanism is used as a fallback in this case. Also it is assumed that the overall performance of the recommender will rise with increasing data as more users use the chatbot (cold start problem of a recommender).
