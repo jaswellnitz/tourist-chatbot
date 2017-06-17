@@ -84,14 +84,14 @@ public class TelegramBotHandler implements Route {
 		boolean isOk = false;
 		for (ChatbotResponse chatbotResponse : chatbotResponses) {
 
-			if (chatbotResponse.sendPhoto()) {
+			if (chatbotResponse.hasPhoto()) {
 				SendPhoto sendPhoto = new SendPhoto(chatId, chatbotResponse.getReply());
 				SendResponse execute = telegramBot.execute(sendPhoto);
 				isOk = execute.isOk();
 			} else {
 				SendMessage sendMessage = new SendMessage(chatId, chatbotResponse.getReply());
 				Keyboard keyboard;
-				if (chatbotResponse.changeKeyboard()) {
+				if (chatbotResponse.hasChangedKeyboard()) {
 					keyboard = getKeyboard(chatbotResponse.getKeyboardButtons());
 				} else {
 					keyboard = new ReplyKeyboardRemove();

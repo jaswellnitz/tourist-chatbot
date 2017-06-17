@@ -128,7 +128,7 @@ public class POIDataModel extends AbstractDataModel implements DataModel {
 
 	@Override
 	public void refresh(Collection<Refreshable> alreadyRefreshed) {
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 }

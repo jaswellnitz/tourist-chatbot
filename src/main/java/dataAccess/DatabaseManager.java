@@ -44,7 +44,6 @@ public abstract class DatabaseManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return rowCount;
 	}
 

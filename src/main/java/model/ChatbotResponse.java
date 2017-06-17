@@ -22,7 +22,7 @@ public class ChatbotResponse {
 		return reply;
 	}
 
-	public boolean changeKeyboard() {
+	public boolean hasChangedKeyboard() {
 		return !keyboardButtons.isEmpty();
 	}
 
@@ -30,7 +30,7 @@ public class ChatbotResponse {
 		return keyboardButtons;
 	}
 	
-	public boolean sendPhoto(){
+	public boolean hasPhoto(){
 		return reply.startsWith("https://") && reply.endsWith(".jpg");
 	}
 }

@@ -54,11 +54,6 @@ public class RatingDB extends DatabaseManager {
 		return rowCount == 1;
 	}
 
-	public boolean deleteRating(long userId, long pointId) {
-		String query = "DELETE from ratings where userId = " + userId + " and pointId = " + pointId + ";";
-		int rowCount = executeUpdate(query);
-		return rowCount == 1;
-	}
 
 	public boolean saveRating(long userId, long pointId, Rating rating) {
 		String query = "INSERT into ratings values (" + userId + "," + pointId + "," + rating.getValue() + ");";

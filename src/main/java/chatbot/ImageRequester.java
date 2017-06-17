@@ -6,7 +6,6 @@ import java.util.Map;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import model.Location;
-import util.ServiceRequester;
 
 public class ImageRequester extends ServiceRequester {
 
