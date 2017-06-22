@@ -1,4 +1,29 @@
-\capitulo{7}{Conclusion and Future Work Lines}
+\capitulo{7}{Conclusion}
 
-Todo proyecto debe incluir las conclusiones que se derivan de su desarrollo. Éstas pueden ser de diferente índole, dependiendo de la tipología del proyecto, pero normalmente van a estar presentes un conjunto de conclusiones relacionadas con los resultados del proyecto y un conjunto de conclusiones técnicas. 
-Además, resulta muy útil realizar un informe crítico indicando cómo se puede mejorar el proyecto, o cómo se puede continuar trabajando en la línea del proyecto realizado. 
+In this project, a chatbot for tourist recommendations was developed that can be accessed using the instant messaging app Telegram. The presented thesis contains the documentation of the application’s course of development, points out the most noteworthy characteristics and serves to provide background knowledge of the applied theoretical concepts and technologies. A recurring theme throughout the documentation is the development of the application’s three main components: the conversational interface, the recommender and the geographic database. These components were integrated in a webserver with a multilayered architecture that is deployed to the Platform-as-a-Service \textit{Heroku}.
+
+On a personal note, the student acquired new skills and knowledge, not only by exploring previously unknown fields of computer science such as recommender system theory. Moreover, the student has become familiar with managing an agile software development process and configuring an application’s infrastructure, including the setup and deployment of a webserver and the integration of external services accessing REST-like HTTP APIs. All in all, developing a fully operative application from scratch can be considered as a personal milestone. 
+
+\section{Future Work Lines}
+There are several future work lines that would lead to an overall improvement of the chatbot functionality, mostly helping to improve the usability and accessibility:
+
+\subsection{Conversational Interface}
+\begin{itemize}
+\item Integrating the chatbot into other messengers, for instance \textit{Facebook} or \textit{Slack}. Due to the recent chatbot hype, there is a large number of messengers a chatbot can be integrated into. The presented chatbot’s architecture is designed in a way in which the main structure does not need to be modified for a change of messenger technology. Thus, an integration of different messengers can be done easily which leads to the chatbot targeting new user groups.
+
+\item Refinement of the conversational interface: In order to recommend points of interests to the user, the conversational interface has to filter the user’s interests from his messages. In the presented version of the chatbot, this is done in a simple way, only checking for the appearance of certain key words used by the user that are similar to the defined tourist categories. The interest retrieval could be improved by proactively asking the user questions about his interests based on small talk between the user and the chatbot.
+\end{itemize}
+
+\subsection{Recommendations}
+\begin{itemize}
+\item The applied content-based recommendation is based on the similarity between the point of interest’s item profile and the user’s interests. To refine the recommendation, the categorization of interests should be refined, applying a finer tourism ontology. A hierarchy of tourism categories could be conceivable, so that the category food, for example, is subdivided into different cuisines, defining whether a user is interested in vegetarian food for instance. Refining the tourist categories will lead to a better adaptation to the user’s interests.
+
+\item Retrieval of User Data: The more user data is available, the more significant are the collaborative filtering results. Therefore the research for user rating data sets could be readopted or more user ratings have to be generated.
+\end{itemize}
+
+\subsection{Geographic Database}
+\begin{itemize}
+\item Extending the chatbot’s recommendation scope: For performance reasons and the lack of user ratings, the presented version is limited to give recommendation for Barcelona. To target a bigger audience, giving recommendations for a larger area would be necessary. A next step would be to extend the recommendation radius to all of Spain. Providing recommendations for the whole world would require a big amount of database storage space and probably a refactoring of the chatbot’s recommendation and data access mechanism due to the massive increase of geographic data. 
+
+\item In the presented version of the chatbot, the data is stored in an offline database, using a dump from 2017. To keep the recommended pojnts of interest data up-to-date, the database should be updated regularly. 
+\end{itemize}
