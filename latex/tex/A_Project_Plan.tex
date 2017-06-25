@@ -67,9 +67,94 @@ In contrast, the last iteration is outstandingly bigger than the previous ones. 
 
 
 \section{Viability Study}
+In this section of the documentation, a viability study is made. It is examined whether the project is economically feasible, comparing the involved costs and potential sources of income. Additionally, the legal viability is checked to ensure that a realization of the application can be done without legal risks. 
 
 \subsection{Economic Viability}
+\subsubsection{Personnel Costs}
+The application’s development was realized by the author of the presented bachelor thesis. As the author is a student of computer sciences without completed university degree, the hourly wage is estimated at 14 €/h. In order to calculate the total development costs, the time invested in the project is examined. As the realization of the bachelor thesis is evaluated with 12 ECTS points and a workload of 30 hours per ECTS point is assumed, a total amount of 360 hours were dedicated to the project’s development. This also coincides with the results of the velocity tracking, where a total number 166 story points was estimated to finish the project, one story point being roughly equivalent to 2-3 hours of working.
+
+All in all, this leads to the following cost calculation:
+
+$ 360h * 14 \frac{\text{\EUR}}{h} = 5040 \text{\EUR} $
+
+
+As the developer is a German citizen, German tax law is applied in the following scenario: Assuming that the produced application is developed in a freelance project on behalf of a customer, the developer only charges the hourly fee. There are no additional social security or tax costs for the customer as freelancers are liable to pay income taxes themselves. However, the charged fees are below the tax allowance for unmarried persons in 2017, which is 8820 €. Therefore no income taxes have to be paid, assuming that the student does not have any other freelance income in the respective year.
+
+\subsubsection{Software Costs}
+In the following, the costs of the services used in the project are examined.
+
+\tablaSmall{Software Costs}{p{3cm} p{1.5cm} p{6cm}}{softwarecosts}
+{ \multicolumn{1}{l}{ } Software & Costs & Comments\\}{ 
+OpenStreetMap & 0,00 € & - \\
+API.AI & 0,00 € &  According to the API.AI terms of use, “services include basic services (“Basic Services”) provided free of charge and enhanced services (“Enhanced Services”), which, if available, must be purchased.” \cite{apiai:terms}
+However, at the time of development, no fees or potential upgrades were evident. \\
+Foursquare & 0,00 € & According to Foursquare’s developer documentation \cite{foursquare:ratelimits}, “the Foursquare API has a default limit of 1000 free requests per 24 hour period” and “500 requests/hour”, “whichever occurs first”. An enterprise option must be booked if more requests are needed.  \\
+Telegram & 0,00 € & - \\
+Apache Mahout & 0,00 € & - \\
+Apache Maven & 0,00 € & - \\
+Java Spark & 0,00 € & - \\
+Heroku & 0,00 € & A “Free Plan” was used to host the application in Heroku. There are several pricing options, adjusted to the developer’s needs. The free plan comes with certain inconveniences, such as “sleep after 30 minutes of inactivity”. \cite{heroku:pricing} \\
+} 
+
+As we can see, no software costs were charged in the way the third-party products are used in this project. However, there could be additional costs with an increasing number of users accessing the chatbot, as some services that are used apply a pricing model that is based on the number of user requests.
+
+\subsubsection{Hardware Costs}
+Two different hardware devices were used during the project duration. For the software’s development, a laptop was used, in particular an Asus Zenbook, bought in 2015 for 899 €. In order to use the application and check the functionality in the productive environment, a mobile device is used, more precisely the Motorola Moto G4 Plus, bought in 2017 for 199 €. Due to the fact that the mentioned devices were not exclusively purchased for this project, their costs can be amortized as seen in the following calculation. A total amortization period of 3 years for the hardware is assumed:
+
+$\text{Total Hardware Cost} = 899 \text{\EUR} + 199 \text{\EUR} = 1098 \text{\EUR} $
+
+$\text{Amortization period in hours} = 3 years * 8760 h/year = 26280h$
+
+$\text{Development period in hours} = 360 h$
+
+$\text{Hardware Cost per hour} = 1098 \text{\EUR} / 26280 h = 0,04 \text{\EUR}/h$
+
+$\text{Hardware Costs during development} = 0,04\text{\EUR}/h* 360 h= 14,40\text{\EUR}$
+
+
+So all in all, total hardware costs of 14,40 € can be assumed.
+
+\subsubsection{Total Costs}
+The previously calculated partial costs result are summarized in the following table:
+
+
+\tablaSmall{Total Costs}{p{3cm} p{2cm}}{totalcosts}
+{ \multicolumn{1}{l}{ } Component & Costs\\}{ 
+Personnel Costs & 5040,00 € \\
+Software Costs & 0,00 € \\
+Hardware Costs & 14,40 € \\
+\textbf{Total Costs} & \textbf{5054,40} € \\
+} 
+
+It must be noted that occurring office costs were not included in the calculation as it is assumed that the developer has worked in a home office which can be set off against tax liability.
+
+\subsubsection{Income Analysis}
+The following section provides an understanding of possible ways to make profit from the developed application. 
+
+Due to the fact that the chatbot is publicly accessible in an instant-messenger, it is not very common to profit from the user directly, as there are no easy-to-use payment mechanisms integrated in the messenger. 
+
+A more interesting concept is to win tourist agencies, cultural institutions or restaurant owners as investors. The chatbot can be seen as an advertisement platform for those who want to promote their offers to tourists which in fact are a very promising target group as people tend to spend a lot of money on vacation.
+
+Essentially, the idea is to present points of interest that belong to a customer in a more prominent, attractive way to the user. This could happen, for example, when a user asks for a recommendation and is situated in close proximity to a promoted point of interest. The presentation of the promoted point of interest could differ from the usual, non-promoted locations, in a way that more precise descriptions or more photos of the location are provided than usual. Additionally, the points of interests could be highlighted visually, for example by applying different font sizes or colors for the messages. 
+
+In return for this service, a monthly payment of the local investors would be conceivable. 
+This way of promoting points of interests is quite interesting for the local tourist industry as the chatbot collects user interests for the recommendation, therefore, the marketers are provided with a direct way to target exactly the user group they are interested in.
+
+However, it must be noted that the commercial use of the application leads to a possible upgrade of pricing plans, for instance using the Foursquare API.
 
 \subsection{Legal Viability}
+The following legal viability concentrates on the third-party software licenses used in the project and in turn, an analysis of which license can be applied for the developed application. The table \ref{tabla:softwarelicenses} contains an overview of the used services and their licenses.
 
+\tablaSmall{Software Licenses}{p{3cm} p{4cm} p{5cm}}{softwarelicenses}
+{ \multicolumn{1}{l}{ } Software & License  & Comments\\}{ 
+OpenStreetMap & Open Database License (ODbL) 1.0 & According to the ODbL license, the rights to use the OpenStreetMap data “explicitly include explicitly include commercial use, and do not exclude any field of endeavour.” \cite{osm:license} \\
+API.AI & API.AI End User License Agreement & According to API.AI’s license agreement, the “use of the Services within the commercial enterprise for internal purposes is expressly allowed.” \cite{apiai:terms} \\
+Foursquare & Foursquare Labs, INC. API and Data License Agrement & For commercial use, an enterprise license is needed. The fees that are charged are not publicly available and are communicated directly by contacting Foursquare.  \\
+Telegram & GNU General Public License v2.0 & According to Telegram, the commercial use of the Telegram API is permitted for anyone except for “large corporations, publicly traded companies and other businesses that exist to maximize shareholder value or sell stock.” \cite{telegram:terms} \\
+Heroku & Heroku License Agreement &  - \\
+Apache Mahout & Apache License, Version 2.0. & Permissive free software license that allows, among other things, sublicensing, commercial use, modifying and distributing of the software. \\
+Apache Maven & Apache License, Version 2.0. & See above \\
+Java Spark & Apache License, Version 2.0. & See above \\
+} 
 
+As some of the used third-party software is  nonsublicenseable, for instance API.AI, it is not possible to apply a permissive free software license such as Apache License 2.0 or GNU General Public License v2.0 to the application. However, if the designed application aims to make profit, publishing the application under a free software license is not an option anyway. Therefore suitable terms of service need to be designed in order to publish the application. 
