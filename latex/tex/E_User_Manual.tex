@@ -1,0 +1,58 @@
+\apendice{User Manual}
+
+\section{Introduction}
+This user manual serves as a guide to show the user how to use the presented chatbot via the instant messenger Telegram. In the following, it is explained how the user accesses the chatbot as well as presenting the main features of the chatbot exemplary. 
+
+\section{User Requirements}
+In order to use the chatbot, the user needs to have a smartphone which is capable of connecting to the Internet. The messenger Telegram has to be downloaded and installed on the device, the app can be found using the respective App Store of the phone. In order to create a Telegram account, a real mobile phone number has to be introduced which links the Telegram messenger to the smartphone's sim card. 
+
+\section{Installation}
+The chatbot is accessed via Telegram. In order to contact the chatbot, its Telegram user name (\textbf{touristrecommenderbot}) is introduced in the Telegram search function. Pressing \textit{Start} activates the user-chatbot conversation. After pressing the button, the conversation should look as follows:
+\screenshot{start}{Starting the chatbot}
+
+
+\section{User Manual}
+The chatbot can be acessed by sending messages using the Telegram keyboard. Users are free to send the chatbot any message they like – however, the chatbot may reject a request if the user’s intention is not tourism-related. The following section shows the chatbot’s main features and examples of how to trigger them.
+
+\subsection{Help}
+The user shows interest in the chatbot’s functioning, so a guide is returned in which the main features are outlined.
+\screenshot{about}{The user asks for help.}
+
+\subsection{Chat About Preferences}
+The user shows the intention to talk and the chatbot asks the user about his tourist preferences. If the chatbot is told by the user that the interests were not filtered correctly, the chatbot asks the user to rephrase his interests. 
+ 
+\screenshot{chat}{The user tells the chatbout about his preferences.}
+
+\subsection{Recommendation}
+\screenshot{rec0}{The user triggers the recommendation.}
+The user triggers the recommendation and is asked to send his location. The shown button helps sending the user’s current location. However, due to the fact that the presented chatbot only recommends points of interest for Barcelona, the recommender will not be able to recommend a point of interest when the user is not situated in that city. Therefore Telegram’s manual location attachment function can be used, accessed by the highlighted paper clip button. The location can be changed using drag and drop.
+\screenshot{chooselocation}{A location in Barcelona is chosen.}
+After selecting a location, a point of interest that matches the user’s interest the most is presented, alongside with a photo of the point of interest (if available). The user is asked to send his first impression of the point of interest, using one of the mutually exclusive buttons or typing a message on his own.
+\screenshot{rec1}{A point of interest is recommended.}
+The chatbot provides other points of interest that match the user’s interest and are situated in the given radius. The user can choose to see one of them by entering the point’s index or decline.
+\screenshot{rec2}{Other points of interest the user might like are shown.}
+After all points of interests were shown or the user declined to see more, the recommendation process is 
+completed.
+
+\subsection{Category-based Recommendation}
+If the user mentions his interest for a specific tourist category, only points of interest that match the stated categories are recommended. Such a category-based recommendation can be triggered as follows:
+\screenshot{catrec}{Category-based recommendation}
+
+\subsection{Show Past Recommendations}
+The user asks to see his past recommendations and is presented with a list of the recommendations he has seen before and were interested in (by showing a positive first impression during recommendation). If there is a recommendation the user has not rated yet, he is asked of his final impression by rating the point with stars from 1 to 5.
+\screenshot{pastrec}{The user's past recommendations}
+
+\subsection{Specify Recommendation Radius}
+The recommendation radius can be specified by entering the preferred maximal distance to the points of interest.
+\screenshot{changerecradius}{The recommendation radius is specified}
+
+\subsection{Show Personal Information}
+The user is provided with the personal information the chatbot has saved during the course of the conversation.
+ 
+\screenshot{personalinformation}{The collected user information is shown by the chatbot.}
+
+\subsection{Error Handling and Reset}
+There is certainly no such thing as bug free software, despite extensive testing. In the rare case of the chatbot not responding appropriately or not responding at all, the chatbot conversation should be restarted by the user. In order to do so, the user has to enter the command \textit{\textbackslash{}start} in the Telegram messenger which restarts the user interaction with the Bot and leads to the state previously seen in screenshot \ref{fig:start}.
+
+This command can also be used if the user wants to reset the conversation, for example in order to make the chatbot delete the previous collected user data.
+
