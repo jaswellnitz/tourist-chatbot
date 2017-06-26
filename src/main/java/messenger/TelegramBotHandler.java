@@ -1,4 +1,4 @@
-package integration;
+package messenger;
 
 import java.util.ArrayList;
 import java.util.List;

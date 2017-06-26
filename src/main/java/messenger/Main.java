@@ -1,4 +1,4 @@
-package integration;
+package messenger;
 
 import static spark.Spark.post;
 
