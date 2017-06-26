@@ -1,4 +1,4 @@
-package model;
+package service.agent;
 
 import java.util.List;
 import java.util.Map;
@@ -12,16 +12,14 @@ public class AgentResponse {
 	private final String reply;
 	private final Map<String, Object> parameters;
 	private final List<Context> contexts;
-	private final String sessionId;
 
 	public AgentResponse(String resolvedQuery, Action action, Map<String, Object> parameters,
-			List<Context> contexts, String reply, String sessionId) {
+			List<Context> contexts, String reply) {
 		this.resolvedQuery = resolvedQuery;
 		this.action = action;
 		this.parameters = parameters;
 		this.contexts = contexts;
 		this.reply = reply;
-		this.sessionId = sessionId;
 	}
 
 	public Map<String, Object> getParameters() {
@@ -42,9 +40,5 @@ public class AgentResponse {
 
 	public Action getAction() {
 		return action;
-	}
-
-	public String getSessionId() {
-		return sessionId;
 	}
 }

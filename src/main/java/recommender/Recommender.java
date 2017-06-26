@@ -21,12 +21,9 @@ import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
 import dataAccess.PointDB;
 import dataAccess.RatingDB;
-import model.Location;
-import model.POIProfile;
-import model.Preference;
-import model.RecommendedPointOfInterest;
-import model.ProfileItem;
-import model.User;
+import domain.Location;
+import domain.RecommendedPointOfInterest;
+import domain.User;
 
 public class Recommender {
 	private PointDB pointConverter;

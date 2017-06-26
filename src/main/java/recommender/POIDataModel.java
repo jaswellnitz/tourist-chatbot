@@ -16,9 +16,6 @@ import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.mahout.cf.taste.model.PreferenceArray;
 
-import model.POIProfile;
-import model.ProfileItem;
-
 // TODO: implement all methods and constructors
 public class POIDataModel extends AbstractDataModel implements DataModel {
 
@@ -44,7 +41,7 @@ public class POIDataModel extends AbstractDataModel implements DataModel {
 			POIProfile profile = profileItem.getProfile();
 			long id = profileItem.getId();
 			PreferenceArray newPrefs = new GenericUserPreferenceArray(POIProfile.CATEGORY_COUNT);
-			List<model.Preference> categories = profile.getAllCategories();
+			List<recommender.Preference> categories = profile.getAllCategories();
 			for (int i = 0; i < categories.size(); i++) {
 					int value = categories.get(i).getValue();
 					newPrefs.setValue(i, value);

@@ -37,11 +37,11 @@ public class ProfileSimilarity implements UserSimilarity {
 			Preference pref2 = iterator2.next();
 			int pref1Value = (int)pref1.getValue();
 			int pref2Value = (int)pref2.getValue();
-			if (pref1Value != model.Preference.NOT_RATED.getValue()
-					&& pref2Value != model.Preference.NOT_RATED.getValue()) {
-				if (pref1Value== model.Preference.TRUE.getValue() && pref1Value == pref2Value) {
+			if (pref1Value != recommender.Preference.NOT_RATED.getValue()
+					&& pref2Value != recommender.Preference.NOT_RATED.getValue()) {
+				if (pref1Value== recommender.Preference.TRUE.getValue() && pref1Value == pref2Value) {
 					similarity += 0.3;
-				} else if (pref1Value == model.Preference.FALSE.getValue()
+				} else if (pref1Value == recommender.Preference.FALSE.getValue()
 						&& pref1Value== pref2Value) {
 					similarity += 0.05;
 				}

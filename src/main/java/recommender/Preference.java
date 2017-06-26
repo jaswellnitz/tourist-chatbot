@@ -1,4 +1,4 @@
-package model;
+package recommender;
 
 public enum Preference {
 	TRUE(1, "1"), FALSE(0, "0"), NOT_RATED(-1, "-");

@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import chatbot.AgentHandler;
-import model.AgentResponse;
-import model.ParameterKey;
+import service.agent.AgentHandler;
+import service.agent.AgentResponse;
+import service.agent.ParameterKey;
 
 public class AgentHandlerTest {
 	
@@ -30,7 +30,6 @@ public class AgentHandlerTest {
 		// Check
 		assertNotNull(agentResult);
 		assertEquals(userInput, agentResult.getResolvedQuery());
-		assertEquals(String.valueOf(sessionId), agentResult.getSessionId());
 		assertFalse(agentResult.getReply().isEmpty());
 	}
 	
@@ -48,7 +47,6 @@ public class AgentHandlerTest {
 		assertNotNull(agentResult);
 		assertFalse(agentResult.getReply().isEmpty());
 		assertEquals(1,agentResult.getContexts().size());
-		assertEquals(String.valueOf(sessionId),agentResult.getSessionId());
 		
 		assertEquals("welcome-followup",agentResult.getContexts().get(0).getName());
 	}
@@ -99,7 +97,6 @@ public class AgentHandlerTest {
 		
 		// Check
 		assertNotNull(agentResult);
-		assertEquals(String.valueOf(sessionIdUser1),agentResult.getSessionId());
 		assertFalse(agentResult.getReply().isEmpty());
 		System.out.println(agentResult.getContexts());
 		assertEquals(1,agentResult.getContexts().size());
@@ -110,7 +107,6 @@ public class AgentHandlerTest {
 		
 		// Check
 		assertNotNull(agentResult2);
-		assertEquals(String.valueOf(sessionIdUser2),agentResult2.getSessionId());
 		assertTrue(agentResult2.getContexts().isEmpty());
 		assertFalse(agentResult2.getReply().isEmpty());
 		
@@ -119,7 +115,6 @@ public class AgentHandlerTest {
 		
 		// Check
 		assertNotNull(agentResult3);
-		assertEquals(String.valueOf(sessionIdUser1),agentResult3.getSessionId());
 		assertFalse(agentResult3.getReply().isEmpty());
 		assertFalse(agentResult3.getContexts().isEmpty());
 		assertEquals("interview",agentResult3.getContexts().get(0).getName());

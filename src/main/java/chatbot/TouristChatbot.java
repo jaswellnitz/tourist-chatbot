@@ -7,18 +7,19 @@ import java.util.concurrent.TimeUnit;
 
 import dataAccess.RatingDB;
 import dataAccess.UserDB;
-import model.AgentResponse;
-import model.ChatbotResponse;
-import model.Context;
-import model.Location;
-import model.POIProfile;
-import model.ParameterKey;
-import model.Rating;
-import model.RecommendedPointOfInterest;
-import model.User;
+import domain.Location;
+import domain.Rating;
+import domain.RecommendedPointOfInterest;
+import domain.User;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import recommender.POIProfile;
 import recommender.Recommender;
+import service.ImageRequester;
+import service.agent.AgentHandler;
+import service.agent.AgentResponse;
+import service.agent.Context;
+import service.agent.ParameterKey;
 
 public class TouristChatbot {
 
@@ -50,7 +51,6 @@ public class TouristChatbot {
 		userDB.storeUser(user);
 		getActiveUsers().put(userId, user);
 		AgentResponse agentResponse = agentHandler.sendEvent("WELCOME", user.getId(), true);
-		System.out.println(agentResponse.getSessionId());
 		return new ChatbotResponse(agentResponse.getReply());
 	}
 
@@ -288,7 +288,6 @@ public class TouristChatbot {
 		return answer;
 	}
 
-	// TODO check if telegram bot responds when /start was not triggered
 	private User getUserFromId(long userId) {
 		if (getActiveUsers().containsKey(userId)) {
 			return getActiveUsers().get(userId);

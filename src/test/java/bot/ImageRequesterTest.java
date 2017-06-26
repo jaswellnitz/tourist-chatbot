@@ -10,8 +10,8 @@ import java.net.URLConnection;
 import org.junit.Before;
 import org.junit.Test;
 
-import chatbot.ImageRequester;
-import model.Location;
+import domain.Location;
+import service.ImageRequester;
 
 public class ImageRequesterTest {
 

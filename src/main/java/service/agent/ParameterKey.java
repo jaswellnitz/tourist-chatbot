@@ -1,4 +1,4 @@
-package model;
+package service.agent;
 
 public enum ParameterKey {
 	DISTANCE, RATING, POI_INDEX, INTEREST, NONE;

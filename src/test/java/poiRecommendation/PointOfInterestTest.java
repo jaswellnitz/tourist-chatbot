@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import model.RecommendedPointOfInterest;
+import domain.RecommendedPointOfInterest;
 
 public class PointOfInterestTest {
 

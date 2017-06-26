@@ -17,12 +17,12 @@ import org.junit.Test;
 
 import dataAccess.PointDB;
 import dataAccess.RatingDB;
-import model.Location;
-import model.POIProfile;
-import model.Preference;
-import model.Rating;
-import model.RecommendedPointOfInterest;
-import model.User;
+import domain.Location;
+import domain.Rating;
+import domain.RecommendedPointOfInterest;
+import domain.User;
+import recommender.POIProfile;
+import recommender.Preference;
 import recommender.Recommender;
 
 public class RecommenderTest {

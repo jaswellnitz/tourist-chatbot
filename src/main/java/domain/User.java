@@ -1,7 +1,10 @@
-package model;
+package domain;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import recommender.POIProfile;
+import recommender.ProfileItem;
 
 public class User implements ProfileItem {
 

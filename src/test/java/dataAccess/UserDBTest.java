@@ -8,11 +8,11 @@ import org.junit.Test;
 
 import dataAccess.PointDB;
 import dataAccess.UserDB;
-import model.Location;
-import model.POIProfile;
-import model.Preference;
-import model.RecommendedPointOfInterest;
-import model.User;
+import domain.Location;
+import domain.RecommendedPointOfInterest;
+import domain.User;
+import recommender.POIProfile;
+import recommender.Preference;
 
 public class UserDBTest {
 

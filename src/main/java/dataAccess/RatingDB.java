@@ -3,7 +3,7 @@ package dataAccess;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import model.Rating;
+import domain.Rating;
 
 public class RatingDB extends DatabaseManager {
 

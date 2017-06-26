@@ -1,4 +1,4 @@
-package chatbot;
+package service.agent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,9 +9,8 @@ import java.util.Map.Entry;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import model.AgentResponse;
-import model.Context;
-import model.ParameterKey;
+
+import chatbot.Action;
 
 public class AgentResponseParser {
 
@@ -55,10 +54,6 @@ public class AgentResponseParser {
 		JsonObject resultObject = responseObject.get("result").getAsJsonObject();
 		Map<String, Object> parameters = parseParameters(resultObject);
 
-		String sessionId = "";
-		if (responseObject.has("sessionId")) {
-			sessionId = responseObject.get("sessionId").getAsString();
-		}
 		String resolvedQuery = resultObject.get("resolvedQuery").getAsString();
 		Action action = Action.getEnum(resultObject.get("action").getAsString());
 		String reply = resultObject.get("fulfillment").getAsJsonObject().get("speech").getAsString();
@@ -75,7 +70,7 @@ public class AgentResponseParser {
 				contexts.add(new Context(name, contextParameters, lifespan));
 			}
 		}
-		return new AgentResponse(resolvedQuery, action, parameters, contexts, reply, sessionId);
+		return new AgentResponse(resolvedQuery, action, parameters, contexts, reply);
 	}
 
 }

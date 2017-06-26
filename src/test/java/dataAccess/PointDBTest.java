@@ -7,10 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import dataAccess.PointDB;
-import model.Location;
-import model.POIProfile;
-import model.RecommendedPointOfInterest;
-import model.Preference;
+import domain.Location;
+import domain.RecommendedPointOfInterest;
+import recommender.POIProfile;
+import recommender.Preference;
 
 public class PointDBTest {
 	private PointDB pointConverter;

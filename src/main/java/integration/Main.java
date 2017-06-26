@@ -1,4 +1,4 @@
-package chatbot;
+package integration;
 
 import static spark.Spark.post;
 
@@ -7,10 +7,13 @@ import static spark.Spark.port;
 
 import com.pengrad.telegrambot.request.SetWebhook;
 
+import chatbot.TouristChatbot;
 import dataAccess.PointDB;
 import dataAccess.RatingDB;
 import dataAccess.UserDB;
 import recommender.Recommender;
+import service.ImageRequester;
+import service.agent.AgentHandler;
 
 // Entry Point: enables Telegram webhook
 public class Main {

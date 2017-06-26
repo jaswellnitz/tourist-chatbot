@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import model.ChatbotResponse;
+import chatbot.ChatbotResponse;
 
 public class ChatbotResponseTest {
 

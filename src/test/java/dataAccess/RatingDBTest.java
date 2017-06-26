@@ -7,10 +7,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import model.POIProfile;
-import model.Preference;
-import model.Rating;
-import model.User;
+import domain.Rating;
+import domain.User;
+import recommender.POIProfile;
+import recommender.Preference;
 
 public class RatingDBTest {
 	private RatingDB ratingDB;

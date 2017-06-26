@@ -1,4 +1,7 @@
-package model;
+package domain;
+
+import recommender.POIProfile;
+import recommender.ProfileItem;
 
 public class RecommendedPointOfInterest implements ProfileItem {
 

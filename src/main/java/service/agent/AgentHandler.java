@@ -1,11 +1,11 @@
-package chatbot;
+package service.agent;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.JsonObject;
 
-import model.AgentResponse;
+import service.ServiceRequester;
 
 // Sends requests to api.ai agent via its http api 
 public class AgentHandler extends ServiceRequester{

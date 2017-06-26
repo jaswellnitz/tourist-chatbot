@@ -5,10 +5,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Location;
-import model.POIProfile;
-import model.RecommendedPointOfInterest;
-import model.Preference;
+import domain.Location;
+import domain.RecommendedPointOfInterest;
+import recommender.POIProfile;
+import recommender.Preference;
 
 public class PointDB extends DatabaseManager {
 

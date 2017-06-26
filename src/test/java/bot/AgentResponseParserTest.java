@@ -13,10 +13,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import chatbot.Action;
-import chatbot.AgentResponseParser;
-import model.AgentResponse;
-import model.Context;
-import model.ParameterKey;
+import service.agent.AgentResponse;
+import service.agent.AgentResponseParser;
+import service.agent.Context;
+import service.agent.ParameterKey;
 
 public class AgentResponseParserTest {
 
@@ -48,7 +48,6 @@ public class AgentResponseParserTest {
 		// Check
 		assertEquals("who are you", agentResult.getResolvedQuery());
 		assertEquals(Action.ABOUT, agentResult.getAction());
-		assertEquals("9196295d-f6f3-4d41-9750-b19d61d5ea6a", agentResult.getSessionId());
 		assertEquals("Hey there, I am your friendly tourist chatbot!", agentResult.getReply());
 		assertEquals(expectedParameters, agentResult.getParameters());
 		assertEquals(expectedContext, agentResult.getContexts());
@@ -78,7 +77,6 @@ public class AgentResponseParserTest {
 		// Check
 		assertEquals("", agentResult.getResolvedQuery());
 		assertEquals(Action.NONE, agentResult.getAction());
-		assertEquals("9196295d-f6f3-4d41-9750-b19d61d5ea6a", agentResult.getSessionId());
 		assertEquals("I missed what you said. Say it again?", agentResult.getReply());
 		assertEquals(expectedParameters, agentResult.getParameters());
 		assertEquals(expectedContext, agentResult.getContexts());
@@ -131,7 +129,6 @@ public class AgentResponseParserTest {
 
 		// Check
 		assertEquals(Action.SAVE_RADIUS, agentResult.getAction());
-		assertEquals("9196295d-f6f3-4d41-9750-b19d61d5ea6a", agentResult.getSessionId());
 		assertEquals(expectedParameters, agentResult.getParameters());
 	}
 

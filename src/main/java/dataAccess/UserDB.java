@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import model.POIProfile;
-import model.Preference;
-import model.RecommendedPointOfInterest;
-import model.User;
+import domain.RecommendedPointOfInterest;
+import domain.User;
+import recommender.POIProfile;
+import recommender.Preference;
 
 public class UserDB extends DatabaseManager {
 

@@ -11,20 +11,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import chatbot.AgentHandler;
-import chatbot.ImageRequester;
+import chatbot.ChatbotResponse;
 import chatbot.TouristChatbot;
 import dataAccess.PointDB;
 import dataAccess.RatingDB;
 import dataAccess.UserDB;
-import model.ChatbotResponse;
-import model.Location;
-import model.POIProfile;
-import model.Preference;
-import model.Rating;
-import model.RecommendedPointOfInterest;
-import model.User;
+import domain.Location;
+import domain.Rating;
+import domain.RecommendedPointOfInterest;
+import domain.User;
+import recommender.POIProfile;
+import recommender.Preference;
 import recommender.Recommender;
+import service.ImageRequester;
+import service.agent.AgentHandler;
 
 public class TouristChatbotTest {
 

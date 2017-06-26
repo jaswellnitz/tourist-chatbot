@@ -1,4 +1,4 @@
-package chatbot;
+package integration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
 
-import model.ChatbotResponse;
+import chatbot.ChatbotResponse;
+import chatbot.TouristChatbot;
 
 // Receives Updates from Telegram and passes text messages to api.ai
 public class TelegramBotHandler implements Route {
@@ -50,7 +51,7 @@ public class TelegramBotHandler implements Route {
 			Object input = null;
 			;
 			if (message.location() != null) {
-				input = new model.Location(message.location().latitude(), message.location().longitude());
+				input = new domain.Location(message.location().latitude(), message.location().longitude());
 				SendChatAction sendChatAction = new SendChatAction(message.chat().id(),
 						ChatAction.find_location.name());
 				telegramBot.execute(sendChatAction);

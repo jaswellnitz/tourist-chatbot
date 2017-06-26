@@ -1,4 +1,4 @@
-package model;
+package recommender;
 
 import java.io.Serializable;
 import java.util.ArrayList;
