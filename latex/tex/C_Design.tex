@@ -1,0 +1,105 @@
+\apendice{Design Specification}
+
+\section{Introduction}
+This annex serves as a detailed description of the application’s implementation, structure and way of functioning. Besides providing structural information such as data model, system topography and architecture, some peculiarities of the application are examined that took significant effort in design, for example the implementation of the recommender system and the conversation flow design. Additionally, the chatbot’s flow of events is shown by examining the procedural steps of some main use cases.
+
+\section{Data Model}
+\subsection{Package Structure}
+The application’s source code is divided into six packages, which also reflects the application’s main component structure. Figure \ref{fig:packagediagram} shows the packages and relationships between them. 
+
+\imagen{packagediagram}{Package Structure}
+
+A description of the packages containing the application’s classes is provided in the following sections. For reasons of clarity and comprehensibility, the classes are not shown in a single diagram but are split into several class diagrams based on their respective package.
+
+\subsection{Messenger}
+The messenger is the application’s entry point. The web service is set up in \textit{Main} and all of the system’s components are initialized using dependency injection. The \textit{TelegramBotHandler} encapsulates the connection to Telegram, receives messages from the messenger and forwards it to the  \textit{TouristChatbot}. It sends messages back to the messenger and triggers the modification of the messenger’s appearance if needed. To do so, a Telegram Bot API \cite{telegrambotapi} is used.
+
+\imagen{messenger}{Messenger Package}
+
+\subsection{Chatbot}
+The  \textit{TouristChatbot} controls the chatbot’s conversation flow. It forwards messages to the natural language platform and triggers recommendations. The class  \textit{ChatbotResponse} is a container specyfing the information that is forwarded back to the messenger. The enumeration  \textit{Action} is used to distinguish between the different actions to be taken in the  \textit{TouristChatbot}.
+
+\imagen{chatbot}{Chatbot Package}
+
+\subsection{Services}
+The service package controls how the APIs are accessed in the project. The package contains a subpackage, the agent package, which contains all logic related to the natural language platform API.AI, including the access of the API and processing of API.AI’s output. Additionally, the Foursquare API is accessed in the class \textit{ImageRequester}. As the way to access HTTP APIs is the same for both services, an inheritance is implemented. The super class \textit{ServiceRequester} uses the library OKHTTP to encapsulate the GET requests. The subclasses \textit{ImageRequester} and \textit{AgentHandler} define the specific way of accessing the APIs.
+\imagen{service}{Service Package}
+
+\subsection{Recommender}
+The recommender package is one of the most central components of the application. The recommendation process itself takes places in the class Recommender which uses the machine learning library \textit{Apache Mahout} to compute recommendations. The classes \textit{ProfileSimilarity} and \textit{POIDataModel} override Mahout functionalities to adapt the recommendation process to the project’s needs. The \textit{POIProfile} contains the tourist categories that show the user interests or POI characteristics. The recommendation mechanism is explained in more depth in the section \ref{recommendationmec}.
+
+
+\imagen{recommender}{Recommender Package}
+
+\subsection{Data Access Package}
+The data access package connects the application to the PostgreSQL database. It consists of the classes \textit{UserDB}, \textit{RatingDB} and \textit{PointDB} which encapsulate the access to the three respective database tables. Due to the fact that their principal way of working is similar, an inheritance was implemented, handling the database connection and methods to execute queries in the \textit{DatabaseManager}. The classes \textit{UserDB}, \textit{RatingDB} and \textit{PointDB} are subclasses of the \textit{DatabaseManager}.
+
+\imagen{dataAccess}{Data Access Package}
+
+\subsection{Domain}
+The domain package contains the business objects of the project, meaning natural objects that have a representation in the real world. They do not possess any complex logic or provide any services, their single function is to contain data. The domain objects are used system-wide and are shared between the components of the data model.
+\imagen{domain}{Domain Package}
+
+\section{Architecture}
+\subsection{System Overview}
+In this section, the application’s architecture is examined in depth. To get a first overview of the system’s topography, figure \ref{fig:architecture} is shown which gives an impression of the system's main components.
+\imagen{architecture}{System Overview}
+
+The figure shows the developed program in green and the external components that are used in the system, visualized in grey, as well as the used technologies to access them. 
+
+
+The system's heart is a Java web application that was set up with the help of the micro framework \textit{Spark}  \cite{spark}. The web application and PostgreSQL database are both deployed to the Platform-as-a-service \textit{Heroku}.The Telegram Bot is connected to the application via webhook, specifically to the URL that was assigned to the web application by Heroku. Every time the user sends a message to the chatbot via Telegram, the web application is notified. The user input is then forwarded to the natural language
+parsing platform API.AI which interprets the meaning of the user input. The Foursquare API is used to provide images to the recommended points of interest.
+
+\subsection{Multitier Architecture}
+\imagen{detailedlayers}{The multitier architecture}
+
+As we can see, the application is designed as a typical 3-tier architecture and consists of a presentation layer, an application layer, a data access layer as well as a horizontal domain object layer. The multitier architecture is a well-known architecture pattern which ensures loose coupling and high cohesion. The direction of access between the layers is from top to bottom which avoids cycles in the dependency graph.
+
+Being usually the layer defining the graphical user interface, the application’s presentation layer is rather small in this case. As the UI is defined externally in the Telegram messenger, the presentation layer in this application only consists of the connection to Telegram and methods to change Telegram’s appearance (e.g. keyboard buttons). This behaviour is mainly controlled by the class \textit{TelegramBotHandler}.
+
+The data access layer connects the application to the PostgreSQL database. It consists of the classes \textit{UserDB}, \textit{RatingDB} and \textit{PointDB} which encapsulate the access to the three database tables.
+
+Certainly, the application layer can be considered as the heart of the software. It contains the two major components \textit{Chatbot} and \textit{Recommender} as well as the helper component \textit{Services}. In contrast to the vertical 3-tier layers, a horizontal layer is introduced that contains the domain objects of the application, such as \textit{User}, \textit{Rating} or \textit{RecommendedPointOfInterest}. Besides using these objects in the application layer, they are also used in the persistence of the data access layer.
+
+A main focus of the architecture design was the interchangeability of components that access external services, marked as cross-hatched areas in figure \ref{fig:detailedlayers}. A reason for this is the recent importance of conversational interfaces these days and therefore the constant appearance of new technologies. In this application, the presentation layer is completely adjusted to the Telegram messenger. If the decision is made to use a different messenger or include an additional one, only the presentation layer has to be adapted whereas the rest of the architecture remains untouched. Similarly, the \textit{Services} component of the application layer is easily replaced if the natural language parsing platform is changed. 
+
+\section{Procedural Design}
+The followings section serves to show the main flow of events and usage of components in the application. 
+
+\subsection{Flow of Events}
+The principal message flow is shown in sequence diagram \ref{fig:messageflow}. It includes all objects that are involved in forwarding and processing user input. This flow is always the same for any user input. As already explained previously, the input is received from the \textit{TelegramBotHandler} and forwarded to API.AI which filters the meaning of the user input. This process is based on the agent model that was implemented in API.AI in which intents and concepts were defined. The response from the NLU platform is parsed from JSON to Java and stored in an object of the class \textit{AgentResponse}. Based on this AgentResponse, the \textit{TouristChatbot} decides which action needs to be taken and processes the action accordingly. The calculated answer is transmitted back to the messenger. 
+
+\imagen{messageflow}{Message Flow Sequence Diagram}
+
+The actual operations that are done in step 5.1 processing depends on the user input and ranges from triggering recommendations to storing user interests or ratings in the database. Certainly, the most complex action to be taken is a recommendation, which is shown in the figure \ref{fig:recommendationoverview}. 
+
+\subsubsection{Recommendation} \label{recommendationmec}
+This use case is used as an example as it involves all components of the program.  For the sake of simplicity and easier understanding, the previous shown natural language parsing and message forwarding from and to Telegram are left out.
+
+\imagen{recommendationoverview}{Recommendation Sequence Diagram}
+
+The actual recommendation mechanism itself is presented in a simplified scheme by step 1.1. As already explained in the relevant aspects of the thesis, the recommender combines collaborative filtering and content-based filtering approaches. 
+
+In total, three points of interest are retrieved for the user, all of them situated in the recommendation radius. The aim is to retrieve as many recommendations as possible from the collaborative filtering mechanism as this is the mechanism that is more likely to output suitable recommendations. The collaborative filtering mechanism is based on user ratings which are retrieved from the PostgreSQL database using Mahout’s  \textit{PostgresJDBCDataModel}.  If the collaborative filtering mechanism outputs less than three different recommendations (for example caused by a lack of user ratings for the specific user), the content-based fallback mechanism is used.
+
+In order to apply the content-based mechanism, some of Mahout’s functionalities were overridden to fit the project’s needs: The classes \textit{ProfileSimilarity} and \textit{POIDataModel} are created that are derived from Mahout interfaces. The \textit{POIDataModel} is used to formalize the relevant data for the recommender, including both the user and all points of interest in the specified recommendation radius. More precisely, the \textit{POIDataModel} introduces \textit{ProfileItems} into the recommender. The \textit{ProfileItem} interface is created to standardize objects that contain a \textit{POIProfile}. The \textit{POIProfile} defines the preference to the tourist categories. The classes \textit{User} and \textit{RecommendedPointOfInterest} both implement the interface as they either show interest in the tourist categories or are characterized by the profile. 
+The similarity measure made to compute the points of interest most similar to the user’s preferences is specified in the class \textit{ProfileSimilarity}. In this class, the user interests are compared with the properties of the points of interest based on their \textit{POIProfile}.
+ 
+Additionally to the general recommendation, the user is able to trigger a category specific recommendation. When the category specific recommendation is used, only recommendations are returned that match the given interest, e.g. sightseeing.
+
+
+\subsection{Conversation Flow Design}
+In order to visualize the conversation flow, a graph was designed defining the chatbot-user interactions based on the application’s use cases. In the following, the general conversation graph is shown as well as the subgraphs defining the interface’s main features. According to this conversation flow, corresponding intents and contexts were modeled in API.AI.
+
+\convograph{conversationflow}{The basic conversation flow}
+
+\convograph{recommend}{The recommendation conversation flow}
+
+\convograph{chatconvo}{Asking for the user's preferences.}
+
+\convograph{pastrecommend}{Showing the past recommendations and asking the user to rate}
+
+
+\subsubsection{API.AI Agent}
+Based on these graphs, intents and contexts were designed in API.AI. The user input is categorized in intents which loosely match the basic use cases. Every time the user chooses between multiple possible answers, a context is set to ensure an appropriate follow-up reaction. The majority of intents trigger actions that are defined in the agent. After parsing the user input with API.AI, the Java web application performs functionalities based on those actions, such as information storage in the database or a recommendation. For further examination, the agent model can be found in the delivered data and introduced into the API.AI (see Technical Programming Documentation).

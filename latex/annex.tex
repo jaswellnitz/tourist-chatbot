@@ -53,6 +53,16 @@
 	\FloatBarrier
 }
 
+\newcommand{\convograph}[2]{
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.7\textwidth]{#1}
+		\caption{#2}\label{fig:#1}
+	\end{figure}
+	\FloatBarrier
+}
+
+
 \newcommand{\screenshot}[2]{
 	\begin{figure}[!h]
 		\centering
@@ -405,7 +415,7 @@
 
 \include{./tex/A_Project_Plan}
 \include{./tex/B_Requirements}
-\include{./tex/C_Diseno}
+\include{./tex/C_Design}
 \include{./tex/D_Technical_Documentation}
 \include{./tex/E_User_Manual}
 
