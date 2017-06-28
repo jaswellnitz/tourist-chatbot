@@ -59,14 +59,14 @@ public class RatingDBTest {
 		long userId = user.getId();
 		long itemId = 5555;
 		Rating rating = Rating._2;
-		assertFalse(ratingDB.hasRatingForUser(userId,itemId));
+		assertFalse(ratingDB.hasRating(userId,itemId));
 
 		// Action
 		ratingDB.saveRating(userId, itemId, rating);
 		
 		// Check
 		assertTrue(ratingDB.hasRatingForUser(userId));
-		assertTrue(ratingDB.hasRatingForUser(userId, itemId));
+		assertTrue(ratingDB.hasRating(userId, itemId));
 	}
 	
 	@Test

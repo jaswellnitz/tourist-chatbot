@@ -5,12 +5,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Defines the preference to the six tourist categories sightseeing, culture, food, nightlife, nature and shopping.
+ * @author Jasmin Wellnitz
+ *
+ */
 public class POIProfile implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -1718108343723888942L;
+	/**
+	 * The tourist categoriy count.
+	 */
+	public static final int CATEGORY_COUNT = 6;
+	
 	private final Preference sightseeing;
 	private final Preference culture;
 	private final Preference food;
@@ -18,13 +25,24 @@ public class POIProfile implements Serializable {
 	private final Preference nature;
 	private final Preference shopping;
 	private final List<Preference> categories;
-	public static final int CATEGORY_COUNT = 6;
 
+	/**
+	 * Creates an undefined POIProfile.
+	 */
 	public POIProfile() {
 		this(Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED,
 				Preference.NOT_RATED, Preference.NOT_RATED);
 	}
 
+	/**
+	 * Creates an POIProfile based on the known category preferences.
+	 * @param sightseeing
+	 * @param culture
+	 * @param food
+	 * @param nightlife
+	 * @param nature
+	 * @param shopping
+	 */
 	public POIProfile(Preference sightseeing, Preference culture, Preference food, Preference nightlife,
 			Preference nature, Preference shopping) {
 		this.sightseeing = sightseeing;
@@ -37,6 +55,10 @@ public class POIProfile implements Serializable {
 		categories.addAll(Arrays.asList(sightseeing, culture, food, nightlife, nature, shopping));
 	}
 
+	/**
+	 * Checks if the profile shows the characteristic of a pof interest. An item is a POI if it is characterized by at least one category.
+	 * @return
+	 */
 	public boolean isPOI() {
 		for (Preference category : categories) {
 			if (category == Preference.TRUE) {
@@ -46,34 +68,66 @@ public class POIProfile implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Shows whether the profile contains the culture category.
+	 * @return boolean
+	 */
 	public Preference hasCulture() {
 		return culture;
 	}
-
+	/**
+	 * Shows whether the profile contains the nightlife category.
+	 * @return boolean
+	 */
 	public Preference hasNightlife() {
 		return nightlife;
 	}
 
+	/**
+	 * Shows whether the profile contains the sightseeing category.
+	 * @return boolean
+	 */
 	public Preference hasSightseeing() {
 		return sightseeing;
 	}
 
+	/**
+	 * Shows whether the profile contains the shopping category.
+	 * @return boolean
+	 */
 	public Preference hasShopping() {
 		return shopping;
 	}
 
+	/**
+	 * Shows whether the profile contains the food category.
+	 * @return boolean
+	 */
 	public Preference hasFood() {
 		return food;
 	}
 
+	/**
+	 * Shows whether the profile contains the nature category.
+	 * @return boolean
+	 */
 	public Preference hasNature() {
 		return nature;
 	}
 
+	/**
+	 * Returns a view of all profile categories.
+	 * @return list of preferences
+	 */
 	public List<Preference> getAllCategories() {
-		return categories;
+		return new ArrayList<Preference>(categories);
 	}
 
+	/**
+	 * Creates a POIProfile with the given category.
+	 * @param categoryIndex index that indicates the tourist category
+	 * @return POIProfile
+	 */
 	public static POIProfile getProfileForCategoryIndex(int categoryIndex) {
 		Preference[] preference = new Preference[CATEGORY_COUNT];
 		for (int i = 0; i < preference.length; i++) {
@@ -86,6 +140,11 @@ public class POIProfile implements Serializable {
 		return new POIProfile(preference[0], preference[1], preference[2], preference[3], preference[4], preference[5]);
 	}
 
+	/**
+	 * Gets the index for a tourist category
+	 * @param interest
+	 * @return category index
+	 */
 	public static int getCategoryIndex(String interest) {
 		List<String> categories = Arrays
 				.asList(new String[] { "sightseeing", "culture", "food", "nightlife", "nature", "shopping" });
@@ -96,6 +155,11 @@ public class POIProfile implements Serializable {
 		return index;
 	}
 
+	/**
+	 * Converts a list of interests into a POIProfile
+	 * @param interests
+	 * @return POIProfile
+	 */
 	public static POIProfile getProfileForInterests(List<String> interests) {
 		Preference[] preference = { Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED,
 				Preference.NOT_RATED, Preference.NOT_RATED, Preference.NOT_RATED };
@@ -108,6 +172,10 @@ public class POIProfile implements Serializable {
 		return new POIProfile(preference[0], preference[1], preference[2], preference[3], preference[4], preference[5]);
 	}
 
+	/**
+	 * Converts the POIProfile into a list of interests
+	 * @return list of interests
+	 */
 	public List<String> getInterestsFromProfile() {
 		List<String> interests = new ArrayList<>();
 

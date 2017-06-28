@@ -11,6 +11,11 @@ import org.apache.mahout.cf.taste.model.PreferenceArray;
 import org.apache.mahout.cf.taste.similarity.PreferenceInferrer;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 
+/**
+ * Class that overrides the Mahout interface UserSimilarity. Computes the similarity between two items based on their preferences to tourist categories.
+ * @author Jasmin Wellnitz
+ *
+ */
 public class ProfileSimilarity implements UserSimilarity {
 
 	private DataModel dataModel;

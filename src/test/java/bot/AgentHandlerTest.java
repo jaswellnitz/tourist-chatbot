@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import service.agent.AgentHandler;
 import service.agent.AgentResponse;
-import service.agent.ParameterKey;
+import service.agent.Parameter;
 
 public class AgentHandlerTest {
 	
@@ -78,7 +78,7 @@ public class AgentHandlerTest {
 		
 		// Check
 		assertEquals(context,setContext.getContexts().get(0).getName());
-		String rating = (String)agentResponse.getParameters().get(ParameterKey.RATING.name());
+		String rating = (String)agentResponse.getParameters().get(Parameter.RATING.name());
 		assertEquals(expectedRating,rating);
 	}
 	

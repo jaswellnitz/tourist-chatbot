@@ -2,6 +2,11 @@ package service.agent;
 
 import java.util.Map;
 
+/**
+ * The context specified by the agent.
+ * @author Jasmin Wellnitz
+ *
+ */
 public class Context {
 
 	private final String name;
@@ -12,10 +17,18 @@ public class Context {
 		this.parameters = parameters;
 	}
 
+	/**
+	 * Returns the context name
+	 * @return context name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Returns the parameters defined in the context.
+	 * @return parameter map
+	 */
 	public Map<String, Object> getParameters() {
 		return parameters;
 	}

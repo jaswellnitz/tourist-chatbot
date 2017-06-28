@@ -16,7 +16,11 @@ import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.mahout.cf.taste.model.PreferenceArray;
 
-// TODO: implement all methods and constructors
+/**
+ * Overrides the Mahout DataModel to process POIProfiles
+ * @author Jasmin Wellnitz
+ *
+ */
 public class POIDataModel extends AbstractDataModel implements DataModel {
 
 
@@ -30,11 +34,15 @@ public class POIDataModel extends AbstractDataModel implements DataModel {
 	public POIDataModel(List<ProfileItem> profItems){
 		this.profileItems = profItems;
 
-		processFile(profileItems);
+		processProfileItems(profileItems);
 
 	}
 
-	private void processFile(List<ProfileItem> profileItems) {
+	/**
+	 * Introduces the profileItems into the Mahout datamodel, converting the tourist category preferences into Mahout PreferenceArrays. 
+	 * @param profileItems
+	 */
+	private void processProfileItems(List<ProfileItem> profileItems) {
 
 		FastByIDMap<PreferenceArray> data = new FastByIDMap<>();
 		for (ProfileItem profileItem : profileItems) {

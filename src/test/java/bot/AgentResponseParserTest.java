@@ -16,7 +16,7 @@ import chatbot.Action;
 import service.agent.AgentResponse;
 import service.agent.AgentResponseParser;
 import service.agent.Context;
-import service.agent.ParameterKey;
+import service.agent.Parameter;
 
 public class AgentResponseParserTest {
 
@@ -122,7 +122,7 @@ public class AgentResponseParserTest {
 		JsonObject json = new JsonParser().parse(jsonString).getAsJsonObject();
 
 		Map<String, Object> expectedParameters = new HashMap<>();
-		expectedParameters.put(ParameterKey.DISTANCE.name(), 500);
+		expectedParameters.put(Parameter.DISTANCE.name(), 500);
 
 		// Action
 		AgentResponse agentResult = AgentResponseParser.fromJson(json);

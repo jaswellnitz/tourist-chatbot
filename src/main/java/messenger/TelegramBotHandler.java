@@ -26,19 +26,29 @@ import com.pengrad.telegrambot.response.SendResponse;
 import chatbot.ChatbotResponse;
 import chatbot.TouristChatbot;
 
-// Receives Updates from Telegram and passes text messages to api.ai
+/**
+ * Interface to the Telegram messenger. Receives updates from the messenger and handles the replies.
+ * @author Jasmin Wellnitz
+ *
+ */
 public class TelegramBotHandler implements Route {
 
-	private final String token;
 	private final TelegramBot telegramBot;
 	private TouristChatbot touristChatbot;
 
+	/**
+	 * Creates the TelegramBotHandler
+	 * @param token the Telegram access token
+	 * @param touristChatbot 
+	 */
 	public TelegramBotHandler(String token, TouristChatbot touristChatbot) {
 		this.telegramBot = TelegramBotAdapter.buildDebug(token);
-		this.token = token;
 		this.touristChatbot = touristChatbot;
 	}
 
+	/**
+	 * Receives messages from Telegram and forwards them to the TouristChatbot.
+	 */
 	@Override
 	public Object handle(Request request, Response response) {
 		Update update = BotUtils.parseUpdate(request.body());
@@ -49,7 +59,6 @@ public class TelegramBotHandler implements Route {
 			chatbotResponses.add(touristChatbot.processStartMessage(message.from().id(), message.from().firstName()));
 		} else {
 			Object input = null;
-			;
 			if (message.location() != null) {
 				input = new domain.Location(message.location().latitude(), message.location().longitude());
 				SendChatAction sendChatAction = new SendChatAction(message.chat().id(),
@@ -67,7 +76,12 @@ public class TelegramBotHandler implements Route {
 		return state;
 	}
 
-	private Keyboard getKeyboard(List<String> keyboardText) {
+	/**
+	 * Creates the Telegram keyboard
+	 * @param keyboardText  The keyboard text for the buttons
+	 * @return a Telegram keyboard
+	 */
+	private Keyboard createKeyboard(List<String> keyboardText) {
 		KeyboardButton[] keyboardButtons = new KeyboardButton[keyboardText.size()];
 		for (int i = 0; i < keyboardText.size(); i++) {
 			KeyboardButton keyboardButton = new KeyboardButton(keyboardText.get(i));
@@ -81,6 +95,12 @@ public class TelegramBotHandler implements Route {
 		return replyKeyboardMarkup;
 	}
 
+	/**
+	 * Sends messages to the Telegram. Based on the element count in chatbotResponses, multiple messages are sent.
+	 * @param chatId
+	 * @param chatbotResponses the message content
+	 * @return a boolean indicating whether the action was successful.
+	 */
 	private boolean sendMessage(long chatId, List<ChatbotResponse> chatbotResponses) {
 		boolean isOk = false;
 		for (ChatbotResponse chatbotResponse : chatbotResponses) {
@@ -93,7 +113,7 @@ public class TelegramBotHandler implements Route {
 				SendMessage sendMessage = new SendMessage(chatId, chatbotResponse.getReply());
 				Keyboard keyboard;
 				if (chatbotResponse.hasChangedKeyboard()) {
-					keyboard = getKeyboard(chatbotResponse.getKeyboardButtons());
+					keyboard = createKeyboard(chatbotResponse.getKeyboardButtons());
 				} else {
 					keyboard = new ReplyKeyboardRemove();
 				}
@@ -106,14 +126,19 @@ public class TelegramBotHandler implements Route {
 		return isOk;
 	}
 
-	public String getToken() {
-		return token;
-	}
-
+	/**
+	 * Returns the TelegramBot
+	 * @return telegramBot
+	 */
 	public TelegramBot getTelegramBot() {
 		return telegramBot;
 	}
 
+	/**
+	 * Indicates whether the user input is a start message.
+	 * @param message a Telegram message
+	 * @return boolean
+	 */
 	protected boolean isStartMessage(Message message) {
 		return message != null && message.text() != null && message.text().startsWith("/start");
 	}

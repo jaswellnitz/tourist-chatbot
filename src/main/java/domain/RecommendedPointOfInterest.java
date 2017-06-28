@@ -3,6 +3,11 @@ package domain;
 import recommender.POIProfile;
 import recommender.ProfileItem;
 
+/**
+ * A point of interest that is recommended to the user.
+ * @author Jasmin Wellnitz
+ *
+ */
 public class RecommendedPointOfInterest implements ProfileItem {
 
 	private static final long serialVersionUID = -8542663924097410195L;
@@ -16,6 +21,16 @@ public class RecommendedPointOfInterest implements ProfileItem {
 	private float recommendationValue;
 	private final static int UNSET_RECOMMENDATION_VALUE = 0;
 	
+	/**
+	 * @param id the id given by OpenStreetMap
+	 * @param name the OpenStreetMap name
+	 * @param location coordinates of the POI
+	 * @param streetName address - street name
+	 * @param houseNumber address - house number
+	 * @param distance distance to the user
+	 * @param openingHours opening hours
+	 * @param profile profile that characterizes the POI
+	 */
 	public RecommendedPointOfInterest(long id, String name, Location location, String streetName, String houseNumber, int distance,
 			String openingHours, POIProfile profile){
 		this.id = id;
@@ -28,27 +43,27 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		this.location = location;
 	}
 
-	public final String parseAddress(String streetName, String houseNumber) {
-		String s = "";
-		String h = "";
-		if (streetName != null && !streetName.equals("")) {
-			s = streetName;
-			if (houseNumber != null && !houseNumber.equals("")) {
-				h = " " + houseNumber;
-			}
-		}
-		return s + h;
-	}
-
+	/**
+	 * Gets the POI's OSM id.
+	 * @return id
+	 */
 	@Override
 	public long getId() {
 		return id;
 	}
 
+	/**
+	 * Gets the POI's OSM name.
+	 * @return name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Gets the POI's address. 
+	 * @return address; an empty string is returned if no address was specified.
+	 */
 	public String getAddress() {
 		return address;
 	}
@@ -58,10 +73,18 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		return profile;
 	}
 
+	/**
+	 * Gets the distance to the user to whom the POI was recommended.
+	 * @return distance to user in meter
+	 */
 	public int getDistance() {
 		return distanceToUser;
 	}
 
+	/**
+	 * Gets the POI's opening hours.
+	 * @return the opening hours;  an empty string is returned if no opening hours were specified.
+	 */
 	public String getOpeningHours() {
 		return openingHours;
 	}
@@ -118,6 +141,11 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		return id + "(: " + name + ", " + address + ", " + distanceToUser + ", " + openingHours + "," + recommendationValue +")";
 	}
 	
+	/**
+	 * Gets a user readable string representation of the POI.
+	 * @param showDistance indicates whether the distance to the user is shown or not
+	 * @return a formatted representation of the POI
+	 */
 	public String getFormattedString(boolean showDistance){
 		String ret = name+ ": ";
 		if(showDistance && distanceToUser != -1){
@@ -137,16 +165,46 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		return ret.substring(0, ret.length()-2) +".";
 	}
 
+	/**
+	 * Gets the recommendation value calculated by the recommender.
+	 * @return recommedantion value
+	 */
 	public float getRecommendationValue() {
 		return recommendationValue;
 	}
 
+	/**
+	 * Sets the recommendation value
+	 * @param recommendationValue the recommendation value
+	 */
 	public void setRecommendationValue(float recommendationValue) {
 		this.recommendationValue = recommendationValue;
 	}
 	
+	/**
+	 * Shows the POI's location.
+	 * @return
+	 */
 	public Location getLocation(){
 		return location;
+	}
+	
+	/**
+	 * Combines the given street name and house number into an address string
+	 * @param streetName street name
+	 * @param houseNumber house number
+	 * @return the address
+	 */
+	private final String parseAddress(String streetName, String houseNumber) {
+		String s = "";
+		String h = "";
+		if (streetName != null && !streetName.equals("")) {
+			s = streetName;
+			if (houseNumber != null && !houseNumber.equals("")) {
+				h = " " + houseNumber;
+			}
+		}
+		return s + h;
 	}
 
 }

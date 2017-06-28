@@ -6,28 +6,56 @@ import java.util.List;
 import recommender.POIProfile;
 import recommender.ProfileItem;
 
+/**
+ * A user who interacts with the chatbot. Contains personal information of the user, his interests and information about his recommendations.
+ * @author Jasmin Wellnitz
+ *
+ */
 public class User implements ProfileItem {
 
 	private static final long serialVersionUID = -8542663924097410197L;
+	private static final int DEFAULT_RECOMMENDATION_RADIUS = 3000;
+	
 	private final long id;
 	private final String name;
 	private POIProfile profile;
 	private int prefRecommendationRadius;
 	private Location currentLocation;
+	
+	// TODO refactor ?
 	private int lastRecommendedIndex;
-	private static final int DEFAULT_RECOMMENDATION_RADIUS = 3000;
 	private List<RecommendedPointOfInterest> pendingRecommendations;
 	private List<RecommendedPointOfInterest> unratedPOIs;
 	private List<RecommendedPointOfInterest> positiveRecommendations;
 
+	/**
+	 * Creates a new user based on the information given by the messenger.
+	 * @param id
+	 * @param name
+	 */
 	public User(long id, String name) {
 		this(id, new POIProfile(), DEFAULT_RECOMMENDATION_RADIUS, Location.UNSET, name);
 	}
-
+	
+	/**
+	 * Creates a user based on previously saved information, the user's current location is unknown
+	 * @param id
+	 * @param name
+	 * @param radius
+	 * @param profile
+	 */
 	public User(long id, String name, int radius, POIProfile profile) {
 		this(id, profile, radius, Location.UNSET, name);
 	}
 
+	/**
+	 * Creates a user based on all available information.
+	 * @param id
+	 * @param profile
+	 * @param radius
+	 * @param location
+	 * @param name
+	 */
 	public User(long id, POIProfile profile, int radius, Location location, String name) {
 		this.id = id;
 		this.profile = profile;
@@ -50,11 +78,19 @@ public class User implements ProfileItem {
 		return profile;
 	}
 
+	/**
+	 * Sets the user's POIProfile and therefore defines his interests
+	 * @param profile
+	 */
 	public void setProfile(POIProfile profile) {
 		assert profile != null : "Precondition failed: profile != null";
 		this.profile = profile;
 	}
 
+	/**
+	 * Gets the user's current location.
+	 * @return the location
+	 */
 	public Location getCurrentLocation() {
 		assert currentLocation != null : "Precondition failed: currentLocation != null";
 		assert !currentLocation.equals(Location.UNSET) : "Precondition failed: location is unset";
@@ -62,16 +98,40 @@ public class User implements ProfileItem {
 		return currentLocation;
 	}
 
+	/**
+	 * Sets the user's current location.
+	 * @param currentLocation
+	 */
 	public void setCurrentLocation(Location currentLocation) {
 		assert currentLocation != null : "Precondition failed: currentLocation != null";
 
 		this.currentLocation = currentLocation;
 	}
-
-	public void setCurrentLocation(double latitude, double longitude) {
-		this.currentLocation = new Location(latitude, longitude);
+	
+	/**
+	 * Gets the user's recommendations radius.
+	 * @return recommendation radius
+	 */
+	public int getPrefRecommendationRadius() {
+		return prefRecommendationRadius;
 	}
 
+	/**
+	 * Sets the recommendation radius
+	 * @param prefRecommendationRadius
+	 */
+	public void setPrefRecommendationRadius(int prefRecommendationRadius) {
+		this.prefRecommendationRadius = prefRecommendationRadius;
+	}
+
+	/**
+	 * Gets the user's name.
+	 * @return name
+	 */
+	public String getName() {
+		return name;
+	}
+	
 	@Override
 	public String toString() {
 		return "User:(" + id + ", " + profile + ", " + prefRecommendationRadius + ", " + currentLocation + ")";
@@ -139,18 +199,6 @@ public class User implements ProfileItem {
 		} else if (!unratedPOIs.equals(other.unratedPOIs))
 			return false;
 		return true;
-	}
-
-	public int getPrefRecommendationRadius() {
-		return prefRecommendationRadius;
-	}
-
-	public void setPrefRecommendationRadius(int prefRecommendationRadius) {
-		this.prefRecommendationRadius = prefRecommendationRadius;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	public void setPendingRecommendations(List<RecommendedPointOfInterest> recPOIs) {

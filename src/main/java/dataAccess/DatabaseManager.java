@@ -8,13 +8,20 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 
-// TODO close connections
+/**
+ * Manages the access to the PostgreSQL database via JDBC
+ * @author Jasmin Wellnitz
+ *
+ */
 public abstract class DatabaseManager {
 	private Connection conn;
 	private Statement statement;
 	private DataSource connectionPool;
 
-	// https://stackoverflow.com/questions/4938517/closing-jdbc-connections-in-pool
+	/***
+	 * Creates a DatabaseManager by connecting to the given database using JDBC
+	 * @param url The database access url
+	 */
 	protected DatabaseManager(String url) {
 		URI dbUri = null;
 		try {
@@ -35,7 +42,12 @@ public abstract class DatabaseManager {
 		connectionPool = basicDataSource;
 	}
 
-	public int executeUpdate(String query) {
+	/**
+	 * Executes an update on the database
+	 * @param query The PostgreSQL Query to be executed
+	 * @return either (1) the row count for SQL Data Manipulation Language (DML) statements or (2) 0 for SQL statements that return nothing
+	 */
+	protected int executeUpdate(String query) {
 		int rowCount = -1;
 		try (Connection conn = connectionPool.getConnection()) {
 			try (Statement statement = conn.createStatement()) {
@@ -47,7 +59,12 @@ public abstract class DatabaseManager {
 		return rowCount;
 	}
 
-	public ResultSet executeQuery(String query) {
+	/**
+	 * Executes a query on the database
+	 * @param query The PostgreSQL Query to be executed
+	 * @return a ResultSet object that contains the data produced by the given query
+	 */
+	protected ResultSet executeQuery(String query) {
 		ResultSet set = null;
 		try {
 			conn = connectionPool.getConnection();
@@ -59,7 +76,10 @@ public abstract class DatabaseManager {
 		return set;
 	}
 
-	public void close() {
+	/**
+	 * Closes the previously opened connection and statement
+	 */
+	protected void close() {
 		try {
 			statement.close();
 			conn.close();
@@ -68,6 +88,10 @@ public abstract class DatabaseManager {
 		}
 	}
 
+	/***
+	 * Gets the database connection
+	 * @return connectionPool
+	 */
 	public DataSource getDataSource() {
 		return connectionPool;
 	}

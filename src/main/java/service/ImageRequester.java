@@ -8,17 +8,33 @@ import com.google.gson.JsonObject;
 
 import domain.Location;
 
+/**
+ * Encapsulates the access of the Foursquare API. Requests image URLs for POI.
+ * @author Jasmin Wellnitz
+ *
+ */
 public class ImageRequester extends ServiceRequester {
 
 	private String clientId;
 	private String clientSecret;
 
+	/**
+	 * Creates an ImageRequester based on the Foursquare credentials
+	 * @param clientId Foursquare client id
+	 * @param clientSecret Foursquare client secret
+	 */
 	public ImageRequester(String clientId, String clientSecret) {
 		super();
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
 	}
 
+	/**
+	 * Gets the image url for a point of interest.
+	 * @param name  the POI name
+	 * @param location the POI location
+	 * @return the image url; if no image was found, an empty string is returned
+	 */
 	public String getImageURL(String name, Location location) {
 		String url = "";
 		String id = getVenueId(name, location);
@@ -27,7 +43,13 @@ public class ImageRequester extends ServiceRequester {
 		}
 		return url;
 	}
-
+	/** Gets the corresponding Foursquare venue id for the given POI
+	 * Uses Foursquare's venue search endpoint
+	 * https://developer.foursquare.com/docs/venues/search
+	 * @param name POI name
+	 * @param location POI location
+	 * @return venue id
+	 */
 	private String getVenueId(String name, Location location) {
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put("v", "20170101");
@@ -48,6 +70,12 @@ public class ImageRequester extends ServiceRequester {
 		return id;
 	}
 
+	/**
+	 * Gets the image url for the venue id, using the following API endpoint:
+	 * https://developer.foursquare.com/docs/venues/photos
+	 * @param id Foursquare venue id
+	 * @return image url
+	 */
 	private String getImageForVenueId(String id){
 		assert id != null: "Precondition failed: id != null";
 		assert !id.isEmpty(): "Precondition failed: !id.isEmpty()";

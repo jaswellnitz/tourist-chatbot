@@ -1,5 +1,10 @@
 package chatbot;
 
+/**
+ * An action to be triggered, specified by the NLU agent.
+ * @author Jasmin Wellnitz
+ *
+ */
 public enum Action {
 
 	ABOUT, SAVE_INTEREST, SAVE_RADIUS, SHOW_INFORMATION,
@@ -7,9 +12,14 @@ public enum Action {
 	RATE, SHOW_PAST_RECOMMENDATIONS, GREETINGS,
 	NONE;
 	
-	public static Action getEnum(String s){
+	/**
+	 * Converts the string representation into the enum value.
+	 * @param actionString
+	 * @return Action
+	 */
+	public static Action getEnum(String actionString){
 		for(Action a: values()){
-			if(s.toUpperCase().equals(a.name())){
+			if(actionString.toUpperCase().equals(a.name())){
 				return a;
 			}
 		}

@@ -11,7 +11,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import chatbot.Action;
-
+/**
+ * Utility class that parses the json agent response into a java representation.
+ * @author touristchatbot
+ *
+ */
 public class AgentResponseParser {
 
 	private static Map<String, Object> parseParameters(JsonObject resultObject) {
@@ -24,9 +28,9 @@ public class AgentResponseParser {
 						list.add(jsonElement.getAsString());
 					}
 					parameters.put(entry.getKey(), list);
-				} else if (ParameterKey.getEnum(entry.getKey()) == ParameterKey.DISTANCE && entry.getValue().isJsonObject()) {
+				} else if (Parameter.getEnum(entry.getKey()) == Parameter.DISTANCE && entry.getValue().isJsonObject()) {
 					int distance = parseDistance(entry.getValue());
-					parameters.put(ParameterKey.DISTANCE.name(), distance);
+					parameters.put(Parameter.DISTANCE.name(), distance);
 				} else {
 					parameters.put(entry.getKey(), entry.getValue().getAsString());
 				}
@@ -49,6 +53,11 @@ public class AgentResponseParser {
 
 	}
 
+	/**
+	 * Parses the agent's response from JSON to the Java object AgentResponse
+	 * @param responseObject json response
+	 * @return the agent response as a Java object
+	 */
 	public static AgentResponse fromJson(JsonObject responseObject) {
 		assert responseObject != null : "Precondition failed: responseObject != null";
 		JsonObject resultObject = responseObject.get("result").getAsJsonObject();

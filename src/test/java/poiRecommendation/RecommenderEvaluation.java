@@ -1,7 +1,6 @@
 package poiRecommendation;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.mahout.cf.taste.common.TasteException;
@@ -30,11 +29,13 @@ public class RecommenderEvaluation {
 	private static int EUCLIDEAN_SIM = 0;
 	private static int PEARSON_SIM = 1;
 	private static int LOGLIKELIHOOD_SIM = 2;
+	@SuppressWarnings("unused") // constant is created for clarity
 	private static int SPEARMAN_SIM = 3;
 
 	private static int THRESHOLD_NEIGHBORHOOD = 0;
 	private static int NEAREST_2_NEIGHBORHOOD = 1;
 	private static int NEAREST_5_NEIGHBORHOOD = 2;
+	@SuppressWarnings("unused") // constant is created for clarity 
 	private static int NEAREST_10_NEIGHBORHOOD = 3;
 	private static int COUNT = 4;
 

@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.mahout.cf.taste.eval.RecommenderIRStatsEvaluator;
-import org.apache.mahout.cf.taste.impl.eval.GenericRecommenderIRStatsEvaluator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,15 +26,13 @@ import recommender.Recommender;
 public class RecommenderTest {
 	private Recommender recommender;
 	private Location defaultUserLocation;
-	private int numRecommendations;
 	private RatingDB ratingDB;
 
 	@Before
 	public void setUp() {
-		numRecommendations = 3;
 		String url = System.getenv("DATABASE_URL");
 		this.ratingDB = new RatingDB(url);
-		recommender = new Recommender(new PointDB(url), ratingDB,numRecommendations);
+		recommender = new Recommender(new PointDB(url), ratingDB);
 		this.defaultUserLocation = new Location(41.4034984, 2.1740598);
 		ratingDB.saveRating(998, 2200465185l, Rating._4);
 		ratingDB.saveRating(999, 249401770, Rating._4);
@@ -60,7 +56,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 
 		// Recommendations are unique
 		Set<RecommendedPointOfInterest> s = new HashSet<>(recommendations);
@@ -80,7 +76,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 		// Recommendations are unique
 		Set<RecommendedPointOfInterest> s = new HashSet<>(recommendations);
 		assertEquals(s.size(), recommendations.size());
@@ -142,7 +138,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 		RecommendedPointOfInterest poi1 = recommendations.get(0);
 		RecommendedPointOfInterest poi2 = recommendations.get(1);
 		assertEquals(Preference.TRUE, poi1.getProfile().hasSightseeing());
@@ -166,7 +162,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 		RecommendedPointOfInterest poi1 = recommendations.get(0);
 		RecommendedPointOfInterest poi2 = recommendations.get(1);
 		assertEquals(Preference.TRUE, poi1.getProfile().hasSightseeing());
@@ -189,7 +185,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 		RecommendedPointOfInterest poi1 = recommendations.get(0);
 		RecommendedPointOfInterest poi2 = recommendations.get(1);
 		assertEquals(Preference.TRUE, poi1.getProfile().hasCulture());
@@ -212,7 +208,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 		RecommendedPointOfInterest poi1 = recommendations.get(0);
 		RecommendedPointOfInterest poi2 = recommendations.get(1);
 		assertEquals(Preference.TRUE, poi1.getProfile().hasFood());
@@ -235,7 +231,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 		RecommendedPointOfInterest poi1 = recommendations.get(0);
 		RecommendedPointOfInterest poi2 = recommendations.get(1);
 		assertEquals(Preference.TRUE, poi1.getProfile().hasNature());
@@ -258,7 +254,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 		RecommendedPointOfInterest poi1 = recommendations.get(0);
 		RecommendedPointOfInterest poi2 = recommendations.get(1);
 		assertEquals(Preference.TRUE, poi1.getProfile().hasNightlife());
@@ -281,7 +277,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 		RecommendedPointOfInterest poi1 = recommendations.get(0);
 		RecommendedPointOfInterest poi2 = recommendations.get(1);
 		assertEquals(Preference.TRUE, poi1.getProfile().hasNightlife());
@@ -304,7 +300,7 @@ public class RecommenderTest {
 
 		// Check
 		assertFalse(recommendations.isEmpty());
-		assertEquals(numRecommendations, recommendations.size());
+		assertEquals(Recommender.NUM_RECOMMENDATIONS, recommendations.size());
 		RecommendedPointOfInterest poi1 = recommendations.get(0);
 		RecommendedPointOfInterest poi2 = recommendations.get(1);
 		assertEquals(Preference.TRUE, poi1.getProfile().hasShopping());

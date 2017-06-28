@@ -2,7 +2,6 @@ package messenger;
 
 import static spark.Spark.post;
 
-import static spark.Spark.get;
 import static spark.Spark.port;
 
 import com.pengrad.telegrambot.request.SetWebhook;
@@ -15,27 +14,40 @@ import recommender.Recommender;
 import service.ImageRequester;
 import service.agent.AgentHandler;
 
-// Entry Point: enables Telegram webhook
+/**
+ * The application's entry point. Starts the web application, enables the Telegram webhook and initializes all of the system's components. 
+ * @author Jasmin Wellnitz
+ *
+ */
 public class Main {
 
+	/**
+	 * Starts the web application and enables the Telegram webhook.
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		port(Integer.valueOf(System.getenv("PORT")));
-
-		get("/hello", (req, res) -> "Hello World");
-
-		TelegramBotHandler botHandler = initBotHandler();
-		post("/" + botHandler.getToken(), botHandler);
-
-		String serviceUrl = System.getenv("HEROKU_URL");
-		botHandler.getTelegramBot().execute(new SetWebhook().url(serviceUrl + botHandler.getToken()));
-	}
-
-	private static TelegramBotHandler initBotHandler() {
+		// Getting the system environment variables
+		String port = System.getenv("PORT");
 		String dbUrl = System.getenv("DATABASE_URL");
 		String clientAccess = System.getenv("API_AI_ACCESS_TOKEN");
 		String telegramToken = System.getenv("TELEGRAM_TOKEN");
 		String foursquareClientId =  System.getenv("F_CLIENT_ID");
 		String foursquareClientSecret = System.getenv("F_CLIENT_SECRET");
+		String serviceUrl = System.getenv("HEROKU_URL");
+		
+		TelegramBotHandler botHandler = initBotHandler(dbUrl, clientAccess, telegramToken, foursquareClientId, foursquareClientSecret);
+		
+		port(Integer.valueOf(port));
+		// Setting the webhook
+		post("/" + telegramToken, botHandler);
+		botHandler.getTelegramBot().execute(new SetWebhook().url(serviceUrl + telegramToken));
+	}
+
+	/**
+	 * Initializes the application's components using dependency injection.
+	 * @return
+	 */
+	private static TelegramBotHandler initBotHandler(String dbUrl, String clientAccess, String telegramToken, String foursquareClientId, String foursquareClientSecret) {
 		PointDB pointConverter = new PointDB(dbUrl);
 		RatingDB ratingDB = new RatingDB(dbUrl);
 		Recommender recommender = new Recommender(pointConverter, ratingDB);
