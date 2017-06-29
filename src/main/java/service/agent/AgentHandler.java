@@ -35,16 +35,6 @@ public class AgentHandler extends ServiceRequester{
 	}
 
 	/**
-	 * Sends an API.AI event. The context is maintained using this method.
-	 * @param event
-	 * @param sessionId specifies the conversation
-	 * @return the agent response
-	 */
-	public AgentResponse sendEvent(String event, long sessionId) {
-		return sendQuery(event, "", "", sessionId, false);
-	}
-
-	/**
 	 * Sends the user input to API.AI
 	 * @param userInput
 	 * @param sessionId specifies the conversation
@@ -88,7 +78,12 @@ public class AgentHandler extends ServiceRequester{
 		String url = buildQuery(event, userInput, context, sessionId, resetContext);
 		JsonObject jsonObject= sendQuery("Authorization", "Bearer " + clientAccessToken, url);
 		
-		return AgentResponseParser.fromJson(jsonObject);
+		AgentResponse resp = null;
+		if(jsonObject != null){
+			resp = AgentResponseParser.fromJson(jsonObject);
+		}
+		
+		return resp;
 	}
 
 	/**

@@ -37,7 +37,7 @@ public class RatingDB extends DatabaseManager {
 		try {
 			hasNext = resultSet.next();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		close();
 
@@ -59,7 +59,7 @@ public class RatingDB extends DatabaseManager {
 		try (ResultSet resultSet = executeQuery(query)) {
 			hasNext = resultSet.next();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		close();
 
@@ -130,7 +130,7 @@ public class RatingDB extends DatabaseManager {
 				rating = Rating.valueOf(rat);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		close();
 		return rating;

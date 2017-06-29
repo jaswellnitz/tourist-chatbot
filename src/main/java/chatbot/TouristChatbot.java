@@ -36,7 +36,8 @@ public class TouristChatbot {
 	private ImageRequester imageRequester;
 	private RatingDB ratingsDB;
 	/**
-	 * A map containing the currently active users. A user is considered as active if he conversed with the chatbot in the last 24 hours.
+	 * A map containing the currently active users. A user is considered as
+	 * active if he conversed with the chatbot in the last 24 hours.
 	 */
 	private final Map<Long, User> activeUsers;
 
@@ -66,27 +67,39 @@ public class TouristChatbot {
 	}
 
 	/**
-	 * Processes the start message, stores the new user and overrides the old one if need be.
+	 * Processes the start message, stores the new user and overrides the old
+	 * one if need be.
+	 * 
 	 * @param userId
 	 * @param userName
 	 * @return a chatbot response
 	 */
 	public ChatbotResponse processStartMessage(long userId, String userName) {
-		if (userDB.hasUser(userId)) {
-			ratingsDB.deleteAllUserRatings(userId);
-			userDB.deleteUser(userId);
+		AgentResponse agentResponse = agentHandler.sendEvent("WELCOME", userId, true);
+		ChatbotResponse chatbotResponse;
+		if (agentResponse == null) {
+			chatbotResponse = createNotAvailableMessage();
+		} else {
+			if (userDB.hasUser(userId)) {
+				ratingsDB.deleteAllUserRatings(userId);
+				userDB.deleteUser(userId);
+			}
+			User user = new User(userId, userName);
+			if (!userDB.storeUser(user)) {
+				return createNotAvailableMessage();
+			} else {
+				getActiveUsers().put(userId, user);
+				chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+			}
 		}
-
-		User user = new User(userId, userName);
-		userDB.storeUser(user);
-		getActiveUsers().put(userId, user);
-		AgentResponse agentResponse = agentHandler.sendEvent("WELCOME", user.getId(), true);
-		return new ChatbotResponse(agentResponse.getReply());
+		return chatbotResponse;
 	}
 
 	/**
-	 * Handles the user input: transfers the user input to the NLU platform, checks which action needs to be taken based on the agent response
-	 * and creates one or multiple chatbot responses.
+	 * Handles the user input: transfers the user input to the NLU platform,
+	 * checks which action needs to be taken based on the agent response and
+	 * creates one or multiple chatbot responses.
+	 * 
 	 * @param userId
 	 * @param userInput
 	 * @return chatbot responses
@@ -98,93 +111,10 @@ public class TouristChatbot {
 		AgentResponse agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 
-		switch (agentResponse.getAction()) {
-		case ABOUT:
-			String answer = getAboutText(user.getPrefRecommendationRadius());
-			chatbotResponses.add(new ChatbotResponse(answer));
-			break;
-		case SAVE_INTEREST:
-			// TODO error handling
-			saveInterests(user, agentResponse);
-			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
-			break;
-		case SHOW_INFORMATION:
-			answer = getPersonalInformation(user);
-			chatbotResponses.add(new ChatbotResponse(answer));
-			break;
-		case RECOMMEND_LOCATION:
-			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply(), "Send Current Location"));
-			break;
-		case RECOMMEND:
-			if (userInput instanceof Location) {
-				user.setCurrentLocation((Location) userInput);
-			} else {
-				String[] coordinates = ((String) userInput).split(",");
-				Location location = new Location(Double.valueOf(coordinates[0]), Double.valueOf(coordinates[1]));
-				user.setCurrentLocation(location);
-			}
-			String interest = "";
-			for (Context context : agentResponse.getContexts()) {
-				if (context.getName().equals("recommendation")) {
-					if (context.getParameters().containsKey(Parameter.INTEREST.name())) {
-						interest = (String) context.getParameters().get(Parameter.INTEREST.name());
-						break;
-					}
-				}
-			}
-			chatbotResponses.addAll(getRecommendation(user, interest));
-			break;
-		case RECOMMENDATION_POSITIVE:
-			processFirstImpressionForPreviousPOI(user, true);
-			if (user.getPendingRecommendations().isEmpty()) {
-				chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
-				agentHandler.resetContext(user.getId());
-			} else {
-				chatbotResponses.add(presentPendingPOIs(user));
-			}
-			break;
-		case RECOMMENDATION_NEGATIVE:
-			processFirstImpressionForPreviousPOI(user, false);
-			if (user.getPendingRecommendations().isEmpty()) {
-				chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
-				agentHandler.resetContext(user.getId());
-			} else {
-				chatbotResponses.add(presentPendingPOIs(user));
-			}
-			break;
-		case RECOMMENDATION_MORE:
-			int ind = Integer.valueOf(((String) agentResponse.getParameters().get(Parameter.POI_INDEX.name()))) - 1;
-			chatbotResponses.addAll(presentRecommendationResult(user, ind));
-			break;
-		case SHOW_PAST_RECOMMENDATIONS:
-			if (!user.getPositiveRecommendations().isEmpty()) {
-				chatbotResponses.addAll(showPastRecommendations(user));
-			} else {
-				chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
-			}
-			break;
-		case SAVE_RADIUS:
-			trySaveRadius(user, agentResponse);
-			// answer = "Please enter a valid input.";
-			// TODO set context correctly
-			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
-			break;
-		case RATE:
-			int rateIndex = 0;
-			int rating = Integer.valueOf((String) agentResponse.getParameters().get(Parameter.RATING.name()));
-			processRating(user, rateIndex, rating);
-			// TODO error handling
-			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
-			break;
-		case GREETINGS:
-			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
-			if (agentResponse.getContexts().isEmpty() && !user.getUnratedPOIs().isEmpty()) {
-				chatbotResponses.add(createRatePrompt(user,0));
-				agentHandler.setContext("Rate", user.getId());
-			}
-			break;
-		default:
-			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
+		if (agentResponse != null) {
+			chatbotResponses = processAction(userInput, user, agentResponse);
+		} else {
+			chatbotResponses.add(createNotAvailableMessage());
 		}
 
 		return chatbotResponses;
@@ -192,7 +122,158 @@ public class TouristChatbot {
 	}
 
 	/**
+	 * Creates an error message
+	 * 
+	 * @return chatbotResponse containing the error message
+	 */
+	private ChatbotResponse createNotAvailableMessage() {
+		String message = "Sorry, the chatbot does not seem to be available at the moment. Please try again later.";
+		return new ChatbotResponse(message);
+	}
+
+	private List<ChatbotResponse> processAction(Object userInput, User user, AgentResponse agentResponse) {
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		switch (agentResponse.getAction()) {
+		case ABOUT:
+			chatbotResponses.add(getAboutText(user.getPrefRecommendationRadius()));
+			break;
+		case SAVE_INTEREST:
+			chatbotResponses.add(handleSaveInterest(user, agentResponse));
+			break;
+		case SHOW_INFORMATION:
+			chatbotResponses.add(getPersonalInformation(user));
+			break;
+		case RECOMMEND_LOCATION:
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply(), "Send Current Location"));
+			break;
+		case RECOMMEND:
+			chatbotResponses.addAll(handleRecommendation(userInput, user, agentResponse));
+			break;
+		case RECOMMENDATION_POSITIVE:
+			chatbotResponses.addAll(handleImpressionForPreviousPOI(user, agentResponse, true));
+			break;
+		case RECOMMENDATION_NEGATIVE:
+			chatbotResponses.addAll(handleImpressionForPreviousPOI(user, agentResponse, false));
+			break;
+		case RECOMMENDATION_MORE:
+			chatbotResponses.addAll(handlePresentRecommendationResult(user, agentResponse));
+			break;
+		case SHOW_PAST_RECOMMENDATIONS:
+			chatbotResponses.addAll(handleShowPastRecommendations(user, agentResponse));
+			break;
+		case SAVE_RADIUS:
+			chatbotResponses.add(handleSaveRadius(user, agentResponse));
+			break;
+		case RATE:
+			chatbotResponses.addAll(handleProcessRating(user,agentResponse));
+			break;
+		case GREETINGS:
+			chatbotResponses.addAll(handleGreetings(user, agentResponse));
+			break;
+		default:
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
+		}
+		return chatbotResponses;
+	}
+
+	private List<ChatbotResponse> handleProcessRating(User user, AgentResponse agentResponse) {
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		int rateIndex = 0;
+		int rating = Integer.valueOf((String) agentResponse.getParameters().get(Parameter.RATING.name()));
+		boolean successful = processRating(user, rateIndex, rating);
+		ChatbotResponse chatbotResponse;
+		if (successful) {
+			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+		} else {
+			chatbotResponse = new ChatbotResponse(
+					"Sorry, there was a mistake. The rating could not be saved, please try again later.");
+		}
+		chatbotResponses.add(chatbotResponse);
+		return chatbotResponses;
+	}
+
+	private List<ChatbotResponse> handleShowPastRecommendations(User user,
+			AgentResponse agentResponse) {
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		if (!user.getPositiveRecommendations().isEmpty()) {
+			chatbotResponses.addAll(showPastRecommendations(user));
+		} else {
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
+		}
+		return chatbotResponses;
+	}
+
+	private List<ChatbotResponse> handlePresentRecommendationResult(User user,
+			AgentResponse agentResponse) {
+		int ind = Integer.valueOf(((String) agentResponse.getParameters().get(Parameter.POI_INDEX.name()))) - 1;
+		return presentRecommendationResult(user, ind);
+	}
+
+	private List<ChatbotResponse> handleImpressionForPreviousPOI(User user, AgentResponse agentResponse,
+			boolean impression) {
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		processFirstImpressionForPreviousPOI(user, impression);
+		if (user.getPendingRecommendations().isEmpty()) {
+			chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
+			agentHandler.resetContext(user.getId());
+		} else {
+			chatbotResponses.add(presentPendingPOIs(user));
+		}
+		return chatbotResponses;
+	}
+
+	private List<ChatbotResponse> handleRecommendation(Object userInput, User user, AgentResponse agentResponse) {
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		if (userInput instanceof Location) {
+			user.setCurrentLocation((Location) userInput);
+		} else {
+			String[] coordinates = ((String) userInput).split(",");
+			Location location = new Location(Double.valueOf(coordinates[0]), Double.valueOf(coordinates[1]));
+			user.setCurrentLocation(location);
+		}
+		String interest = "";
+		for (Context context : agentResponse.getContexts()) {
+			if (context.getName().equals("recommendation")) {
+				if (context.getParameters().containsKey(Parameter.INTEREST.name())) {
+					interest = (String) context.getParameters().get(Parameter.INTEREST.name());
+					break;
+				}
+			}
+		}
+		chatbotResponses.addAll(getRecommendation(user, interest));
+		return chatbotResponses;
+	}
+
+	private List<ChatbotResponse> handleGreetings(User user, AgentResponse agentResponse) {
+		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
+		if (agentResponse.getContexts().isEmpty() && !user.getUnratedPOIs().isEmpty()) {
+			AgentResponse contextSet = agentHandler.setContext("Rate", user.getId());
+			if (contextSet != null) {
+				chatbotResponses.add(createRatePrompt(user, 0));
+			}
+		}
+		return chatbotResponses;
+	}
+
+	private ChatbotResponse handleSaveRadius(User user, AgentResponse agentResponse) {
+		boolean successful = saveRadius(user, agentResponse);
+		// answer = "Please enter a valid input.";
+		// TODO set context correctly
+		ChatbotResponse chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+		return chatbotResponse;
+	}
+
+	private ChatbotResponse handleSaveInterest(User user, AgentResponse agentResponse) {
+		// TODO error handling
+		saveInterests(user, agentResponse);
+		ChatbotResponse chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+		return chatbotResponse;
+	}
+
+	/**
 	 * Filters the user interests from the agent response and saves them.
+	 * 
 	 * @param user
 	 * @param response
 	 */
@@ -210,45 +291,48 @@ public class TouristChatbot {
 
 	/**
 	 * Returns the chatbot's presentation text.
+	 * 
 	 * @param recommendationRadius
-	 * @return presentation text 
+	 * @return presentation text
 	 */
-	private String getAboutText(int recommendationRadius) {
+	private ChatbotResponse getAboutText(int recommendationRadius) {
 		String aboutText = "Hey there, I am your friendly tourist chatbot! I will try my best to recommend you cool places on your trip. "
 				+ "As I get to know you better, my recommendations are going to be more adjusted to your interests."
 				+ "\n\n" + "Currently, I am looking for recommendations in a distance of " + recommendationRadius
 				+ " m from you. " + "You can change that distance anytime." + "\n\n"
 				+ "If you already asked for recommendations, I can show them to you if you like."
 				+ " While doing so, you can also tell me how you liked them in order to improve my recommendations.";
-		return aboutText;
+		return new ChatbotResponse(aboutText);
 	}
-	
 
 	/**
-	 * Filters the agent response for the new recommendation radius and saves it.
+	 * Filters the agent response for the new recommendation radius and saves
+	 * it.
+	 * 
 	 * @param user
-	 * @param response the agent response
+	 * @param response
+	 *            the agent response
 	 * @return boolean that indicates whether the action was successful
 	 */
-	// TODO refactor
-	private boolean trySaveRadius(User user, AgentResponse response) {
-		boolean succesful = false;
+	private boolean saveRadius(User user, AgentResponse response) {
 		Object object = response.getParameters().get(Parameter.DISTANCE.name());
 		if (object instanceof Integer) {
 			int radius = (int) object;
 			if (radius > 0) {
 				user.setPrefRecommendationRadius(radius);
 				userDB.changeRadiusForUser(user.getId(), radius);
-				succesful = true;
+			} else {
+				return false;
 			}
 		}
-		return succesful;
+		return true;
 	}
-	
-
 
 	/**
-	 * Shows the user's past recommendations. If the user has recommendations that are marked as unrated, he is asked to rate the oldest recommendation.
+	 * Shows the user's past recommendations. If the user has recommendations
+	 * that are marked as unrated, he is asked to rate the oldest
+	 * recommendation.
+	 * 
 	 * @param user
 	 * @return
 	 */
@@ -260,16 +344,19 @@ public class TouristChatbot {
 		}
 		responses.add(new ChatbotResponse(reply));
 		if (!user.getUnratedPOIs().isEmpty()) {
-			ChatbotResponse rate = createRatePrompt(user,0);
+			ChatbotResponse rate = createRatePrompt(user, 0);
 			responses.add(rate);
 		}
 		return responses;
 	}
 
 	/**
-	 * The user was asked to rate his first impression. A positive first impression is saved; a provisional rating of 4 is given 
-	 * and the rating is marked as unrated recommendation for the user, so he is going to be asked for his opinion later again.
-	 * Negative impressions are discarded and rated with a value of 1.
+	 * The user was asked to rate his first impression. A positive first
+	 * impression is saved; a provisional rating of 4 is given and the rating is
+	 * marked as unrated recommendation for the user, so he is going to be asked
+	 * for his opinion later again. Negative impressions are discarded and rated
+	 * with a value of 1.
+	 * 
 	 * @param user
 	 * @param positiveImpression
 	 */
@@ -288,7 +375,9 @@ public class TouristChatbot {
 	}
 
 	/**
-	 * Shows the user the pending recommendations that were calculated during the last recommendation process and not seen yet.
+	 * Shows the user the pending recommendations that were calculated during
+	 * the last recommendation process and not seen yet.
+	 * 
 	 * @param user
 	 * @return the chatbot response
 	 */
@@ -308,10 +397,14 @@ public class TouristChatbot {
 	}
 
 	/**
-	 * Triggers the recommendation process. 
+	 * Triggers the recommendation process.
+	 * 
 	 * @param user
-	 * @param interest if an interest is set (the value is not empty), a category-specific recommendation is triggered
-	 * @return the chatbot responses (the recommendation result itself and a picture and asking for the user's first impression)
+	 * @param interest
+	 *            if an interest is set (the value is not empty), a
+	 *            category-specific recommendation is triggered
+	 * @return the chatbot responses (the recommendation result itself and a
+	 *         picture and asking for the user's first impression)
 	 */
 	private List<ChatbotResponse> getRecommendation(User user, String interest) {
 		List<RecommendedPointOfInterest> recommendations = new ArrayList<>();
@@ -320,8 +413,9 @@ public class TouristChatbot {
 		} else {
 			recommendations = recommender.recommendForCategory(user, POIProfile.getCategoryIndex(interest));
 		}
-		
-		// POIs that were already recommended and rated positively are not recommended again.
+
+		// POIs that were already recommended and rated positively are not
+		// recommended again.
 		List<RecommendedPointOfInterest> toRemove = new ArrayList<>();
 		for (RecommendedPointOfInterest recommendation : recommendations) {
 			if (user.getPositiveRecommendations().contains(recommendation)) {
@@ -343,10 +437,14 @@ public class TouristChatbot {
 	}
 
 	/**
-	 * Creates chatbot responses that contain the recommendation result and asking the user for his first impression
+	 * Creates chatbot responses that contain the recommendation result and
+	 * asking the user for his first impression
+	 * 
 	 * @param user
-	 * @param index pending recommendation index
-	 * @return the chatbot responses (the recommendation result itself and a picture and asking for the user's first impression)
+	 * @param index
+	 *            pending recommendation index
+	 * @return the chatbot responses (the recommendation result itself and a
+	 *         picture and asking for the user's first impression)
 	 */
 	private List<ChatbotResponse> presentRecommendationResult(User user, int index) {
 		assert index >= 0
@@ -368,31 +466,42 @@ public class TouristChatbot {
 	}
 
 	/**
-	 * Processes the user rating:
-	 * saves the rating in the data base and marks the recommendation as rated
+	 * Processes the user rating: saves the rating in the data base and marks
+	 * the recommendation as rated
+	 * 
 	 * @param user
-	 * @param rateIndex index of the recommended poi
+	 * @param rateIndex
+	 *            index of the recommended poi
 	 * @param ratingValue
-	 * @return
+	 * @return indicates whether the rating process was successful
 	 */
 	private boolean processRating(User user, int rateIndex, int ratingValue) {
 		assert !user.getUnratedPOIs().isEmpty() : "Precondition failed: !user.getUnratedPOIs().isEmpty()";
 		Rating rating = Rating.valueOf(ratingValue);
 		if (rating != Rating.INVALID) {
 			RecommendedPointOfInterest recommendedPointOfInterest = user.getUnratedPOIs().get(rateIndex);
-			ratingsDB.updateRating(user.getId(), recommendedPointOfInterest.getId(), Rating.valueOf(ratingValue));
+			if (!ratingsDB.updateRating(user.getId(), recommendedPointOfInterest.getId(),
+					Rating.valueOf(ratingValue))) {
+				return false;
+			}
+			if (!userDB.deleteFirstUnratedRecommendation(user.getId())) {
+				// rollback to first impression rating if database access fails
+				ratingsDB.updateRating(user.getId(), recommendedPointOfInterest.getId(), Rating._4);
+				return false;
+			}
 			user.getUnratedPOIs().remove(rateIndex);
-			userDB.deleteFirstUnratedRecommendation(user.getId());
-			return true;
 		}
-		return false;
+		return true;
 	}
 
 	/**
 	 * Creates a rate prompt which asks the user to rate a previously seen POI
+	 * 
 	 * @param user
-	 * @param rateIndex the user's unrated recommendation to be rated
-	 * @return a chatbot response, asking for the user's opinion and modifying the keyboard
+	 * @param rateIndex
+	 *            the user's unrated recommendation to be rated
+	 * @return a chatbot response, asking for the user's opinion and modifying
+	 *         the keyboard
 	 */
 	private ChatbotResponse createRatePrompt(User user, int rateIndex) {
 		RecommendedPointOfInterest pointOfInterest = user.getUnratedPOIs().get(rateIndex);
@@ -403,13 +512,14 @@ public class TouristChatbot {
 		ChatbotResponse response = new ChatbotResponse(ret, ratings);
 		return response;
 	}
-	
+
 	/**
 	 * Gets the personal information for the user and creates the chatbot reply
+	 * 
 	 * @param user
 	 * @return the chatbot reply
 	 */
-	private String getPersonalInformation(User user) {
+	private ChatbotResponse getPersonalInformation(User user) {
 		String answer = "So, here's what I know about you: Your current recommendation radius is "
 				+ user.getPrefRecommendationRadius() + " m.";
 		List<String> interests = user.getProfile().getInterestsFromProfile();
@@ -423,13 +533,16 @@ public class TouristChatbot {
 			answer += "\n\nYou are interested in: " + interestString + ".";
 		}
 
-		return answer;
+		return new ChatbotResponse(answer);
 	}
 
 	/**
-	 * Gets the user from the messenger id. If the user is already active, the database do not have to be called.
-	 * If the user was not active before, the user is retrieved from the database and added to the activeUsers cache.
-	 * @param userId the messenger id
+	 * Gets the user from the messenger id. If the user is already active, the
+	 * database do not have to be called. If the user was not active before, the
+	 * user is retrieved from the database and added to the activeUsers cache.
+	 * 
+	 * @param userId
+	 *            the messenger id
 	 * @return
 	 */
 	private User getUserFromId(long userId) {
@@ -445,11 +558,9 @@ public class TouristChatbot {
 		getActiveUsers().put(user.getId(), user);
 		return user;
 	}
-	
 
 	// public for JUnit testing
 	public Map<Long, User> getActiveUsers() {
 		return activeUsers;
 	}
-
 }

@@ -3,6 +3,8 @@ package service;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -18,6 +20,7 @@ import okhttp3.Response;
  */
 public abstract class ServiceRequester {
 	private OkHttpClient httpClient;
+	protected Logger logger = Logger.getLogger(this.getClass());
 
 	protected ServiceRequester() {
 		this.httpClient = new OkHttpClient();
@@ -44,7 +47,6 @@ public abstract class ServiceRequester {
 	 * @param url 
 	 * @return the JSON response
 	 */
-	// TODO error handling
 	protected JsonObject sendQuery(String header, String headerValue, String url) {
 		Request request;
 		if (header.isEmpty() || headerValue.isEmpty()) {
@@ -57,11 +59,13 @@ public abstract class ServiceRequester {
 			Response response = httpClient.newCall(request).execute();
 			jsonResponse = response.body().string();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
-
-		assert jsonResponse != null : "Postcondition failed: jsonResponse != null";
-		return new JsonParser().parse(jsonResponse).getAsJsonObject();
+		JsonObject jsonObject = null;
+		if(jsonResponse != null){
+			jsonObject = new JsonParser().parse(jsonResponse).getAsJsonObject();
+		}
+		return jsonObject ;
 	}
 
 }

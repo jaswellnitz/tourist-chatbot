@@ -19,7 +19,7 @@ public enum Action {
 	 */
 	public static Action getEnum(String actionString){
 		for(Action a: values()){
-			if(actionString.toUpperCase().equals(a.name())){
+			if(actionString.equalsIgnoreCase(a.name())){
 				return a;
 			}
 		}

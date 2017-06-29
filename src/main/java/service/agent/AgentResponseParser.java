@@ -39,15 +39,16 @@ public class AgentResponseParser {
 		return parameters;
 	}
 
-	// TODO error handling
 	private static int parseDistance(JsonElement value) {
 		JsonObject jsonObject = value.getAsJsonObject();
 		double amount = jsonObject.get("amount").getAsDouble();
 		String unit = jsonObject.get("unit").getAsString();
 		if (unit.equals("km")) {
 			amount *= 1000;
-		} else if (!unit.equals("m")) {
-			return 0;
+		} else if (unit.equals("m")) {
+			amount *= 1;
+		} else {
+			amount = -1;
 		}
 		return (int) amount;
 

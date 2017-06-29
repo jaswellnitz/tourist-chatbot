@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import dataAccess.RatingDB;
 import domain.Rating;
 import domain.User;
 import recommender.POIProfile;

@@ -2,7 +2,6 @@ package dataAccess;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,8 +141,7 @@ public class UserDB extends DatabaseManager {
 	 */
 	public User getUser(long userId) {
 		String query = "select * from users where id = " + userId;
-		List<User> users = new ArrayList<>();
-
+		User user = null;
 		try(ResultSet resultSet = executeQuery(query)){
 		assert resultSet != null : "Postcondition failed: no user found for id " + userId;
 			while (resultSet.next()) {
@@ -155,22 +153,21 @@ public class UserDB extends DatabaseManager {
 				resultSet.getArray("recommendations").getArray().getClass();
 				Long[] positiveRec = (Long[])resultSet.getArray("recommendations").getArray();
 				Long[] unrated = (Long[])resultSet.getArray("unrated").getArray();
-				User user = new User(id, name, radius, poiProfile);
+				user = new User(id, name, radius, poiProfile);
 				for(long poiId: positiveRec){
 					user.addPositiveRecommendations(pointConverter.getPOIForId(poiId));
 				}
 				for(long poiId: unrated){
 					user.addUnratedPOI(pointConverter.getPOIForId(poiId));
 				}
-				users.add(user);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
+			user = null;
 		}
 		close();
-		assert users.size() == 1 : "Postcondition failed: getUser from UserDB for id " + userId;
 
-		return users.get(0);
+		return user;
 	}
 	
 
