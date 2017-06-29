@@ -93,7 +93,7 @@
 					<appendAssemblyId>false</appendAssemblyId>
 					<archive>
 						<manifest>
-							<mainClass>chatbot.Main</mainClass>
+							<mainClass>messenger.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
