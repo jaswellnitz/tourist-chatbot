@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import org.apache.log4j.Logger;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.jdbc.PostgreSQLJDBCDataModel;
 import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood;
@@ -35,7 +36,7 @@ public class Recommender {
 	
 	private PointDB pointDB;
 	private RatingDB ratingDB;
-
+	Logger logger = Logger.getLogger(this.getClass());
 
 	/**
 	 * Creates a recommender which has access on the ratings and POI database.
@@ -111,7 +112,7 @@ public class Recommender {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		return recommendedPOI;
 	}
@@ -149,7 +150,6 @@ public class Recommender {
 	 * @param alreadyRecommendedPOIs POI's that were recommended in a previous recommendation process - cannot be recommended again
 	 * @return recommended points of interest
 	 */
-	// TODO compute recommendation value
 	private List<RecommendedPointOfInterest> recommendContentBased(User user,
 			List<RecommendedPointOfInterest> alreadyRecommendedPOIs) {
 
@@ -182,7 +182,7 @@ public class Recommender {
 						NUM_RECOMMENDATIONS - alreadyRecommendedPOIs.size());
 				userIds = LongStream.of(mostSimilarUserIDs).boxed().collect(Collectors.toList());
 			} catch (TasteException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 
 			final List<Long> mostSimilarUserIDs = userIds;

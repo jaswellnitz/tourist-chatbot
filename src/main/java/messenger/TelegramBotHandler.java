@@ -70,10 +70,7 @@ public class TelegramBotHandler implements Route {
 			chatbotResponses.addAll(touristChatbot.processInput(message.from().id(), input));
 		}
 
-		boolean state = sendMessage(message.chat().id(), chatbotResponses);
-		// TODO error handling
-
-		return state;
+		return sendMessage(message.chat().id(), chatbotResponses);
 	}
 
 	/**

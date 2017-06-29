@@ -21,8 +21,6 @@ public class User implements ProfileItem {
 	private POIProfile profile;
 	private int prefRecommendationRadius;
 	private Location currentLocation;
-	
-	// TODO refactor ?
 	private int lastRecommendedIndex;
 	private List<RecommendedPointOfInterest> pendingRecommendations;
 	private List<RecommendedPointOfInterest> unratedPOIs;

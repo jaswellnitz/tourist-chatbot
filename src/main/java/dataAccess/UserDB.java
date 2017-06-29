@@ -45,7 +45,7 @@ public class UserDB extends DatabaseManager {
 		try {
 			hasNext = resultSet.next();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		close();
 

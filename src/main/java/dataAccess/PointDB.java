@@ -92,8 +92,9 @@ public class PointDB extends DatabaseManager {
 	 * Creates a POIProfile from the database results by mapping the OpenStreetMap tags to the defined tourist categories.
 	 * @param set the JDBC ResultSet
 	 * @return POIProfile
+	 * @throws SQLException 
 	 */
-	private POIProfile mapTagsToCategories(ResultSet set) {
+	private POIProfile mapTagsToCategories(ResultSet set) throws SQLException {
 		Preference culture = Preference.FALSE;
 		Preference sightseeing = Preference.FALSE;
 		Preference food = Preference.FALSE;
@@ -101,7 +102,6 @@ public class PointDB extends DatabaseManager {
 		Preference nature = Preference.FALSE;
 		Preference shopping = Preference.FALSE;
 
-		try {
 
 			String tourismTag = set.getString("tourism");
 			if (tourismTag != null) {
@@ -182,9 +182,6 @@ public class PointDB extends DatabaseManager {
 			if (cuisineTag != null) {
 				food = Preference.TRUE;
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 		return new POIProfile(sightseeing, culture, food, nightlife, nature, shopping);
 	}
 	
@@ -207,7 +204,7 @@ public class PointDB extends DatabaseManager {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		close();
 

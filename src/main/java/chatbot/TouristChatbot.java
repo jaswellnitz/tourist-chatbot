@@ -122,15 +122,12 @@ public class TouristChatbot {
 	}
 
 	/**
-	 * Creates an error message
-	 * 
-	 * @return chatbotResponse containing the error message
+	 * Checks which action needs to be performed and calls the according method.
+	 * @param userInput
+	 * @param user
+	 * @param agentResponse
+	 * @return the chatbot responses
 	 */
-	private ChatbotResponse createNotAvailableMessage() {
-		String message = "Sorry, the chatbot does not seem to be available at the moment. Please try again later.";
-		return new ChatbotResponse(message);
-	}
-
 	private List<ChatbotResponse> processAction(Object userInput, User user, AgentResponse agentResponse) {
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		switch (agentResponse.getAction()) {
@@ -165,7 +162,7 @@ public class TouristChatbot {
 			chatbotResponses.add(handleSaveRadius(user, agentResponse));
 			break;
 		case RATE:
-			chatbotResponses.addAll(handleProcessRating(user,agentResponse));
+			chatbotResponses.addAll(handleProcessRating(user, agentResponse));
 			break;
 		case GREETINGS:
 			chatbotResponses.addAll(handleGreetings(user, agentResponse));
@@ -176,8 +173,15 @@ public class TouristChatbot {
 		return chatbotResponses;
 	}
 
+	/**
+	 * Handles the rating processing
+	 * @param user
+	 * @param agentResponse
+	 * @return the chatbot responses
+	 */
 	private List<ChatbotResponse> handleProcessRating(User user, AgentResponse agentResponse) {
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		// the oldest unrated rating is chosen per default
 		int rateIndex = 0;
 		int rating = Integer.valueOf((String) agentResponse.getParameters().get(Parameter.RATING.name()));
 		boolean successful = processRating(user, rateIndex, rating);
@@ -192,8 +196,7 @@ public class TouristChatbot {
 		return chatbotResponses;
 	}
 
-	private List<ChatbotResponse> handleShowPastRecommendations(User user,
-			AgentResponse agentResponse) {
+	private List<ChatbotResponse> handleShowPastRecommendations(User user, AgentResponse agentResponse) {
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		if (!user.getPositiveRecommendations().isEmpty()) {
 			chatbotResponses.addAll(showPastRecommendations(user));
@@ -203,8 +206,7 @@ public class TouristChatbot {
 		return chatbotResponses;
 	}
 
-	private List<ChatbotResponse> handlePresentRecommendationResult(User user,
-			AgentResponse agentResponse) {
+	private List<ChatbotResponse> handlePresentRecommendationResult(User user, AgentResponse agentResponse) {
 		int ind = Integer.valueOf(((String) agentResponse.getParameters().get(Parameter.POI_INDEX.name()))) - 1;
 		return presentRecommendationResult(user, ind);
 	}
@@ -258,16 +260,29 @@ public class TouristChatbot {
 
 	private ChatbotResponse handleSaveRadius(User user, AgentResponse agentResponse) {
 		boolean successful = saveRadius(user, agentResponse);
-		// answer = "Please enter a valid input.";
-		// TODO set context correctly
-		ChatbotResponse chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+		ChatbotResponse chatbotResponse;
+		if (successful) {
+			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+		} else {
+			chatbotResponse = new ChatbotResponse("Please enter a valid input (positive value in meter or kilometer)");
+		}
 		return chatbotResponse;
 	}
 
+	/**
+	 * Filters the user interests from the agent response and saves them, deals with error handling.
+	 * @param user
+	 * @param agentResponse
+	 * @return the chatbot response
+	 */
 	private ChatbotResponse handleSaveInterest(User user, AgentResponse agentResponse) {
-		// TODO error handling
-		saveInterests(user, agentResponse);
-		ChatbotResponse chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+		boolean successful = saveInterests(user, agentResponse);
+		ChatbotResponse chatbotResponse;
+		if(successful){
+			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+		}else{
+			chatbotResponse = new ChatbotResponse("Sorry, there was a mistake. The interest could not be saved. Please try again later.");
+		}
 		return chatbotResponse;
 	}
 
@@ -276,17 +291,22 @@ public class TouristChatbot {
 	 * 
 	 * @param user
 	 * @param response
+	 * @return indicates whether the method was successful
 	 */
-	private void saveInterests(User user, AgentResponse response) {
+	private boolean saveInterests(User user, AgentResponse response) {
 		for (Context context : response.getContexts()) {
 			if (context.getName().equals("interview")) {
 				@SuppressWarnings("unchecked")
 				List<String> interests = (List<String>) context.getParameters().get(Parameter.INTEREST.name());
 				POIProfile profile = POIProfile.getProfileForInterests(interests);
-				user.setProfile(profile);
-				userDB.changeProfileForUser(user.getId(), profile);
+				boolean successful = userDB.changeProfileForUser(user.getId(), profile);
+				if (successful) {
+					user.setProfile(profile);
+					return true;
+				}
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -558,6 +578,16 @@ public class TouristChatbot {
 		getActiveUsers().put(user.getId(), user);
 		return user;
 	}
+	/**
+	 * Creates an error message
+	 * 
+	 * @return chatbotResponse containing the error message
+	 */
+	private ChatbotResponse createNotAvailableMessage() {
+		String message = "Sorry, the chatbot does not seem to be available at the moment. Please try again later.";
+		return new ChatbotResponse(message);
+	}
+
 
 	// public for JUnit testing
 	public Map<Long, User> getActiveUsers() {
