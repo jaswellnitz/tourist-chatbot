@@ -108,10 +108,10 @@ public class TouristChatbot {
 		assert userInput != null : "Precondition failed: userInput != null";
 
 		User user = getUserFromId(userId);
-		// debug message
-		System.out.println(user.getName() +": " + userInput.toString());
 		
 		AgentResponse agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
+		// debug message
+		System.out.println(user.getName() +": " + agentResponse);
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 
 		if (agentResponse != null) {
