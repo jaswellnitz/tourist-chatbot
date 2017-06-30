@@ -4,17 +4,17 @@ In this section, the tools and technologies used during the course of the projec
 In contrast, the tools used in the development process such as version control repository, integrated development environment or build-management tools are not explained in detail as they could be interchanged and are not essential for the application’s characteristics.
 
 \section{Chatbot Platform}
-As already discussed in the previous chapter, there are several competing platforms that permit developers to build their own chatbot. Most of the major software big-players nowadays, such as Google, Facebook, Microsoft, are taking part in the development of these platforms and provide their own solutions, for example API.ai (Google), wit.ai (Facebook), luis.ai (Microsoft) or IBM Watson. Out of these contestants, api.ai and wit.ai seem to be the most widely known and easiest to use. Therefore, both options were investigated to see which one would be the most suitable for this project. 
-\subsection{API.ai}
-API.ai \cite{apiai} is a natural language processing platform by Google that facilitates creating conversational user interfaces. In order to model conversations, entities and intents are used as key concepts. api.ai provides a rich management toolset as well as a simply one-click-integration mechanism to import the chatbot into a variety of mobile apps. Also, the modeled conversation flow in API.ai can be accessed by submitting queries through the REST-like HTTP endpoints. 
+As already discussed in the previous chapter, there are several competing platforms that permit developers to build their own chatbot. Most of the major software big-players nowadays, such as Google, Facebook, Microsoft, are taking part in the development of these platforms and provide their own solutions, for example API.AI (Google), wit.ai (Facebook), luis.ai (Microsoft) or IBM Watson. Out of these contestants, API.AI and wit.ai seem to be the most widely known and easiest to use. Therefore, both options were investigated to see which one would be the most suitable for this project. 
+\subsection{API.AI}
+API.AI \cite{apiai} is a natural language processing platform that facilitates creating conversational user interfaces. It was launched in 2014 and acquired by Google in September 2016 \cite{apiai:google}. In order to model conversations, entities and intents are used as key concepts. API.AI provides a rich management toolset as well as a simply one-click-integration mechanism to import the chatbot into a variety of mobile apps. Also, the modeled conversation flow in API.AI can be accessed by submitting queries through the REST-like HTTP endpoints. 
 
-API.ai offers a variety of prebuilt agents that can be used as a base for the own conversational interface. On top of it, the conversational interface can be enabled to support \textit{small talk}, allowing it to reply to basic, unspecific user input without any further development.
+API.AI offers a variety of prebuilt agents that can be used as a base for the own conversational interface. On top of it, the conversational interface can be enabled to support \textit{small talk}, allowing it to reply to basic, unspecific user input without any further development.
 
 \subsection{Wit.ai}
-Like API.ai, Wit.ai is a natural language processing platform. It was acquired by Facebook in January 2015 and is free to use ever since then \cite{witai:facebook}. Its key concepts for language processing include entities, intents and, additionally, stories. Stories help to create basic user scenarios in which typical user and chatbot conversations are designed. Regarding integration, Wit.ai provides a web service API to integrate the designed conversational interface in messaging apps.
+Like API.AI, Wit.ai is a natural language processing platform. It was acquired by Facebook in January 2015 and is free to use ever since then \cite{witai:facebook}. Its key concepts for language processing include entities, intents and, additionally, stories. Stories help to create basic user scenarios in which typical user and chatbot conversations are designed. Regarding integration, Wit.ai provides a web service API to integrate the designed conversational interface in messaging apps.
 
-\subsection{Choice of Platform: API.ai}
-After testing both platforms, both left a good impression and seem to be suitable to use. On the one hand, Wit.ai’s story feature seems promising to design conversations in an easy way, but is still in beta status. However, API.ai convinces with its rich management toolset, an extensive documentation and the integration of simple conversational features such as \textit{small talk}.
+\subsection{Choice of Platform: API.AI}
+After testing both platforms, both left a good impression and seem to be suitable to use. On the one hand, Wit.ai’s story feature seems promising to design conversations in an easy way, but is still in beta status. However, API.AI convinces with its rich management toolset, an extensive documentation and the integration of simple conversational features such as \textit{small talk}.
 
 \section{Geographic Database}
 In order to extract tourist points of interests from \textit{OpenStreetMap}, a geographic database was set up as the application’s backend. The following tools form either a part of the mentioned database or were used to set it up.
@@ -44,6 +44,6 @@ In June 2015, Telegram introduced its Bot API, allowing third-party developers t
 
 Likewise, Heroku Postgres is a database-as-a-service enabling the upload of the project’s database into the cloud. 
 
-\section{Additional Services}
+\section{API and Libraries}
 \subsection{Foursquare}
 \textit{Foursquare} \cite{foursquare} is a mobile service application which provides personalized recommendations of places for its users. In this project, Foursquare’s RESTful API is used to access additional information OpenStreetMap does not provide, more precisely extracting photos for points of interests

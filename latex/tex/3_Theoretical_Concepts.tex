@@ -6,7 +6,8 @@ This section explains the most relevant theoretical concepts that were applied d
 \section{Chatbots}
 A chatbot is a computer program that interacts with its user via a chat interface. About 60 years ago, the first steps in the development of chatbots were taken by the computer scientists Alan Turing and Joseph Weizenbaum, proposing the concept of computers communicating like humans do. One of the first natural language processing programs was ELIZA, developed by Joseph Weizenbaum in 1966. Although some users were tricked into thinking that ELIZA was an actual human conversation partner \cite{weizenbaum66}, this basic example was stretched to its limit quickly because of its simple rule-based structure. However, the fascination of computers being a conversation partner remained one of the big objectives of modern artificial intelligence.
 
-The topic’s big revival occurred with the introduction of mobile devices in the early 2000s. All of the sudden, developers were faced with the task of transforming their well-known desktop applications and websites into apps to make them suitable for a mobile market. Still, in the last couple of years it turned out that users actually do not like to use a variety of apps, but rather concentrate on only a few, mainly messaging apps. That is how in 2016, the idea of the conversational interface resurged when many global big-players like Google, Facebook, Microsoft, IBM or Amazon decided to take part in the development of conversational interfaces3. 
+The topic’s big revival occurred with the introduction of mobile devices in the early 2000s. All of the sudden, developers were faced with the task of transforming their well-known desktop applications and websites into apps to make them suitable for a mobile market. Still, in the last couple of years it turned out that users actually do not like to use a variety of apps, but rather concentrate on only a few, mainly messaging apps. That is how in 2016, the idea of the conversational interface resurged when many global big-players like Google, Facebook, Microsoft, IBM or Amazon decided to take part in the development of conversational interfaces \cite{venturebeat:chatbots}. 
+
 After explaining briefly the importance of chatbots over the years, the following part is going to define the different terms Natural Language Processing, Conversational Interface and Chatbots to outline the differences between them. After that, the key concepts needed to model a conversation flow are introduced.
 
 
@@ -14,7 +15,7 @@ After explaining briefly the importance of chatbots over the years, the followin
 
 \textbf{Natural Language Processing} is a component in the field of Artificial Intelligence in which natural language is analyzed and processed in a way that computers can use converted information easily in further algorithms \cite{collobert08}. A sub-discipline of Natural Language Processing is the so-called Natural Language Understanding (NLU).
 
-Nowadays, many big players provide free to use natural language understanding platforms that make the development of conversational interfaces possible. One of these NLP-NLU platforms is API.ai which translates human language into a formal representation using machine learning techniques as well the later explained NLU concepts entities, intents and contexts \cite{apiai:concepts}.
+Nowadays, many big players provide free to use natural language understanding platforms that make the development of conversational interfaces possible. One of these NLP-NLU platforms is API.AI which translates human language into a formal representation using machine learning techniques as well the later explained NLU concepts entities, intents and contexts \cite{apiai:concepts}.
 
 Using a \textbf{conversational interface}, people are enabled to interact with virtual assistants, smart devices and social robot via their natural language \cite{mctear16}. Conversational interfaces are considered as the third wave of user experience, after the terminal and the graphical user interface. The aim is that by having a conversational interface, users do not have to adapt to the computer, but the computer has to adapt to the human way of communicating.
 
@@ -23,18 +24,15 @@ There are two basic types of conversational interfaces: voice assistants such as
 
 \subsection{Concepts}
 
-The conversational interface used in this project is developed using the NLP-NLU platform api.ai that relies on certain key concepts that are explained in the following.
+The conversational interface used in this project is developed using the NLP-NLU platform API.AI that relies on certain key concepts that are explained in the following.
 
-Using api.ai, an agent is modeled to parse the user’s natural input into structured data. In an agent, the conversation flow with the user is specified using the key components entities, intents and context. After designing the agent, it can be integrated into many different platforms and thus providing an application’s conversational interface.
-
-Using api.ai, an \textbf{agent} is modeled to parse the user’s natural input into structured data. In an agent, the conversation flow with the user is specified using the key components entities, intents and context. After designing the agent, it can be integrated into many different platforms and thus providing an application’s conversational interface \cite{apiai:agents}.
-
+Using API.AI, an \textbf{agent} is modeled to parse the user’s natural input into structured data. In an agent, the conversation flow with the user is specified using the key components entities, intents and context. After designing the agent, it can be integrated into many different platforms and thus providing an application’s conversational interface \cite{apiai:agents}. The agent will rest located on the service provider servers and is integrated in our application by accessing it via HTTP endpoints.
 
 The agent relies on \textbf{machine learning} algorithms to understand the user input and extract relevant data. Before being confronted with the actual user, input examples are to be specified. Based on these examples, the agent’s machine learning model decides which path of the conversation flow is chosen. As usual in machine learning, the agent learns to adapt better to the user as it is provided constantly with real-life conversations \cite{apiai:ml}. 
 
-The main components used in modeling the conversation flow are entities, intents and context.  \textbf{Entities} are domain objects an application takes actions on. They can be considered as parameters of an action to be taken. In api.ai, there are several already defined system entities, e.g. specifying parameters of time, units and geography. Additionally, the developer can define his own entities \cite{apiai:entities}. 
+The main components used in modeling the conversation flow are entities, intents and context.  \textbf{Entities} are domain objects an application takes actions on. They can be considered as parameters of an action to be taken. In API.AI, there are several already defined system entities, e.g. specifying parameters of time, units and geography. Additionally, the developer can define his own entities \cite{apiai:entities}. 
 
-In an api.ai agent, user requests are mapped to  \textbf{intents}. By matching the user input with previously specified examples, intents are extracted and used to trigger an action. In our tourist chatbot example, a typical intent would be “Give Recommendation” if the user asks for a tourist recommendation nearby \cite{apiai:intents}.
+In an API.AI agent, user requests are mapped to  \textbf{intents}. By matching the user input with previously specified examples, intents are extracted and used to trigger an action. In our tourist chatbot example, a typical intent would be “Give Recommendation” if the user asks for a tourist recommendation nearby \cite{apiai:intents}.
  
 When defining an intent, the developer has the option to set an output context.  \textbf{Contexts} manage the conversation flow by distinguishing the state the conversation is in. Based on the state, the agent may take different decisions on the same user input \cite{apiai:contexts}. 
 
