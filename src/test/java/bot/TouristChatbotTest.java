@@ -63,19 +63,6 @@ public class TouristChatbotTest {
 			ratingDB.deleteAllUserRatings(user.getId());
 		}
 	}
-
-	@Test
-	public void deleteme(){
-		String input = "I need a recommendation";
-		String coordinates = "41.403706,2.173504";
-
-		touristChatbot.processInput(user.getId(), input);
-		agentHandler.checkContexts(user.getId());
-		touristChatbot.processInput(user.getId(), coordinates);
-		agentHandler.checkContexts(user.getId());
-		touristChatbot.processInput(user.getId(),"Sounds good");
-		agentHandler.checkContexts(user.getId());
-	}
 	
 	@Test
 	public void testWelcome() {
@@ -234,7 +221,7 @@ public class TouristChatbotTest {
 	public void testRecommendPositive() throws SQLException {
 		// Prepare
 		String input = "I need a recommendation";
-		String coordinates = "41.403706,2.173504";
+		String coordinates = "41.403706 2.173504";
 
 		touristChatbot.processInput(user.getId(), input);
 		touristChatbot.processInput(user.getId(), coordinates);
@@ -267,7 +254,7 @@ public class TouristChatbotTest {
 	public void testRecommendNegative() throws SQLException {
 		// Prepare
 		String input = "I need a recommendation";
-		String coordinates = "41.403706,2.173504";
+		String coordinates = "41.403706 2.173504";
 
 		touristChatbot.processInput(user.getId(), input);
 		touristChatbot.processInput(user.getId(), coordinates);
@@ -297,7 +284,7 @@ public class TouristChatbotTest {
 	public void testRecommendShowDifferentOptions() throws SQLException {
 		// Prepare
 		String input = "I need a recommendation";
-		String coordinates = "41.403706,2.173504";
+		String coordinates = "41.403706 2.173504";
 
 		touristChatbot.processInput(user.getId(), input);
 		touristChatbot.processInput(user.getId(), coordinates);
@@ -331,7 +318,7 @@ public class TouristChatbotTest {
 	public void testRecommendShowAllOptions() throws SQLException {
 		// Prepare
 		String input = "I need a recommendation";
-		String coordinates = "41.403706,2.173504";
+		String coordinates = "41.403706 2.173504";
 		String positiveImpression = "Sounds good";
 		String firstOption = "1";
 
@@ -366,7 +353,7 @@ public class TouristChatbotTest {
 	public void testRecommendCategory() {
 		// Prepare
 		String input = "I want to do some shopping";
-		String coordinates = "41.403706,2.173504";
+		String coordinates = "41.403706 2.173504";
 
 		// Action
 		touristChatbot.processInput(user.getId(), input);

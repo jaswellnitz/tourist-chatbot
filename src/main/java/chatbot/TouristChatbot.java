@@ -107,9 +107,13 @@ public class TouristChatbot {
 	public List<ChatbotResponse> processInput(long userId, Object userInput) {
 		assert userInput != null : "Precondition failed: userInput != null";
 		User user = getUserFromId(userId);
-		
-		AgentResponse agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		AgentResponse agentResponse;
+//		if(!isLocation){
+		 agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
+//		}else{
+//		agentResponse = agentHandler.sendEvent(event, sessionId, resetContext)	
+//		}
 
 		if (agentResponse != null) {
 			chatbotResponses = processAction(userInput, user, agentResponse);
@@ -231,7 +235,7 @@ public class TouristChatbot {
 		if (userInput instanceof Location) {
 			user.setCurrentLocation((Location) userInput);
 		} else {
-			String[] coordinates = ((String) userInput).split(",");
+			String[] coordinates = ((String) userInput).split(" ");
 			Location location = new Location(Double.valueOf(coordinates[0]), Double.valueOf(coordinates[1]));
 			user.setCurrentLocation(location);
 		}
