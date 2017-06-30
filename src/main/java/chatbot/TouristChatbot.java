@@ -367,7 +367,7 @@ public class TouristChatbot {
 		for (RecommendedPointOfInterest poi : user.getPositiveRecommendations()) {
 			reply += "\n" + poi.getFormattedString(false);
 			if (!user.getUnratedPOIs().contains(poi)) {
-				reply += " Your rating: " + ratingsDB.getRating(user.getId(), poi.getId());
+				reply += " Your rating: " + ratingsDB.getRating(user.getId(), poi.getId()).getValue();
 			}
 		}
 		responses.add(new ChatbotResponse(reply));

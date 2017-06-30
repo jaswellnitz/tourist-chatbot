@@ -166,7 +166,7 @@ public class RecommendedPointOfInterest implements ProfileItem {
 
 		List<String> interestsFromProfile = profile.getInterestsFromProfile();
 		if(!interestsFromProfile.isEmpty()){
-			ret += "category: ";
+			ret += "category - ";
 			for(String interest: interestsFromProfile){
 				ret += interest + ", ";
 			}
