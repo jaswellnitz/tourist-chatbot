@@ -247,6 +247,9 @@ public class TouristChatbot {
 				}
 			}
 		}
+		agentHandler.resetContext(user.getId());
+		agentHandler.setContext("recommendation", user.getId());
+		
 		chatbotResponses.addAll(getRecommendation(user, interest));
 		return chatbotResponses;
 	}
