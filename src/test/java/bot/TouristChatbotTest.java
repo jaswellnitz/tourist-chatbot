@@ -63,6 +63,39 @@ public class TouristChatbotTest {
 			ratingDB.deleteAllUserRatings(user.getId());
 		}
 	}
+	
+	@Test
+	public void testbla(){
+		// Prepare
+		String input = "I need a recommendation";
+		String coordinates ="42.32709503173828,-3.6996009349823";
+
+		touristChatbot.processInput(user.getId(), input);
+		touristChatbot.processInput(user.getId(), coordinates);
+
+//		User activeUser = touristChatbot.getActiveUsers().get(user.getId());
+//		List<RecommendedPointOfInterest> pendingRecommendations = new ArrayList<>(
+//				activeUser.getPendingRecommendations());
+//		assertFalse(pendingRecommendations.isEmpty());
+//		int size = pendingRecommendations.size();
+//		RecommendedPointOfInterest recPOI = activeUser.getPendingRecommendations().get(0);
+//
+//		// Action
+//		touristChatbot.processInput(user.getId(), "Sounds good!");
+//
+//		// Check
+//		activeUser = touristChatbot.getActiveUsers().get(user.getId());
+//		assertEquals(size - 1, activeUser.getPendingRecommendations().size());
+//		List<RecommendedPointOfInterest> posiveRecommendations = activeUser.getPositiveRecommendations();
+//		assertFalse(activeUser.getPendingRecommendations().contains(recPOI));
+//		assertEquals(1, posiveRecommendations.size());
+//		assertEquals(pendingRecommendations.get(0), posiveRecommendations.get(0));
+//		assertEquals(pendingRecommendations.get(0), activeUser.getUnratedPOIs().get(0));
+//		assertEquals(Rating._4, ratingDB.getRating(user.getId(), recPOI.getId()));
+//		User storedUser = userDB.getUser(user.getId());
+//		assertEquals(activeUser.getPositiveRecommendations(),storedUser.getPositiveRecommendations());
+//		assertEquals(activeUser.getUnratedPOIs(),storedUser.getUnratedPOIs());
+	}
 
 	@Test
 	public void testWelcome() {

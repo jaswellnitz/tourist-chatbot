@@ -61,6 +61,7 @@ public class TelegramBotHandler implements Route {
 		} else {
 			Object input = null;
 			if (message.location() != null) {
+				System.out.println();
 				input = new domain.Location(message.location().latitude(), message.location().longitude());
 				SendChatAction sendChatAction = new SendChatAction(message.chat().id(),
 						ChatAction.find_location.name());
@@ -68,10 +69,12 @@ public class TelegramBotHandler implements Route {
 				telegramBot.execute(sendMessage);
 				telegramBot.execute(sendChatAction);
 			} else if (message.text() != null) {
+				System.out.println("Message interpreted as text");
 				input = message.text();
 			}else{
 				sendMessage = new SendMessage(message.chat().id(),"Please enter a valid input.");
 				telegramBot.execute(sendMessage);
+				return false;
 			}
 			chatbotResponses.addAll(touristChatbot.processInput(message.from().id(), input));
 		}
