@@ -39,11 +39,17 @@ At first, the similar tool \textit{osm2psql} was investigated and used in this p
 
 In June 2015, Telegram introduced its Bot API, allowing third-party developers to integrate their own bots into the messenger. The bots are controlled sending HTTPS request. In this project, incoming updates from Telegram are received via an outgoing webhook \cite{telegram:updates}.
 
-\section{Web Service - Heroku}
+\section{Platform as a Service - Heroku}
 \textit{Heroku} \cite{heroku} is a platform-as-a-service that enables users to run their applications in the cloud. It supports several programming languages, among them Node, Ruby and Java. There are several pricing models offering a range of different features. In this case, the free plan is used which comes with the inconvenience that the application sleeps after 30 minutes of inactivity, leading to a short delay every time the chatbot is accessed after not using it.
 
 Likewise, Heroku Postgres is a database-as-a-service enabling the upload of the project’s database into the cloud. 
 
 \section{API and Libraries}
+\subsection{Apache Mahout}
+\textit{Apache Mahout} is an open-source project which provides a set of machine-learning algorithms for classification, clustering and recommendation \cite{mahout}. Mahout plays a vital part in the project’s development as Mahout’s Java library forms the base for the application’s recommender. The recommender’s collaborative filtering approach is based on Mahout’s simple user-based recommender \cite{mahout:userbased} whereas some of Mahout’s algorithms were adapted to create a content-based mechanism that fit this project’s needs (more precisely in Relevant Aspects and Annex C – Design Specification).
+
+\subsection{Spark}
+\textit{Spark} is a micro framework that is used to create Java web applications. \cite{spark}. Its most outstanding feature is the lightweight design which enables the setup of a web application with minimal overhead relying on Java 8 language features. A Spark application's key element is a set of routes which defines how the application is accessed by clients. A route consists of a HTTP verb, a path and a callback. In this project, a POST route is set up using Spark which receives the incoming messages from Telegram. 
+
 \subsection{Foursquare}
-\textit{Foursquare} \cite{foursquare} is a mobile service application which provides personalized recommendations of places for its users. In this project, Foursquare’s RESTful API is used to access additional information OpenStreetMap does not provide, more precisely extracting photos for points of interests
+\textit{Foursquare} \cite{foursquare} is a mobile service application which provides personalized recommendations of places for its users. In this project, Foursquare’s RESTful API is used to access additional information OpenStreetMap does not provide, more precisely extracting photos for points of interests.
