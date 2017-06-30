@@ -61,7 +61,7 @@ public class TelegramBotHandler implements Route {
 		} else {
 			Object input = null;
 			if (message.location() != null) {
-				System.out.println();
+				System.out.println("Message interpreted as location");
 				input = new domain.Location(message.location().latitude(), message.location().longitude());
 				SendChatAction sendChatAction = new SendChatAction(message.chat().id(),
 						ChatAction.find_location.name());
