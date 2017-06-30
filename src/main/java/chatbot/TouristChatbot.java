@@ -109,8 +109,6 @@ public class TouristChatbot {
 		User user = getUserFromId(userId);
 		
 		AgentResponse agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
-		// debug message
-		System.out.println(user.getName() +": " + agentResponse);
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 
 		if (agentResponse != null) {
@@ -287,6 +285,7 @@ public class TouristChatbot {
 		ChatbotResponse chatbotResponse;
 		if (successful) {
 			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+			agentHandler.resetContext(user.getId());
 		} else {
 			chatbotResponse = new ChatbotResponse(
 					"Sorry, there was a mistake. The interest could not be saved. Please try again later.");
