@@ -3,6 +3,7 @@ package service.agent;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import service.ServiceRequester;
@@ -76,17 +77,31 @@ public class AgentHandler extends ServiceRequester{
 			boolean resetContext) {
 		
 		System.out.println("AGENTHANDLER - Telegram: " + userInput);
+		checkContexts(sessionId);
 		String url = buildQuery(event, userInput, context, sessionId, resetContext);
-		JsonObject jsonObject= sendQuery("Authorization", "Bearer " + clientAccessToken, url);
+		JsonObject jsonObject= sendQuery("Authorization", "Bearer " + clientAccessToken, url).getAsJsonObject();
 		
 		AgentResponse resp = null;
 		if(jsonObject != null){
 			resp = AgentResponseParser.fromJson(jsonObject);
 		}
 		System.out.println("AGENTHANDLER - Response: " + resp.getReply() + "," + resp.getContexts());
+		checkContexts(sessionId);
 		return resp;
 	}
 
+	public void checkContexts(long sessionId){
+		Map<String,String> map= new HashMap<>();
+		String sessionIdStr = String.valueOf(sessionId);
+		if (sessionIdStr.length() < 10) {
+			sessionIdStr = String.format("%10s", sessionIdStr).replace(" ", "0");
+		}
+		map.put("sessionId", sessionIdStr);
+		String url = buildQuery("https://api.api.ai/v1/contexts?",map);
+		
+		JsonArray jsonObject= sendQuery("Authorization", "Bearer " + clientAccessToken, url).getAsJsonArray();
+		System.out.println(jsonObject);
+	}
 	/**
 	 * Builds a query based on API.AI's API documentation: 
 	 * https://docs.api.ai/docs/query

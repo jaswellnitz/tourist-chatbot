@@ -65,6 +65,19 @@ public class TouristChatbotTest {
 	}
 
 	@Test
+	public void deleteme(){
+		String input = "I need a recommendation";
+		String coordinates = "41.403706,2.173504";
+
+		touristChatbot.processInput(user.getId(), input);
+		agentHandler.checkContexts(user.getId());
+		touristChatbot.processInput(user.getId(), coordinates);
+		agentHandler.checkContexts(user.getId());
+		touristChatbot.processInput(user.getId(),"Sounds good");
+		agentHandler.checkContexts(user.getId());
+	}
+	
+	@Test
 	public void testWelcome() {
 		// Prepare
 		userDB.deleteUser(user.getId());
