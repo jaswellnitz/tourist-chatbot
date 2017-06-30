@@ -101,13 +101,16 @@ public class TouristChatbot {
 	 * creates one or multiple chatbot responses.
 	 * 
 	 * @param userId
-	 * @param userInput
+	 * @param userInput the user message or location attachment
 	 * @return chatbot responses
 	 */
 	public List<ChatbotResponse> processInput(long userId, Object userInput) {
 		assert userInput != null : "Precondition failed: userInput != null";
 
 		User user = getUserFromId(userId);
+		// debug message
+		System.out.println(user.getName() +": " + userInput.toString());
+		
 		AgentResponse agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 

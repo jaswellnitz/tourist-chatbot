@@ -55,6 +55,7 @@ public class TelegramBotHandler implements Route {
 		Message message = update.message();
 
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		SendMessage sendMessage;
 		if (isStartMessage(message)) {
 			chatbotResponses.add(touristChatbot.processStartMessage(message.from().id(), message.from().firstName()));
 		} else {
@@ -63,9 +64,14 @@ public class TelegramBotHandler implements Route {
 				input = new domain.Location(message.location().latitude(), message.location().longitude());
 				SendChatAction sendChatAction = new SendChatAction(message.chat().id(),
 						ChatAction.find_location.name());
+				sendMessage = new SendMessage(message.chat().id(), "Please be patient, this action might take a while...");
+				telegramBot.execute(sendMessage);
 				telegramBot.execute(sendChatAction);
 			} else if (message.text() != null) {
 				input = message.text();
+			}else{
+				sendMessage = new SendMessage(message.chat().id(),"Please enter a valid input.");
+				telegramBot.execute(sendMessage);
 			}
 			chatbotResponses.addAll(touristChatbot.processInput(message.from().id(), input));
 		}
