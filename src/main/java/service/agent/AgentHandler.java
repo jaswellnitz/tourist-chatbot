@@ -75,6 +75,7 @@ public class AgentHandler extends ServiceRequester{
 	private AgentResponse sendQuery(String event, String userInput, String context, long sessionId,
 			boolean resetContext) {
 		
+		System.out.println("AGENTHANDLER - Telegram: " + userInput);
 		String url = buildQuery(event, userInput, context, sessionId, resetContext);
 		JsonObject jsonObject= sendQuery("Authorization", "Bearer " + clientAccessToken, url);
 		
@@ -82,7 +83,7 @@ public class AgentHandler extends ServiceRequester{
 		if(jsonObject != null){
 			resp = AgentResponseParser.fromJson(jsonObject);
 		}
-		
+		System.out.println("AGENTHANDLER - Response: " + resp.getReply() + "," + resp.getContexts());
 		return resp;
 	}
 
