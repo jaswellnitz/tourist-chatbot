@@ -373,7 +373,6 @@ public class TouristChatbotTest {
 		touristChatbot.processInput(user.getId(), coordinates);
 		User activeUser = touristChatbot.getActiveUsers().get(user.getId());
 
-
 		// Check
 		activeUser = touristChatbot.getActiveUsers().get(user.getId());
 		List<RecommendedPointOfInterest> pendingRecommendations = activeUser.getPendingRecommendations();

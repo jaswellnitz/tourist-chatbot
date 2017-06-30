@@ -62,8 +62,8 @@ public class TelegramBotHandler implements Route {
 		} else {
 			Object input = null;
 			if (message.location() != null) {
-				double latitude = new BigDecimal(message.location().latitude()).setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue();
-				double longitude = new BigDecimal(message.location().longitude()).setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue();
+				double latitude = new BigDecimal(message.location().latitude()).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
+				double longitude = new BigDecimal(message.location().longitude()).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
 				input = new domain.Location(latitude, longitude);
 				SendChatAction sendChatAction = new SendChatAction(message.chat().id(),
 						ChatAction.find_location.name());
