@@ -123,6 +123,7 @@ public class TouristChatbot {
 
 	/**
 	 * Checks which action needs to be performed and calls the according method.
+	 * 
 	 * @param userInput
 	 * @param user
 	 * @param agentResponse
@@ -175,6 +176,7 @@ public class TouristChatbot {
 
 	/**
 	 * Handles the rating processing
+	 * 
 	 * @param user
 	 * @param agentResponse
 	 * @return the chatbot responses
@@ -270,7 +272,9 @@ public class TouristChatbot {
 	}
 
 	/**
-	 * Filters the user interests from the agent response and saves them, deals with error handling.
+	 * Filters the user interests from the agent response and saves them, deals
+	 * with error handling.
+	 * 
 	 * @param user
 	 * @param agentResponse
 	 * @return the chatbot response
@@ -278,10 +282,11 @@ public class TouristChatbot {
 	private ChatbotResponse handleSaveInterest(User user, AgentResponse agentResponse) {
 		boolean successful = saveInterests(user, agentResponse);
 		ChatbotResponse chatbotResponse;
-		if(successful){
+		if (successful) {
 			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
-		}else{
-			chatbotResponse = new ChatbotResponse("Sorry, there was a mistake. The interest could not be saved. Please try again later.");
+		} else {
+			chatbotResponse = new ChatbotResponse(
+					"Sorry, there was a mistake. The interest could not be saved. Please try again later.");
 		}
 		return chatbotResponse;
 	}
@@ -361,6 +366,9 @@ public class TouristChatbot {
 		String reply = "Here are the past recommendations you were interested in: ";
 		for (RecommendedPointOfInterest poi : user.getPositiveRecommendations()) {
 			reply += "\n" + poi.getFormattedString(false);
+			if (!user.getUnratedPOIs().contains(poi)) {
+				reply += " Your rating: " + ratingsDB.getRating(user.getId(), poi.getId());
+			}
 		}
 		responses.add(new ChatbotResponse(reply));
 		if (!user.getUnratedPOIs().isEmpty()) {
@@ -578,6 +586,7 @@ public class TouristChatbot {
 		getActiveUsers().put(user.getId(), user);
 		return user;
 	}
+
 	/**
 	 * Creates an error message
 	 * 
@@ -587,7 +596,6 @@ public class TouristChatbot {
 		String message = "Sorry, the chatbot does not seem to be available at the moment. Please try again later.";
 		return new ChatbotResponse(message);
 	}
-
 
 	// public for JUnit testing
 	public Map<Long, User> getActiveUsers() {

@@ -1,5 +1,7 @@
 package domain;
 
+import java.util.List;
+
 import recommender.POIProfile;
 import recommender.ProfileItem;
 
@@ -154,7 +156,7 @@ public class RecommendedPointOfInterest implements ProfileItem {
 		if(!address.isEmpty()){
 			ret += address + ", ";
 		}
-	
+		
 		if(!openingHours.isEmpty()){
 			ret += openingHours +", ";
 		}
@@ -162,6 +164,14 @@ public class RecommendedPointOfInterest implements ProfileItem {
 			ret += "your computed preference value: " + recommendationValue + ", ";
 		}
 
+		List<String> interestsFromProfile = profile.getInterestsFromProfile();
+		if(!interestsFromProfile.isEmpty()){
+			ret += "category: ";
+			for(String interest: interestsFromProfile){
+				ret += interest + ", ";
+			}
+		}
+		
 		return ret.substring(0, ret.length()-2) +".";
 	}
 
