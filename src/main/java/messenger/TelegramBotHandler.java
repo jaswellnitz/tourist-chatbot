@@ -1,5 +1,6 @@
 package messenger;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,19 +54,27 @@ public class TelegramBotHandler implements Route {
 	public Object handle(Request request, Response response) {
 		Update update = BotUtils.parseUpdate(request.body());
 		Message message = update.message();
-
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		SendMessage sendMessage;
 		if (isStartMessage(message)) {
 			chatbotResponses.add(touristChatbot.processStartMessage(message.from().id(), message.from().firstName()));
 		} else {
 			Object input = null;
 			if (message.location() != null) {
-				input = new domain.Location(message.location().latitude(), message.location().longitude());
+				double latitude = new BigDecimal(message.location().latitude()).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
+				double longitude = new BigDecimal(message.location().longitude()).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
+				input = new domain.Location(latitude, longitude);
 				SendChatAction sendChatAction = new SendChatAction(message.chat().id(),
 						ChatAction.find_location.name());
+				sendMessage = new SendMessage(message.chat().id(), "Please be patient, this action might take a while...");
+				telegramBot.execute(sendMessage);
 				telegramBot.execute(sendChatAction);
 			} else if (message.text() != null) {
 				input = message.text();
+			}else{
+				sendMessage = new SendMessage(message.chat().id(),"Please enter a valid input.");
+				telegramBot.execute(sendMessage);
+				return false;
 			}
 			chatbotResponses.addAll(touristChatbot.processInput(message.from().id(), input));
 		}

@@ -65,7 +65,7 @@ public abstract class ServiceRequester {
 		if(jsonResponse != null){
 			jsonObject = new JsonParser().parse(jsonResponse).getAsJsonObject();
 		}
-		return jsonObject ;
+		return jsonObject;
 	}
 
 }

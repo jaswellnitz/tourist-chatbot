@@ -1,4 +1,4 @@
-package poiRecommendation;
+package recommender;
 
 import java.util.HashMap;
 import java.util.Map;

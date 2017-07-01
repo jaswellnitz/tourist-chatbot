@@ -74,4 +74,8 @@ public class AgentResponse {
 	public Action getAction() {
 		return action;
 	}
+	
+	public String toString(){
+		return "AgentResponse("+resolvedQuery+","+reply+","+contexts+")";
+	}
 }

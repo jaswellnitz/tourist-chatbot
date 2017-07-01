@@ -1,4 +1,4 @@
-package bot;
+package service;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +28,6 @@ public class ImageRequesterTest {
 		Location location = new Location(41.4034984,2.1740598);
 		
 		String imageURL = imageRequester.getImageURL(name, location);
-		System.out.println(imageURL);
 		assertNotNull(imageURL);
 		assertFalse(imageURL.isEmpty());
 		

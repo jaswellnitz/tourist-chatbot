@@ -102,14 +102,16 @@ public class TouristChatbot {
 	 * 
 	 * @param userId
 	 * @param userInput
+	 *            the user message or location attachment
 	 * @return chatbot responses
 	 */
 	public List<ChatbotResponse> processInput(long userId, Object userInput) {
 		assert userInput != null : "Precondition failed: userInput != null";
-
 		User user = getUserFromId(userId);
-		AgentResponse agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
+		AgentResponse agentResponse;
+
+		agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
 
 		if (agentResponse != null) {
 			chatbotResponses = processAction(userInput, user, agentResponse);
@@ -231,7 +233,7 @@ public class TouristChatbot {
 		if (userInput instanceof Location) {
 			user.setCurrentLocation((Location) userInput);
 		} else {
-			String[] coordinates = ((String) userInput).split(",");
+			String[] coordinates = ((String) userInput).split(" ");
 			Location location = new Location(Double.valueOf(coordinates[0]), Double.valueOf(coordinates[1]));
 			user.setCurrentLocation(location);
 		}
@@ -244,6 +246,7 @@ public class TouristChatbot {
 				}
 			}
 		}
+
 		chatbotResponses.addAll(getRecommendation(user, interest));
 		return chatbotResponses;
 	}
@@ -284,6 +287,7 @@ public class TouristChatbot {
 		ChatbotResponse chatbotResponse;
 		if (successful) {
 			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
+			agentHandler.resetContext(user.getId());
 		} else {
 			chatbotResponse = new ChatbotResponse(
 					"Sorry, there was a mistake. The interest could not be saved. Please try again later.");

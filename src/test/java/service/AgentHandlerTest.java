@@ -1,4 +1,4 @@
-package bot;
+package service;
 
 import static org.junit.Assert.*;
 
@@ -98,7 +98,6 @@ public class AgentHandlerTest {
 		// Check
 		assertNotNull(agentResult);
 		assertFalse(agentResult.getReply().isEmpty());
-		System.out.println(agentResult.getContexts());
 		assertEquals(1,agentResult.getContexts().size());
 		assertEquals("welcome-followup",agentResult.getContexts().get(0).getName());
 		

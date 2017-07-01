@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 import chatbot.Action;
 /**
  * Utility class that parses the json agent response into a java representation.
- * @author touristchatbot
+ * @author Jasmin Wellnitz
  *
  */
 public class AgentResponseParser {

@@ -76,13 +76,12 @@ public class AgentHandler extends ServiceRequester{
 			boolean resetContext) {
 		
 		String url = buildQuery(event, userInput, context, sessionId, resetContext);
-		JsonObject jsonObject= sendQuery("Authorization", "Bearer " + clientAccessToken, url);
+		JsonObject jsonObject= sendQuery("Authorization", "Bearer " + clientAccessToken, url).getAsJsonObject();
 		
 		AgentResponse resp = null;
 		if(jsonObject != null){
 			resp = AgentResponseParser.fromJson(jsonObject);
 		}
-		
 		return resp;
 	}
 
