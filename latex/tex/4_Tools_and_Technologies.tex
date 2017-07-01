@@ -4,17 +4,17 @@ In this section, the tools and technologies used during the course of the projec
 In contrast, the tools used in the development process such as version control repository, integrated development environment or build-management tools are not explained in detail as they could be interchanged and are not essential for the application’s characteristics.
 
 \section{Chatbot Platform}
-As already discussed in the previous chapter, there are several competing platforms that permit developers to build their own chatbot. Most of the major software big-players nowadays, such as Google, Facebook, Microsoft, are taking part in the development of these platforms and provide their own solutions, for example API.ai (Google), wit.ai (Facebook), luis.ai (Microsoft) or IBM Watson. Out of these contestants, api.ai and wit.ai seem to be the most widely known and easiest to use. Therefore, both options were investigated to see which one would be the most suitable for this project. 
-\subsection{API.ai}
-API.ai \cite{apiai} is a natural language processing platform by Google that facilitates creating conversational user interfaces. In order to model conversations, entities and intents are used as key concepts. api.ai provides a rich management toolset as well as a simply one-click-integration mechanism to import the chatbot into a variety of mobile apps. Also, the modeled conversation flow in API.ai can be accessed by submitting queries through the REST-like HTTP endpoints. 
+As already discussed in the previous chapter, there are several competing platforms that permit developers to build their own chatbot. Most of the major software big-players nowadays, such as Google, Facebook, Microsoft, are taking part in the development of these platforms and provide their own solutions, for example API.AI (Google), wit.ai (Facebook), luis.ai (Microsoft) or IBM Watson. Out of these contestants, API.AI and wit.ai seem to be the most widely known and easiest to use. Therefore, both options were investigated to see which one would be the most suitable for this project. 
+\subsection{API.AI}
+API.AI \cite{apiai} is a natural language processing platform that facilitates creating conversational user interfaces. It was launched in 2014 and acquired by Google in September 2016 \cite{apiai:google}. In order to model conversations, entities and intents are used as key concepts. API.AI provides a rich management toolset as well as a simply one-click-integration mechanism to import the chatbot into a variety of mobile apps. Also, the modeled conversation flow in API.AI can be accessed by submitting queries through the REST-like HTTP endpoints. 
 
-API.ai offers a variety of prebuilt agents that can be used as a base for the own conversational interface. On top of it, the conversational interface can be enabled to support \textit{small talk}, allowing it to reply to basic, unspecific user input without any further development.
+API.AI offers a variety of prebuilt agents that can be used as a base for the own conversational interface. On top of it, the conversational interface can be enabled to support \textit{small talk}, allowing it to reply to basic, unspecific user input without any further development.
 
 \subsection{Wit.ai}
-Like API.ai, Wit.ai is a natural language processing platform. It was acquired by Facebook in January 2015 and is free to use ever since then \cite{witai:facebook}. Its key concepts for language processing include entities, intents and, additionally, stories. Stories help to create basic user scenarios in which typical user and chatbot conversations are designed. Regarding integration, Wit.ai provides a web service API to integrate the designed conversational interface in messaging apps.
+Like API.AI, Wit.ai is a natural language processing platform. It was acquired by Facebook in January 2015 and is free to use ever since then \cite{witai:facebook}. Its key concepts for language processing include entities, intents and, additionally, stories. Stories help to create basic user scenarios in which typical user and chatbot conversations are designed. Regarding integration, Wit.ai provides a web service API to integrate the designed conversational interface in messaging apps.
 
-\subsection{Choice of Platform: API.ai}
-After testing both platforms, both left a good impression and seem to be suitable to use. On the one hand, Wit.ai’s story feature seems promising to design conversations in an easy way, but is still in beta status. However, API.ai convinces with its rich management toolset, an extensive documentation and the integration of simple conversational features such as \textit{small talk}.
+\subsection{Choice of Platform: API.AI}
+After testing both platforms, both left a good impression and seem to be suitable to use. On the one hand, Wit.ai’s story feature seems promising to design conversations in an easy way, but is still in beta status. However, API.AI convinces with its rich management toolset, an extensive documentation and the integration of simple conversational features such as \textit{small talk}.
 
 \section{Geographic Database}
 In order to extract tourist points of interests from \textit{OpenStreetMap}, a geographic database was set up as the application’s backend. The following tools form either a part of the mentioned database or were used to set it up.
@@ -39,11 +39,17 @@ At first, the similar tool \textit{osm2psql} was investigated and used in this p
 
 In June 2015, Telegram introduced its Bot API, allowing third-party developers to integrate their own bots into the messenger. The bots are controlled sending HTTPS request. In this project, incoming updates from Telegram are received via an outgoing webhook \cite{telegram:updates}.
 
-\section{Web Service - Heroku}
+\section{Platform as a Service - Heroku}
 \textit{Heroku} \cite{heroku} is a platform-as-a-service that enables users to run their applications in the cloud. It supports several programming languages, among them Node, Ruby and Java. There are several pricing models offering a range of different features. In this case, the free plan is used which comes with the inconvenience that the application sleeps after 30 minutes of inactivity, leading to a short delay every time the chatbot is accessed after not using it.
 
 Likewise, Heroku Postgres is a database-as-a-service enabling the upload of the project’s database into the cloud. 
 
-\section{Additional Services}
+\section{API and Libraries}
+\subsection{Apache Mahout}
+\textit{Apache Mahout} is an open-source project which provides a set of machine-learning algorithms for classification, clustering and recommendation \cite{mahout}. Mahout plays a vital part in the project’s development as Mahout’s Java library forms the base for the application’s recommender. The recommender’s collaborative filtering approach is based on Mahout’s simple user-based recommender \cite{mahout:userbased} whereas some of Mahout’s algorithms were adapted to create a content-based mechanism that fit this project’s needs (more precisely in Relevant Aspects and Annex C – Design Specification).
+
+\subsection{Spark}
+\textit{Spark} is a micro framework that is used to create Java web applications. \cite{spark}. Its most outstanding feature is the lightweight design which enables the setup of a web application with minimal overhead relying on Java 8 language features. A Spark application's key element is a set of routes which defines how the application is accessed by clients. A route consists of a HTTP verb, a path and a callback. In this project, a POST route is set up using Spark which receives the incoming messages from Telegram. 
+
 \subsection{Foursquare}
-\textit{Foursquare} \cite{foursquare} is a mobile service application which provides personalized recommendations of places for its users. In this project, Foursquare’s RESTful API is used to access additional information OpenStreetMap does not provide, more precisely extracting photos for points of interests
+\textit{Foursquare} \cite{foursquare} is a mobile service application which provides personalized recommendations of places for its users. In this project, Foursquare’s RESTful API is used to access additional information OpenStreetMap does not provide, more precisely extracting photos for points of interests.

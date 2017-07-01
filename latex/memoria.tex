@@ -372,11 +372,11 @@
 
 \noindent\includegraphics[width=\textwidth]{cabecera}\vspace{1cm}
 
-\noindent D. Bruno Baruque Zanón, profesor del departamento de Ingenería Civil, Lenguajes y .
+\noindent D. Bruno Baruque Zanón, profesor del departamento de Ingenería Civil, Lenguajes y Sistemas Informáticos".
 
 \noindent Expone:
 
-\noindent Que la alumna D. \nombre, con DNI L28PGM5NZ, ha realizado el Trabajo final de Grado en Ingeniería Informática titulado Development of a Chatbot for Tourist Recommendations. 
+\noindent Que la alumna D. \nombre, con pasaporte L28PGM5NZ, ha realizado el Trabajo final de Grado en Ingeniería Informática titulado Development of a Chatbot for Tourist Recommendations. 
 
 \noindent Y que dicho trabajo ha sido realizado por la alumna bajo la dirección del que suscribe, en virtud de lo cual se autoriza su presentación y defensa.
 
@@ -420,19 +420,19 @@ D. nombre tutor
 % Abstract en castellano
 \renewcommand*\abstractname{Resumen}
 \begin{abstract}
-Este proyecto consiste en desarollar una aplicación de bote conversacional que es capaz de recomendar puntos de interés turisticos, personalizados a los gustos del usario. Se accede al bote conversacional usando la aplicación de mensajería instantánea Telegram.
+Este proyecto consiste en desarollar una aplicación de bot conversacional que es capaz de recomendar puntos de interés turisticos, personalizados a los gustos del usario. Se accede al bot conversacional usando la aplicación de mensajería instantánea Telegram.
 
-El proyecto se focaliza en desarollar el lado servidor del interfaz de Telegram. Para ello se construye un servidor web Java que usa la plataforma de procesamiento de lenguaje natural api.ai para analizar la entrada del usario. Luego la aplicación está desplegada en la plataforma-como-servicio Heroku.
+El proyecto se focaliza en desarollar el lado servidor del interfaz de Telegram. Para ello se construye un servidor web Java que usa la plataforma de procesamiento de lenguaje natural API.AI para analizar la entrada del usario. Como prueba de su utilización la aplicación está desplegada en la plataforma-como-servicio Heroku.
 
-Las recomendaciones dadas al usario están basadas en las informaciones el usario comparte con el bote conversacional y datos ya existentes de otros usarios parecidos. El algoritmo de recomendación aplicado combina los dos enfoques de la teoría de recomendación más importantes: el filtrado colaborativo y basado en el contenido.
+Las recomendaciones dadas al usario están basadas en las informaciones el usario comparte con el bot conversacional y datos ya existentes de otros usarios parecidos. El algoritmo de recomendación aplicado combina los dos enfoques de la teoría de recomendación más importantes: el filtrado colaborativo y basado en el contenido.
 
-Además, se construye un base de datos geográfico usando PostGis, proporcionando las informaciones turisticas en las cuales las recomendaciones están basadas. En la versión de la aplicación presentada, se usa la información geográfica de Barcelona, España y por tal motivo, las recomendaciones proporcionadas están limitadas a esa ciudad. 
+Además, se emplea una base de datos geográfica usando PostGis, proporcionando las informaciones turisticas en las cuales las recomendaciones están basadas. En la demostración de la aplicación, se usa la información geográfica de Barcelonam, España, empleando datos obtenidos de la plataforma libre de \textit{OpenStreetMaps}, España y por tal motivo, las recomendaciones proporcionadas están limitadas a esa ciudad. 
 
 \end{abstract}
 
 \renewcommand*\abstractname{Descriptores}
 \begin{abstract}
-bot conversacional, interfaz conversacional, Telegram, procesamiento de lenguaje natural, sistema de recomendación, base de datos geográfico, punto de interés\ldots
+bot conversacional, interfaz conversacional, Telegram, procesamiento de lenguaje natural, sistema de recomendación, base de datos geográfica, punto de interés
 \end{abstract}
 
 \clearpage
@@ -442,11 +442,11 @@ bot conversacional, interfaz conversacional, Telegram, procesamiento de lenguaje
 \begin{abstract}
 This project deals with the development of a chatbot application that is able to recommend tourist points of interest customized to the user’s preferences. The chatbot can be accessed using the instant messaging app Telegram.
 
-The project’s main focus lies on the development of a server-side architecture to the Telegram interface. In order to do so, a Java web server is set up that uses the natural language processing platform api.ai to parse the user input. The application is deployed to the platform-as-a-service Heroku.
+The project’s main focus lies on the development of a server-side architecture to the Telegram interface. In order to do so, a Java web server is set up that uses the natural language processing platform API.AI to parse the user input. The application is deployed to the platform-as-a-service Heroku.
 
 The recommendations given to the user are based on the information the user shares with the chatbot and already existing data of similar users. The applied recommendation algorithm combines the two most important approaches of recommendation theory, content-based and collaborative filtering.
 
-Furthermore, a geographic database is set up using PostGis, providing the needed tourist information the recommendations are based on. In the presented version of the application, geographic information of Barcelona, Spain, is used and therefore limiting the provided recommendations to this city.
+Furthermore, a geographic database is set up using PostGis, providing the needed tourist information the recommendations are based on. In the presented example of the application, geographic information of Barcelona, Spain, is used and therefore limiting the provided recommendations to this city.
 
 \end{abstract}
 
@@ -477,7 +477,7 @@ Chatbot, conversational interface, Telegram, natural language processing, recomm
 \include{./tex/5_Relevant_Aspects}
 \include{./tex/7_Conclusion_Future_Work_Lines}
 
-\bibliographystyle{plain}
+\bibliographystyle{unsrt}
 \bibliography{bibliografia}
 
 \end{document}
