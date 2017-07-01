@@ -41,7 +41,7 @@ This section describes the so-called non-functional requirements which contain t
 \item The device must be connected to the internet to use the chatbot.
 \item The device must be capable of receiving GPS information to calculate its current location. 
 \item The conversational interface should be intuitive, so the user is able to communicate with the chatbot without previously reading an exhaustive tutorial. To facilitate user decisions, mutually exclusive keyboard buttons are used.
-\item The chatbot should be able to handle user requests adequately. Questions and demands concerning travelling are understood and answered satisfyingly. Other requests are rejected politely.
+\item The chatbot should be able to handle user requests adequately. Questions and demands concerning travelling should be understood and answered satisfyingly. Other requests are rejected politely.
 \end{itemize}
 
 \subsection{Limitations}
@@ -105,7 +105,7 @@ Importance & \multicolumn{2}{l|}{High}  \\ \hline
 \textbf{Use Case ID} & \multicolumn{2}{l|}{\cellcolor[HTML]{C0C0C0}\textbf{UC-02}} \\ \hline
 Use Case Name & \multicolumn{2}{l|}{Get Recommendation} \\ \hline
 Description & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user asks for a recommended point of interest. Based on the user information, the recommender returns points of interests close to the user. \end{tabular}} \\ \hline
-Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user types in a message that is interpreted as a “recommendation” intent by the language processing platform.\end{tabular}} \\ \hline
+Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user asks for a recommendation.\end{tabular}} \\ \hline
 Precondition & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The chatbot is in a state in which the user is allowed to type messages independently, meaning that the user does not conduct another predefined conversation.\end{tabular}} \\ \hline
  & Step & Action \\ \cline{2-3} 
  & 1 & \begin{tabular}[c]{@{}p{6cm}@{}}Chatbot asks for the user's current location.\end{tabular}  \\ \cline{2-3} 
@@ -161,7 +161,7 @@ Importance & \multicolumn{2}{l|}{High}  \\ \hline
 \textbf{Use Case ID} & \multicolumn{2}{l|}{\cellcolor[HTML]{C0C0C0}\textbf{UC-04}} \\ \hline
 Use Case Name & \multicolumn{2}{l|}{Specify Recommendation Radius} \\ \hline
 Description & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user sets the radius in which he wants the recommended points of interests to be in.  \end{tabular}} \\ \hline
-Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}User enters messages which is identified as a distance intent by the natural language processing platform (e.g. “I don’t want to walk that far”, “Let me set the distance”…)\end{tabular}} \\ \hline
+Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user asks to set the recommendation distance.\end{tabular}} \\ \hline
 Precondition & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The chatbot is in a state in which the user is allowed to type messages independently, meaning that the user does not conduct another predefined conversation.\end{tabular}} \\ \hline
  & Step & Action \\ \cline{2-3} 
  & 1 & \begin{tabular}[c]{@{}p{6cm}@{}}Chatbot asks the user about his preferred maximal recommendation radius.\end{tabular}  \\ \cline{2-3} 
@@ -212,7 +212,7 @@ Importance & \multicolumn{2}{l|}{Medium}  \\ \hline
 \textbf{Use Case ID} & \multicolumn{2}{l|}{\cellcolor[HTML]{C0C0C0}\textbf{UC-06}} \\ \hline
 Use Case Name & \multicolumn{2}{l|}{Show Past Recommendations} \\ \hline
 Description & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The chatbot provides the user with information about the points of interests that were recommended to him previously.\end{tabular}} \\ \hline
-Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user types in a message that is interpreted as a “past recommendations” intent by the language processing platform.\end{tabular}} \\ \hline
+Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user asks to see his previous recommendations.\end{tabular}} \\ \hline
 Precondition & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The chatbot is in a state in which the user is allowed to type messages independently, meaning that the user does not conduct another predefined conversation.\end{tabular}} \\ \hline
  & Step & Action \\ \cline{2-3} 
 \multirow{-2}{*}{Flow of Events} & 1 & \begin{tabular}[c]{@{}p{6cm}@{}}The chatbot lists the past recommendations the user was interested in.\end{tabular}\\ \hline
@@ -236,7 +236,7 @@ Importance & \multicolumn{2}{l|}{Medium}  \\ \hline
 \textbf{Use Case ID} & \multicolumn{2}{l|}{\cellcolor[HTML]{C0C0C0}\textbf{UC-07}} \\ \hline
 Use Case Name & \multicolumn{2}{l|}{Help} \\ \hline
 Description & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user asks for help and gets an overview of the chatbot features.\end{tabular}} \\ \hline
-Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user types in a message that is interpreted as a “help” intent by the language processing platform.\end{tabular}} \\ \hline
+Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user asks for help.\end{tabular}} \\ \hline
 Precondition & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The chatbot is in a state in which the user is allowed to type messages independently, meaning that the user does not conduct another predefined conversation.\end{tabular}} \\ \hline
  & Step & Action \\ \cline{2-3} 
 \multirow{-2}{*}{Flow of Events} & 1 & \begin{tabular}[c]{@{}p{6cm}@{}}The chatbot gives an overview of the chatbot features (rating, chatting, recommendations).\end{tabular}\\ \hline
@@ -260,7 +260,7 @@ Importance & \multicolumn{2}{l|}{Low}  \\ \hline
 \textbf{Use Case ID} & \multicolumn{2}{l|}{\cellcolor[HTML]{C0C0C0}\textbf{UC-08}} \\ \hline
 Use Case Name & \multicolumn{2}{l|}{Show User Information} \\ \hline
 Description & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user is provided with the personal information the chatbot has collected so far.\end{tabular}} \\ \hline
-Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user types in a message that is interpreted as a “show user information” intent by the language processing platform.\end{tabular}} \\ \hline
+Trigger  & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The user asks to see his personal information.\end{tabular}} \\ \hline
 Precondition & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}p{7.5cm}@{}}The chatbot is in a state in which the user is allowed to type messages independently, meaning that the user does not conduct another predefined conversation.\end{tabular}} \\ \hline
  & Step & Action \\ \cline{2-3} 
 \multirow{-2}{*}{Flow of Events} & 1 & \begin{tabular}[c]{@{}p{6cm}@{}}The chatbot shows the user his stored interests and the current specified recommendation radius.\end{tabular}\\ \hline

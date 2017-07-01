@@ -11,7 +11,7 @@ The project’s management is inspired by \textit{Scrum}  \cite{scrum}, an agile
 However, the applied process during this project is only loosely based on the Scrum framework since there are several concepts of the original framework that were not applied. Scrum defines roles which describes the different members of a group (\textit{Scrum Master}, \textit{Project Owner} and \textit{Development Team}) as well as several artefacts organizing the team’s interaction. Due to the nature of the project not having a development team in the proper meaning of the word, but only a single person realizing the bachelor thesis, only some artefacts were applied. The most important applied concept is the \textit{Sprint}, a two-week time slot which is used to structure the project. At the beginning of each sprint, a \textit{Sprint Planning} is realized between the author and the coordinator of project. The project’s coordinator can be seen as a Product Owner in the Scrum framework, prioritizing tasks and guiding the project’s direction. In the Sprint Planning, it is decided which tasks are going to be worked at during the two-week sprint. At the end of each sprint, a \textit{Sprint Review} takes place where the development team, meaning the student, presents its results to the Product Owner.
 
 \subsection{Managing the project in GitHub}
-In order to facilitate the project’s management, the online project hosting tool \textit{GitHub} with \textit{ZenHub} as an extension was used. ZenHub provides several useful collaboration features such as a board to visualize tasks as well as an overview of the remaining workload and velocity. The tasks are defined in GitHub’s \textit{Issues} where tasks can be named, described and estimated. Story Points are used to estimate the workload of each issue. In this project, one story point is seen as the equivalent of 2 - 3 hours of work. The iterations are planned and defined using \textit{Milestones} which the different issues are assigned to.
+In order to facilitate the project’s management, the online project hosting tool \textit{GitHub} \cite{github:about} with \textit{ZenHub} as an extension was used. ZenHub provides several useful collaboration features such as a board to visualize tasks as well as an overview of the remaining workload and velocity \cite{zenhub}. The tasks are defined in GitHub’s \textit{Issues} where tasks can be named, described and estimated. Story Points are used to estimate the workload of each issue. In this project, one story point is seen as the equivalent of 2 - 3 hours of work. The sprints are planned and defined using \textit{Milestones} to which the different issues are assigned.
 	
 
 \section{Time Planning}
@@ -84,7 +84,8 @@ As the developer is a German citizen, German tax law is applied in the following
 In the following, the costs of the services used in the project are examined.
 
 \tablaSmall{Software Costs}{p{3cm} p{1.5cm} p{6cm}}{softwarecosts}
-{ \multicolumn{1}{l}{ } Software & Costs & Comments\\}{ 
+{ \multicolumn{1}{l}{ } Software & Costs & Comments\\}{
+Ubuntu 16.04.2 LTS & 0,00 € & - \\ 
 OpenStreetMap & 0,00 € & - \\
 API.AI & 0,00 € &  According to the API.AI terms of use, “services include basic services (“Basic Services”) provided free of charge and enhanced services (“Enhanced Services”), which, if available, must be purchased.” \cite{apiai:terms}
 However, at the time of development, no fees or potential upgrades were evident. \\
@@ -135,12 +136,16 @@ Due to the fact that the chatbot is publicly accessible in an instant-messenger,
 
 A more interesting concept is to win tourist agencies, cultural institutions or restaurant owners as investors. The chatbot can be seen as an advertisement platform for those who want to promote their offers to tourists which in fact are a very promising target group as people tend to spend a lot of money on vacation.
 
-Essentially, the idea is to present points of interest that belong to a customer in a more prominent, attractive way to the user. This could happen, for example, when a user asks for a recommendation and is situated in close proximity to a promoted point of interest. The presentation of the promoted point of interest could differ from the usual, non-promoted locations, in a way that more precise descriptions or more photos of the location are provided than usual. Additionally, the points of interests could be highlighted visually, for example by applying different font sizes or colors for the messages. 
+Essentially, the idea is to present points of interest that belong to a customer in a more prominent, attractive way to the potential client. This could happen, for example, when a user asks for a recommendation and is situated in close proximity to a promoted point of interest. The presentation of the promoted point of interest could differ from the usual, non-promoted locations, in a way that more precise descriptions or more photos of the location are provided than usual. Additionally, the points of interests could be highlighted visually, for example by applying different font sizes or colors for the messages. 
 
 In return for this service, a monthly payment of the local investors would be conceivable. 
 This way of promoting points of interests is quite interesting for the local tourist industry as the chatbot collects user interests for the recommendation, therefore, the marketers are provided with a direct way to target exactly the user group they are interested in.
 
+If we charged a customer a fee of 10€/month to be presented in the chatbot, then we would need 42 customers  to achieve the return of investment of 5040 €. Considering the large number of restaurant proprietors and tourist agencies in a city of touristic relevance, this could be seen as a realistic aim.
+
 However, it must be noted that the commercial use of the application leads to a possible upgrade of pricing plans, for instance using the Foursquare API.
+
+
 
 \subsection{Legal Viability}
 The following legal viability concentrates on the third-party software licenses used in the project and in turn, an analysis of which license can be applied for the developed application. The table \ref{tabla:softwarelicenses} contains an overview of the used services and their licenses.
