@@ -60,7 +60,7 @@ public class ImageRequester extends ServiceRequester {
 		parameters.put("radius", String.valueOf(100));
 		parameters.put("intent", "match");
 		String query = buildQuery("https://api.foursquare.com/v2/venues/search", parameters);
-		JsonObject jsonObject = sendQuery("", "", query).getAsJsonObject();
+		JsonObject jsonObject = sendQuery("", "", query);
 		JsonArray venues = jsonObject.get("response").getAsJsonObject().get("venues").getAsJsonArray();
 		String id = "";
 		if(venues.size() > 0){
@@ -87,7 +87,7 @@ public class ImageRequester extends ServiceRequester {
 		parameters.put("client_secret", clientSecret);
 		String photos = "https://api.foursquare.com/v2/venues/"+id+"/photos";
 		String query = buildQuery(photos, parameters);
-		JsonObject jsonObject = sendQuery("","",query).getAsJsonObject();
+		JsonObject jsonObject = sendQuery("","",query);
 		JsonArray items = jsonObject.get("response").getAsJsonObject().get("photos").getAsJsonObject().get("items").getAsJsonArray();
 		if(items.size() > 0){
 			JsonObject item = items.get(0).getAsJsonObject();

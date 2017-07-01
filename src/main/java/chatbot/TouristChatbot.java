@@ -101,7 +101,8 @@ public class TouristChatbot {
 	 * creates one or multiple chatbot responses.
 	 * 
 	 * @param userId
-	 * @param userInput the user message or location attachment
+	 * @param userInput
+	 *            the user message or location attachment
 	 * @return chatbot responses
 	 */
 	public List<ChatbotResponse> processInput(long userId, Object userInput) {
@@ -109,11 +110,8 @@ public class TouristChatbot {
 		User user = getUserFromId(userId);
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		AgentResponse agentResponse;
-//		if(!isLocation){
-		 agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
-//		}else{
-//		agentResponse = agentHandler.sendEvent(event, sessionId, resetContext)	
-//		}
+
+		agentResponse = agentHandler.sendUserInput(userInput.toString(), user.getId());
 
 		if (agentResponse != null) {
 			chatbotResponses = processAction(userInput, user, agentResponse);
@@ -248,7 +246,7 @@ public class TouristChatbot {
 				}
 			}
 		}
-		
+
 		chatbotResponses.addAll(getRecommendation(user, interest));
 		return chatbotResponses;
 	}

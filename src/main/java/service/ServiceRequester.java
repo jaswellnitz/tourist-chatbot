@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -48,7 +47,7 @@ public abstract class ServiceRequester {
 	 * @param url 
 	 * @return the JSON response
 	 */
-	protected JsonElement sendQuery(String header, String headerValue, String url) {
+	protected JsonObject sendQuery(String header, String headerValue, String url) {
 		Request request;
 		if (header.isEmpty() || headerValue.isEmpty()) {
 			request = new Request.Builder().url(url).build();
@@ -62,9 +61,9 @@ public abstract class ServiceRequester {
 		} catch (Exception e) {
 			logger.error(e);
 		}
-		JsonElement jsonObject = null;
+		JsonObject jsonObject = null;
 		if(jsonResponse != null){
-			jsonObject = new JsonParser().parse(jsonResponse);
+			jsonObject = new JsonParser().parse(jsonResponse).getAsJsonObject();
 		}
 		return jsonObject;
 	}

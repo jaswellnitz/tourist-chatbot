@@ -54,7 +54,6 @@ public class TelegramBotHandler implements Route {
 	public Object handle(Request request, Response response) {
 		Update update = BotUtils.parseUpdate(request.body());
 		Message message = update.message();
-
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		SendMessage sendMessage;
 		if (isStartMessage(message)) {
