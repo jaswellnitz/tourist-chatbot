@@ -4,21 +4,58 @@
 This section contains the technical programming documentation, describing the directory structure of the presented CD, an installation guide as well as a documentation of the realized tests to measure the code quality.
 
 \section{Directory Structure}
-This report is handed in along with a CD containing the essential data to examine the application in more depth. The presented CD contains the following directories:
+This report is handed in along with a DVD containing the essential data to examine the application in more depth. The presented DVD contains the following directories:
 \begin{description}
-\item[Documentation] 
-Contains the project’s documentation, saved as both .pdf and .doc format.
-\item[Software] 
-Contains the executables of the tools needed to run the virtual machine. 
 \item[Application] 
 Contains all essential data of the developed software, subdivided in the following directories:
 \begin{description}
-\item[Virtual Machine] The virtual machine image containing the infrastructure that was set up in the course of the project
-\item[Source Code] The source code of the application
-\item[Javadoc] The source code’s documentation in Javadoc format.
-\item[Agent] Contains the exported api.ai agent as .zip
-\item[Data] Contains the raw geographic data and dumps of the initial database 
+\item[Agent] Contains the exported API.AI agent as .zip
+\item[Code] The source code of the application
+\item[Javadoc] The source code’s documentation in Javadoc 
+\item[VM] The virtual machine image containing the infrastructure that was set up in the course of the project
 \end{description}
+\item[Data] Contains the raw geographic data and dumps of the initial database 
+\begin{description}
+\item[Analysis] Contains the Python script to generate user ratings from a TripAdvisor data set 
+\end{description}
+\item[Documentation] 
+Contains the project’s documentation, saved as .pdf format.
+\item[Tools] 
+Contains the executables of the tools needed to run the virtual machine. 
+format.
+\end{description}
+
+\subsection{Source Folder Overview} \label{ss:sfo}
+The application’s source folder follows the traditional maven project structure.
+\begin{description}
+\item[src] Source Code
+\begin{description}
+\item[java] Main Contains the application’s Java code, subdivided in the six packages chatbot, dataAccess, domain, messenger, recommender and service
+\item[resources]  Contains user ratings that were generated previously, saved as .csv files. They are not required for the application's correct execution.
+\begin{description}
+\item[util] Contains the RatingsGenerator. Not included in the main folder as it is a separate program that is not required for the main application’s execution
+\end{description}
+\end{description}
+\item[test] Test Code Contains the project's unit tests
+\begin{description}
+\item[chatbot] Contains, amongst others, the class TouristChatbotTest.java which contains JUnit tests that cover a system-wide functionality
+\item[service] Tests covering the service package classes
+\item[recommender] Contains unit tests concerning the recommender as well as the recommender evaluation seen in \ref{ss:re}
+\item[dataAccess] Tests the database access, using the local PostgreSQL database in the VM
+\end{description}
+\end{description}
+
+\section{APIs, Libraries and Frameworks}
+Some of the used tools and technologies were already examined in the previous documentation due to their importance to the project. For the sake of completeness and overview, the following listing shows all APIs, libraries and frameworks used in the project. 
+\begin{description}
+\item[\hyperlink{http://mahout.apache.org/}{Apache Mahout}] The Java library is used to compute recommendations
+\item[\hyperlink{https://api.ai/docs/reference/agent/query}{API.AI API}] The modeled NLU agent is accessed using the REST-like HTTP API
+\item[\hyperlink{https://developer.foursquare.com/}{Foursquare API}]The API is used to access the Foursquare database and, more precisely, to retrieve image URLs
+\item[\hyperlink{https://spark.apache.org/}{Spark}] A micro framework to create Java web applications 
+\item[\hyperlink{https://github.com/pengrad/java-telegram-bot-api}{Telegram Bot API}] Provides a Java API for Telegram Bot API 3.0 methods
+\item[\hyperlink{http://square.github.io/okhttp/}{Okhttp}] Provides an HTTP client for Java applications; used to access the Foursquare and API.AI HTTP API 
+\item[\hyperlink{https://github.com/google/gson}{Google GSON}] A Java library used to deserialize JSON into Java Objects
+\item[\hyperlink{https://github.com/jhalterman/expiringmap}{ExpiringMap}] Provides a Java map that expires entries; used to realize a lightweight cache that remembers currently active users that interact with the chatbot
 \end{description}
 
 \section{Developer Manual}
@@ -95,10 +132,10 @@ To access the conversational interface, the messenger Telegram as well as our na
 \imagen{Botfather}{ The \textit{Botfather} is used to create the Telegram Bot}
 After choosing a name and a username, the BotFather provides you with the authorization token for your bot. This authorization token is needed to access the Telegram bot from our web service. To do so, the token is saved as an environment variable (see \nameref{sssec:sev}). After saving the token, the web service is able to receive updates from and send messages to the Telegram bot via a webhook. 
 
-\subsubsection{api.ai agent}
-In order to use the NLU platform api.ai, we need to set up an \hyperlink{https://console.api.ai/api-client/}{account}. After doing so, the api.ai agent modeling interface can be accessed. First, we need to create a new agent and enter an agent name. 
-\imagen{apiai}{api.ai agent creation interface}
-If the creation is successful, the entered agent name will appear on the left sidebar. In order to access the agent from our web service, api.ai’s HTTP API is used. Therefore, the agent’s API key is needed which can be accessed by clicking on the gear icon right to the agent name. The client access token is be copied and, again, introduced into the system environment variables (see \nameref{sssec:sev}).
+\subsubsection{API.AI agent}
+In order to use the NLU platform API.AI, we need to set up an \hyperlink{https://console.api.ai/api-client/}{account}. After doing so, the API.AI agent modeling interface can be accessed. First, we need to create a new agent and enter an agent name. 
+\imagen{apiai}{API.AI agent creation interface}
+If the creation is successful, the entered agent name will appear on the left sidebar. In order to access the agent from our web service, API.AI’s HTTP API is used. Therefore, the agent’s API key is needed which can be accessed by clicking on the gear icon right to the agent name. The client access token is be copied and, again, introduced into the system environment variables (see \nameref{sssec:sev}).
 
 To restore the agent created in the course of this project, a.zip file containing the modeled agent can be found in the project’s documents (Application/Agent). By clicking on the already mentioned gear icon right to the agent name, a subtab called “Export and Import” provides the possibility to import the agent from zip.
 
@@ -190,7 +227,7 @@ This command’s execution is repeated for all of the above mentioned tokens wit
 The project is developed using Eclipse Neon as an IDE. The 64-bit installer can be downloaded from \hyperlink{https://www.eclipse.org/downloads/}{Eclipse}'s website. 
 After installing Maven and Eclipse, start Eclipse in order to import the source code. This can be easily done by importing a Maven project, executing \textit{File $\,\to\,$ Import $\,\to\,$ Existing Maven Projects} and then choosing the project's source folder.
  
-The project’s source code can now be accessed and modified using Eclipse. Additionally, Eclipse is used to run the Junit tests for this project.
+The project’s source code can now be accessed and modified using Eclipse. Additionally, Eclipse can be used to run the Junit tests for this project.
 
 \section{Program Compilation, Installation and Execution}
 The presented application was designed for online usage and is deployed to the Platform as a Service Heroku.  Therefore, no further compilation, installation or execution steps are needed as this is managed by the PaaS. Changes to the previous source code are published by using the Git workflow, meaning to commit the changes and then push them to Heroku using the command:
@@ -198,14 +235,22 @@ The presented application was designed for online usage and is deployed to the P
 git push heroku master
 \end{lstlisting}
 
+In order to use Heroku, it is required to use Apache Maven as a build-management tool \cite{maven}. Maven is used to declare dependencies, compile the source code and run tests. The configuration file pom.xml (Project Object Model) defines the Maven project and is also included in the project’s documentation. To run all of the project’s tests, the following command can be used from the Maven project folder:
+
+\begin{lstlisting}
+mvn test
+\end{lstlisting}
+
+However, it must be noted that the tests also cover the database connection and access of external APIs, so the tests need to be executed in a development environment (e.g. by using the provided virtual machine) with a current Internet connection.
+
 \section{Tests}
 Tests were made during this project to ensure the project’s quality. For this reason, several measures were taken to concentrate on different aspects of quality assurance. 
 
 \subsection{Automation Testing using JUnit}
-Java’s unit testing framework JUnit is used to design automated tests. Using JUnit, the test-driven development paradigm was applied in this project to ensure the code’s correctness constantly during development. The tests can be found in the project folder tree navigating to \textit{src/test/java}. The folder is subdivided into the packages \textit{bot, dataAccess, poiRecommendation} which match the main components in the project. In this project, two different kinds of tests were designed:
+Java’s unit testing framework JUnit is used to design automated tests. Using JUnit, the test-driven development paradigm was applied in this project to ensure the code’s correctness constantly during development. The tests can be found in the source folder tree navigating to \textit{src/test/java}. The folder is subdivided into the packages seen in \ref{ss:sfo} which match the main components in the project. In this project, two different kinds of tests were designed:
 \begin{description}
 \item[Unit tests] that concentrate on ensuring the proper functioning of the code on a class level. 
-\item[Integration tests] covering the essential use cases of the chatbot (including all of the system’s relevant components and therefore demonstrating the proper interaction of the components). These integration tests can be found in the JUnit test class \textit{src/test/java/bot/TouristChatbotTest}
+\item[Integration tests] covering the essential use cases of the chatbot (including all of the system’s relevant components and therefore demonstrating the proper interaction of the components). These integration tests can be found in the JUnit test class \textit{src/test/java/chatbot/TouristChatbotTest}
 \end{description}
 
 The code coverage tool \href{http://www.eclemma.org/}{EclEmma} is used to show how much of the source code is actually tested by the JUnit tests. EclEmma is integrated into the IDE Eclipse. The following results are obtained by executing all of the project’s JUnit tests:
@@ -214,8 +259,8 @@ The code coverage tool \href{http://www.eclemma.org/}{EclEmma} is used to show h
 
 As we can see, 80 \% of the productive source code is tested. The test coverage mainly centers on the proper functioning of the service classes of the chatbot, meaning the classes that provide important functionalities and are error prune due to their complex structure. On the other hand, model classes are not as extensively tested as most of them follow a simple design, providing only getter, setter and field-based equals implementations. Furthermore, classes using code from external libraries are not a focus of the tests as it is assumed that their proper functioning is ensured by the developers of the respective libraries (e.g. hooking the application to the Telegram bot by using a third party Telegram library). 
 
-\subsection{Recommender Evaluation}
-To ensure that the computed recommendations of the chatbot are actually adjusted the users’ preferences, an evaluation is made using the \textit{Mahout} framework. The evaluation is limited to the user-based part of the recommender which is based on user ratings. The reason for this is that the content-based mechanism is used as a fallback that provides recommendation when the user data is too sparse for the user-based recommender to perform properly. In fact, the content-based mechanism is not really a recommender but rather a similarity measure. The proper functioning of this mechanism is tested using unit tests (see the JUnit test class \textit{RecommenderTest}).
+\subsection{Recommender Evaluation} \label{ss:re}
+To ensure that the computed recommendations of the chatbot are actually adjusted the users’ preferences, an evaluation is made using the \textit{Mahout} framework. The evaluation is limited to the user-based part of the recommender which is based on user ratings. The reason for this is that the content-based mechanism is used as a fallback that provides recommendation when the user data is too sparse for the user-based recommender to perform properly. In fact, the content-based inspired approach used in this project is not a recommender in the traditional sense but rather a similarity measure. The proper functioning of this mechanism is tested using unit tests (see the JUnit test class \textit{RecommenderTest}).
 
 The actual recommender evaluation can be found in \textit{src/test/java/poiRecommendation/RecommenderEvaluation}. Mahout’s \textit{RecommenderIRStatsEvaluator} is used which splits the available user data automatically into training and test sets. To evaluate the recommender performance, information retrieval metrics are computed. More precisely, the metrics precision and recall are examined as well as the F-Measure which is a harmonic mean of the other mentioned metrics \cite{rijsbergen79}.
 
