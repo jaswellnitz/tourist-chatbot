@@ -12,7 +12,7 @@ The application’s source code is divided into six packages, which also reflect
 A description of the packages containing the application’s classes is provided in the following sections. For reasons of clarity and comprehensibility, the classes are not shown in a single diagram but are split into several class diagrams based on their respective package.
 
 \subsection{Messenger}
-The messenger is the application’s entry point. The web service is set up in \textit{Main} and all of the system’s components are initialized using dependency injection. The \textit{TelegramBotHandler} encapsulates the connection to Telegram, receives messages from the messenger and forwards it to the  \textit{TouristChatbot}. It sends messages back to the messenger and triggers the modification of the messenger’s appearance if needed. To do so, a Telegram Bot API \cite{telegrambotapi} is used.
+The messenger is the application’s entry point. The web service is set up in \textit{Main} and all of the system’s components are initialized using dependency injection. The \textit{TelegramBotHandler} encapsulates the connection to Telegram, receives messages from the messenger and forwards it to the  \textit{TouristChatbot}. It sends messages back to the messenger and triggers the modification of the messenger’s keyboard buttons if needed. To do so, a Telegram Bot API \cite{telegrambotapi} is used.
 
 \imagen{messenger}{Messenger Package}
 
@@ -68,7 +68,7 @@ A main focus of the architecture design was the interchangeability of components
 The followings section serves to show the main flow of events and usage of components in the application. 
 
 \subsection{Flow of Events}
-The principal message flow is shown in sequence diagram \ref{fig:messageflow}. It includes all objects that are involved in forwarding and processing user input. This flow is always the same for any user input. As already explained previously, the input is received from the \textit{TelegramBotHandler} and forwarded to API.AI which filters the meaning of the user input. This process is based on the agent model that was implemented in API.AI in which intents and concepts were defined. The response from the NLU platform is parsed from JSON to Java and stored in an object of the class \textit{AgentResponse}. Based on this AgentResponse, the \textit{TouristChatbot} decides which action needs to be taken and processes the action accordingly. The calculated answer is transmitted back to the messenger. 
+The principal message flow is shown in sequence diagram \ref{fig:messageflow}. It includes all objects that are involved in forwarding and processing user input. This flow is always the same for any user input. As explained previously, the input is received from the \textit{TelegramBotHandler} and forwarded to API.AI which filters the meaning of the user input. This process is based on the agent model that was implemented in API.AI in which intents and concepts were defined. The response from the NLU platform is parsed from JSON to Java and stored in an object of the class \textit{AgentResponse}. Based on this AgentResponse, the \textit{TouristChatbot} decides which action needs to be taken and processes the action accordingly. The calculated answer is transmitted back to the messenger. 
 
 \imagen{messageflow}{Message Flow Sequence Diagram}
 
@@ -85,12 +85,9 @@ In total, three points of interest are retrieved for the user, all of them situa
 
 In order to apply the content-based mechanism, some of Mahout’s functionalities were overridden to fit the project’s needs: The classes \textit{ProfileSimilarity} and \textit{POIDataModel} are created that are derived from Mahout interfaces. The \textit{POIDataModel} is used to formalize the relevant data for the recommender, including both the user and all points of interest in the specified recommendation radius. More precisely, the \textit{POIDataModel} introduces \textit{ProfileItems} into the recommender. The \textit{ProfileItem} interface is created to standardize objects that contain a \textit{POIProfile}. The \textit{POIProfile} defines the preference to the tourist categories. The classes \textit{User} and \textit{RecommendedPointOfInterest} both implement the interface as they either show interest in the tourist categories or are characterized by the profile. 
 The similarity measure made to compute the points of interest most similar to the user’s preferences is specified in the class \textit{ProfileSimilarity}. In this class, the user interests are compared with the properties of the points of interest based on their \textit{POIProfile}.
- 
-Additionally to the general recommendation, the user is able to trigger a category specific recommendation. When the category specific recommendation is used, only recommendations are returned that match the given interest, e.g. sightseeing.
-
 
 \subsection{Conversation Flow Design}
-In order to visualize the conversation flow, a graph was designed defining the chatbot-user interactions based on the application’s use cases. In the following, the general conversation graph is shown as well as the subgraphs defining the interface’s main features. According to this conversation flow, corresponding intents and contexts were modeled in API.AI.
+In order to visualize the conversation flow, a graph was designed defining the chatbot-user interactions based on the application’s use cases. In the following, the general conversation graph is shown as well as the subgraphs defining the interface’s main features, following an example shown in the API.AI documentation \cite{apiai:conversationflow}. According to this conversation flow, corresponding intents and contexts were modeled in API.AI.
 
 \convograph{conversationflow}{The basic conversation flow}
 
@@ -102,4 +99,8 @@ In order to visualize the conversation flow, a graph was designed defining the c
 
 
 \subsubsection{API.AI Agent}
-Based on these graphs, intents and contexts were designed in API.AI. The user input is categorized in intents which loosely match the basic use cases. Every time the user chooses between multiple possible answers, a context is set to ensure an appropriate follow-up reaction. The majority of intents trigger actions that are defined in the agent. After parsing the user input with API.AI, the Java web application performs functionalities based on those actions, such as information storage in the database or a recommendation. For further examination, the agent model can be found in the delivered data and introduced into the API.AI (see Technical Programming Documentation).
+Based on these graphs, intents and contexts were designed in API.AI. The user input is categorized in intents which loosely match the basic use cases.
+
+\screenshot{intents.png}{The API.AI agent's intents}
+
+Every time the user chooses between multiple possible answers, a context is set to ensure an appropriate follow-up reaction. An example of how the contexts are set is shown in the previous conversation graphs. The majority of intents trigger actions that are defined in the agent. After parsing the user input with API.AI, the Java web application performs functionalities based on those actions, such as information storage in the database or a recommendation. For further examination, the agent model can be found in a .zip file in the presented DVD under Application$\,\to\,$Agent and introduced into the API.AI console (see Annex D - Technical Programming Documentation).
