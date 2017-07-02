@@ -149,21 +149,20 @@ public class POIProfile implements Serializable {
 	}
 
 	/**
-	 * Converts the POIProfile into a list of interests
-	 * 
-	 * @return list of interests
+	 * Converts the POIProfile into a list of interests that match the given preference
+	 * @param pref
+	 * @return list of interests or dislikes, depending on the given preference
 	 */
-	public List<String> getInterestsFromProfile() {
+	public List<String> getInterestsFromProfile(Preference pref) {
 		List<String> interests = new ArrayList<>();
 		for(Map.Entry<TouristCategory, Preference> cat: categories.entrySet()){
-			if (cat.getValue().toBoolean()){
+			if (cat.getValue() == pref){
 				interests.add(cat.getKey().name().toLowerCase());
 			}
 			
 		}
 		return interests;
 	}
-
 	
 	/**
 	 * Changes the profile for the given categories

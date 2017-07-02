@@ -570,7 +570,8 @@ public class TouristChatbot {
 	private ChatbotResponse getPersonalInformation(User user) {
 		String answer = "So, here's what I know about you: Your current recommendation radius is "
 				+ user.getPrefRecommendationRadius() + " m.";
-		List<String> interests = user.getProfile().getInterestsFromProfile();
+		List<String> interests = user.getProfile().getInterestsFromProfile(Preference.TRUE);
+		List<String> dislikes = user.getProfile().getInterestsFromProfile(Preference.FALSE);
 
 		if (!interests.isEmpty()) {
 			String interestString = "";
@@ -579,8 +580,15 @@ public class TouristChatbot {
 			}
 			interestString = interestString.substring(0, interestString.length() - 2);
 			answer += "\n\nYou are interested in: " + interestString + ".";
-			
-			// TODO, not interested in
+		}
+		
+		if (!dislikes.isEmpty()) {
+			String dislikeString = "";
+			for (String dislike : dislikes) {
+				dislikeString += dislike + ", ";
+			}
+			dislikeString = dislikeString.substring(0, dislikeString.length() - 2);
+			answer += "\n\nYou don't like: " + dislikeString + ".";
 		}
 
 		return new ChatbotResponse(answer);

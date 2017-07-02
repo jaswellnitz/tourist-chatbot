@@ -3,6 +3,7 @@ package domain;
 import java.util.List;
 
 import recommender.POIProfile;
+import recommender.Preference;
 import recommender.ProfileItem;
 
 /**
@@ -164,7 +165,7 @@ public class RecommendedPointOfInterest implements ProfileItem {
 			ret += "\nyour computed preference value: " + recommendationValue + ", ";
 		}
 
-		List<String> interestsFromProfile = profile.getInterestsFromProfile();
+		List<String> interestsFromProfile = profile.getInterestsFromProfile(Preference.TRUE);
 		if(!interestsFromProfile.isEmpty()){
 			ret += "\ncategory - ";
 			for(String interest: interestsFromProfile){
