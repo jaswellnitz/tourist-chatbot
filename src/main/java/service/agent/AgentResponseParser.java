@@ -41,13 +41,16 @@ public class AgentResponseParser {
 
 	private static int parseDistance(JsonElement value) {
 		JsonObject jsonObject = value.getAsJsonObject();
-		double amount = jsonObject.get("amount").getAsDouble();
+		int amount = (int) jsonObject.get("amount").getAsDouble();
 		String unit = jsonObject.get("unit").getAsString();
 		if (unit.equals("km")) {
 			amount *= 1000;
 		} else if (unit.equals("m")) {
 			amount *= 1;
 		} else {
+			amount = -1;
+		}
+		if(amount < 0 ){
 			amount = -1;
 		}
 		return (int) amount;
