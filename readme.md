@@ -1,12 +1,13 @@
-# TFG - Development of a chatbot for tourist recommendations 
+# TFG - Development of a chatbot for tourist recommendations  
 
 Author: Jasmin Wellnitz  
 Tutor: Bruno Baruque Zanón  
 Department: Ingeniería Civil, Área de Lenguajes y Sistemas Informáticos  
 Universidad de Burgos  
------
-#### Telegram Chatbot: @touristrecommenderbot
------
+
+----
+ Telegram Chatbot: @touristrecommenderbot
+----
 ## Description
 
 This project deals with the development of a chatbot application that
