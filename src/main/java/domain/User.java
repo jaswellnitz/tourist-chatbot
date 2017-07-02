@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import recommender.POIProfile;
+import recommender.Preference;
 import recommender.ProfileItem;
 
 /**
@@ -75,10 +76,6 @@ public class User implements ProfileItem {
 	public POIProfile getProfile() {
 		return profile;
 	}
-	
-	public boolean addToProfile(String... interests){
-		return profile.addToProfile(interests);
-	}
 
 	/**
 	 * Sets the user's POIProfile and therefore defines his interests
@@ -87,6 +84,17 @@ public class User implements ProfileItem {
 	public void setProfile(POIProfile profile) {
 		assert profile != null : "Precondition failed: profile != null";
 		this.profile = profile;
+	}
+	
+
+	/**
+	 * Changes the profile for the user.
+	 * @param pref the new preference value
+	 * @param interests the tourist categories to be updated
+	 * @return indicates whether action was successful
+	 */
+	public boolean changeProfile(Preference pref, String...interests) {
+		return profile.changeProfilePreference(pref, interests);
 	}
 
 	/**

@@ -14,6 +14,7 @@ import domain.User;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import recommender.POIProfile;
+import recommender.Preference;
 import recommender.Recommender;
 import recommender.TouristCategory;
 import service.ImageRequester;
@@ -139,8 +140,10 @@ public class TouristChatbot {
 			chatbotResponses.add(getAboutText(user.getPrefRecommendationRadius()));
 			break;
 		case SAVE_INTEREST:
-			chatbotResponses.add(handleSaveInterest(user, agentResponse));
+			chatbotResponses.add(handleSavePreferences(user, agentResponse, "interview", Preference.TRUE));
 			break;
+		case SAVE_DISLIKE:
+			chatbotResponses.add(handleSavePreferences(user, agentResponse, "dislike", Preference.FALSE));
 		case SHOW_INFORMATION:
 			chatbotResponses.add(getPersonalInformation(user));
 			break;
@@ -194,8 +197,7 @@ public class TouristChatbot {
 		if (successful) {
 			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
 		} else {
-			chatbotResponse = new ChatbotResponse(
-					"Sorry, the rating could not be saved, please try again later.");
+			chatbotResponse = new ChatbotResponse("Sorry, the rating could not be saved, please try again later.");
 		}
 		chatbotResponses.add(chatbotResponse);
 		return chatbotResponses;
@@ -283,8 +285,8 @@ public class TouristChatbot {
 	 * @param agentResponse
 	 * @return the chatbot response
 	 */
-	private ChatbotResponse handleSaveInterest(User user, AgentResponse agentResponse) {
-		boolean successful = saveInterests(user, agentResponse);
+	private ChatbotResponse handleSavePreferences(User user, AgentResponse agentResponse, String contextName, Preference pref) {
+		boolean successful = changeInterests(user, agentResponse, contextName, pref);
 		ChatbotResponse chatbotResponse;
 		if (successful) {
 			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
@@ -298,25 +300,31 @@ public class TouristChatbot {
 
 	/**
 	 * Filters the user interests from the agent response and saves them.
-	 * 
 	 * @param user
 	 * @param response
+	 * @param contextName
+	 * @param pref
 	 * @return indicates whether the method was successful
 	 */
-	private boolean saveInterests(User user, AgentResponse response) {
+	private boolean changeInterests(User user, AgentResponse response, String contextName, Preference pref) {
 		for (Context context : response.getContexts()) {
-			if (context.getName().equals("interview")) {
-				@SuppressWarnings("unchecked")
-				List<String> interests = (List<String>) context.getParameters().get(Parameter.INTEREST.name());
-				POIProfile profile = user.getProfile();
-				if(user.addToProfile(interests.toArray(new String[interests.size()]))){
-					if(userDB.changeProfileForUser(user.getId(), user.getProfile())){
-						return true;
-					}else{
-						// reset changes
-						user.setProfile(profile);
-					}
-				}
+			if (context.getName().equals(contextName)) {
+				return changeProfile(user, context, pref);
+			}
+		}
+		return false;
+	}
+	
+	private boolean changeProfile(User user, Context context, Preference pref) {
+		@SuppressWarnings("unchecked")
+		List<String> interests = (List<String>) context.getParameters().get(Parameter.INTEREST.name());
+		POIProfile profile = user.getProfile();
+		if (user.changeProfile(pref, interests.toArray(new String[interests.size()]))) {
+			if (userDB.changeProfileForUser(user.getId(), user.getProfile())) {
+				return true;
+			} else {
+				// reset changes
+				user.setProfile(profile);
 			}
 		}
 		return false;
@@ -382,6 +390,9 @@ public class TouristChatbot {
 		if (!user.getUnratedPOIs().isEmpty()) {
 			ChatbotResponse rate = createRatePrompt(user, 0);
 			responses.add(rate);
+		}else{
+			// TODO check
+			agentHandler.resetContext(user.getId());
 		}
 		return responses;
 	}

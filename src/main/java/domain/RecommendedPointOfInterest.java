@@ -151,22 +151,22 @@ public class RecommendedPointOfInterest implements ProfileItem {
 	public String getFormattedString(boolean showDistance){
 		String ret = name+ ": ";
 		if(showDistance && distanceToUser != -1){
-			ret+="distance to your current location " + distanceToUser + " m, ";
+			ret+="\ndistance to you -" + distanceToUser + " m, ";
 		}
 		if(!address.isEmpty()){
-			ret += address + ", ";
+			ret += "\n"+address + ", ";
 		}
 		
 		if(!openingHours.isEmpty()){
-			ret += openingHours +", ";
+			ret += "\n"+openingHours +", ";
 		}
 		if(recommendationValue > 0.1){
-			ret += "your computed preference value: " + recommendationValue + ", ";
+			ret += "\nyour computed preference value: " + recommendationValue + ", ";
 		}
 
 		List<String> interestsFromProfile = profile.getInterestsFromProfile();
 		if(!interestsFromProfile.isEmpty()){
-			ret += "category - ";
+			ret += "\ncategory - ";
 			for(String interest: interestsFromProfile){
 				ret += interest + ", ";
 			}

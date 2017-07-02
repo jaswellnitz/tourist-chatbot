@@ -140,7 +140,7 @@ public class POIProfile implements Serializable {
 	 */
 	public static POIProfile getProfileForCategory(TouristCategory category) {
 		POIProfile poiProfile = new POIProfile();
-		poiProfile.addToProfile(category.name());
+		poiProfile.changeProfilePreference(Preference.TRUE,category.name());
 		return poiProfile;
 	}
 	
@@ -164,26 +164,14 @@ public class POIProfile implements Serializable {
 		return interests;
 	}
 
-	/**
-	 * Adds interests to the existing POIProfile
-	 * @param interests
-	 * @return indicates whether the action was successful
-	 */
-	public boolean addToProfile(String...interests) {
-		return changeProfilePreference(Preference.TRUE, interests);
-	}
 	
-
 	/**
-	 * Deletes interests from the existing POIProfile
-	 * @param dislikes
-	 * @return indicates whether the action was successfull
+	 * Changes the profile for the given categories
+	 * @param newPreference the new preference values
+	 * @param catStrings
+	 * @return indicates whether action was successful
 	 */
-	public boolean deleteFromProfile(String... dislikes) {
-		return changeProfilePreference(Preference.FALSE, dislikes);
-	}
-	
-	private boolean changeProfilePreference(Preference newPreference, String... catStrings){
+	public boolean changeProfilePreference(Preference newPreference, String... catStrings){
 		Map<TouristCategory, Preference> originalPreferences = new HashMap<>(categories);
 		try {
 			for (String cat : catStrings) {
