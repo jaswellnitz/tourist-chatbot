@@ -1,7 +1,10 @@
+# TFG - Development of a chatbot for tourist recommendations
+
 Telegram Chatbot: @touristrecommenderbot
 
 -----
-Description
+## Description
+
 This project deals with the development of a chatbot application that
 is able to recommend tourist points of interest customized to the user's
 preferences. The chatbot can be accessed using the instant messaging
