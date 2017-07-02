@@ -134,8 +134,7 @@ public class POIProfile implements Serializable {
 	/**
 	 * Creates a POIProfile with the given category.
 	 * 
-	 * @param categoryIndex
-	 *            index that indicates the tourist category
+	 * @param category tourist category
 	 * @return POIProfile
 	 */
 	public static POIProfile getProfileForCategory(TouristCategory category) {
