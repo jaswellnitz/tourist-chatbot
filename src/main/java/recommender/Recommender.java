@@ -54,16 +54,16 @@ public class Recommender {
 	 * @param categoryIndex index that specifies the tourist category
 	 * @return Recommended points of interest
 	 */
-	public List<RecommendedPointOfInterest> recommendForCategory(User user, int categoryIndex) {
+	public List<RecommendedPointOfInterest> recommendForCategory(User user, TouristCategory touristCategory) {
 		POIProfile originalProfile = user.getProfile();
-		POIProfile categoryProfile = POIProfile.getProfileForCategoryIndex(categoryIndex);
+		POIProfile categoryProfile = POIProfile.getProfileForCategory(touristCategory);
 		user.setProfile(categoryProfile);
 		List<RecommendedPointOfInterest> recommendations = new ArrayList<>();
 		
 		if (ratingDB.hasRatingForUser(user.getId())) {
 			recommendations = recommendCollaborative(user);
 			List<RecommendedPointOfInterest> toRemove = filterRecommendationsForCategory(recommendations,
-					categoryIndex);
+					touristCategory);
 			recommendations.removeAll(toRemove);
 		}
 
@@ -133,11 +133,11 @@ public class Recommender {
 	 * @return recommended points of interest
 	 */
 	private List<RecommendedPointOfInterest> filterRecommendationsForCategory(
-			List<RecommendedPointOfInterest> recommendations, int categoryIndex) {
+			List<RecommendedPointOfInterest> recommendations, TouristCategory category) {
 		List<RecommendedPointOfInterest> toRemove = new ArrayList<>();
 		for (RecommendedPointOfInterest recommendedPointOfInterest : recommendations) {
 			POIProfile poi = recommendedPointOfInterest.getProfile();
-			if (poi.getAllCategories().get(categoryIndex) != Preference.TRUE) {
+			if (poi.getPreferenceForCategory(category) != Preference.TRUE) {
 				toRemove.add(recommendedPointOfInterest);
 			}
 		}

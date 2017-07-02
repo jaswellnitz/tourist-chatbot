@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
@@ -134,8 +135,9 @@ public class TouristChatbotTest {
 		user.setPrefRecommendationRadius(300);
 		touristChatbot.getActiveUsers().put(user.getId(), user);
 		String expectedAnswer = "So, here's what I know about you: Your current recommendation radius is 300 m.\n\n"
-				+ "You are interested in: sightseeing, food, nature, shopping.";
-
+				+ "You are interested in:";
+		List<String> categories = Arrays.asList(new String[]{"sightseeing", "food", "nature", "shopping"});
+		
 		// Action
 		List<ChatbotResponse> responses = touristChatbot.processInput(user.getId(), input);
 
@@ -143,7 +145,10 @@ public class TouristChatbotTest {
 		assertFalse(responses.isEmpty());
 		String answer = responses.get(0).getReply();
 		assertFalse(answer.isEmpty());
-		assertEquals(expectedAnswer, answer);
+		assertEquals(expectedAnswer, answer.split(":")[0] + ":" + answer.split(":")[1] +":");
+		for(String cat: categories){
+			assertTrue(answer.contains(cat));
+		}
 	}
 
 	@Test

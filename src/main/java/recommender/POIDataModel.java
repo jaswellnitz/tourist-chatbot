@@ -49,7 +49,7 @@ public class POIDataModel extends AbstractDataModel implements DataModel {
 			POIProfile profile = profileItem.getProfile();
 			long id = profileItem.getId();
 			PreferenceArray newPrefs = new GenericUserPreferenceArray(POIProfile.CATEGORY_COUNT);
-			List<recommender.Preference> categories = profile.getAllCategories();
+			List<recommender.Preference> categories = profile.getPreferenceValues();
 			for (int i = 0; i < categories.size(); i++) {
 					int value = categories.get(i).getValue();
 					newPrefs.setValue(i, value);

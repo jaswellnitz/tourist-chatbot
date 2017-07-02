@@ -75,6 +75,10 @@ public class User implements ProfileItem {
 	public POIProfile getProfile() {
 		return profile;
 	}
+	
+	public boolean addToProfile(String... interests){
+		return profile.addToProfile(interests);
+	}
 
 	/**
 	 * Sets the user's POIProfile and therefore defines his interests

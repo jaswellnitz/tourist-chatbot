@@ -15,6 +15,7 @@ import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import recommender.POIProfile;
 import recommender.Recommender;
+import recommender.TouristCategory;
 import service.ImageRequester;
 import service.agent.AgentHandler;
 import service.agent.AgentResponse;
@@ -307,11 +308,14 @@ public class TouristChatbot {
 			if (context.getName().equals("interview")) {
 				@SuppressWarnings("unchecked")
 				List<String> interests = (List<String>) context.getParameters().get(Parameter.INTEREST.name());
-				POIProfile profile = POIProfile.getProfileForInterests(interests);
-				boolean successful = userDB.changeProfileForUser(user.getId(), profile);
-				if (successful) {
-					user.setProfile(profile);
-					return true;
+				POIProfile profile = user.getProfile();
+				if(user.addToProfile(interests.toArray(new String[interests.size()]))){
+					if(userDB.changeProfileForUser(user.getId(), user.getProfile())){
+						return true;
+					}else{
+						// reset changes
+						user.setProfile(profile);
+					}
 				}
 			}
 		}
@@ -443,7 +447,8 @@ public class TouristChatbot {
 		if (interest.isEmpty()) {
 			recommendations = recommender.recommend(user);
 		} else {
-			recommendations = recommender.recommendForCategory(user, POIProfile.getCategoryIndex(interest));
+			TouristCategory category = TouristCategory.valueOf(interest.toUpperCase());
+			recommendations = recommender.recommendForCategory(user, category);
 		}
 
 		// POIs that were already recommended and rated positively are not

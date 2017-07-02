@@ -69,10 +69,10 @@ public class RecommenderTest {
 		long userId = 999; // test user who liked Casa Battló
 		User user = new User(userId, "");
 		user.setCurrentLocation(defaultUserLocation);
-		int categoryIndex = 3;
+		TouristCategory touristCategory = TouristCategory.FOOD;
 
 		// Action
-		List<RecommendedPointOfInterest> recommendations = recommender.recommendForCategory(user, categoryIndex);
+		List<RecommendedPointOfInterest> recommendations = recommender.recommendForCategory(user, touristCategory);
 
 		// Check
 		assertFalse(recommendations.isEmpty());
@@ -83,7 +83,7 @@ public class RecommenderTest {
 		
 		for (RecommendedPointOfInterest recommendation : recommendations) {
 			POIProfile profile = recommendation.getProfile();
-			assertEquals(Preference.TRUE, profile.getAllCategories().get(categoryIndex));
+			assertEquals(Preference.TRUE, profile.getPreferenceForCategory(touristCategory));
 		}
 	}
 
