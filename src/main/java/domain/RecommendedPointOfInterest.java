@@ -150,9 +150,9 @@ public class RecommendedPointOfInterest implements ProfileItem {
 	 * @return a formatted representation of the POI
 	 */
 	public String getFormattedString(boolean showDistance){
-		String ret = name+ ": ";
+		String ret = name;
 		if(showDistance && distanceToUser != -1){
-			ret+="\ndistance to you -" + distanceToUser + " m, ";
+			ret+="\nDistance " + distanceToUser + " m, ";
 		}
 		if(!address.isEmpty()){
 			ret += "\n"+address + ", ";
@@ -167,7 +167,7 @@ public class RecommendedPointOfInterest implements ProfileItem {
 
 		List<String> interestsFromProfile = profile.getInterestsFromProfile(Preference.TRUE);
 		if(!interestsFromProfile.isEmpty()){
-			ret += "\ncategory - ";
+			ret += "\nCategory - ";
 			for(String interest: interestsFromProfile){
 				ret += interest + ", ";
 			}

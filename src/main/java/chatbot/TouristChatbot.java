@@ -204,6 +204,12 @@ public class TouristChatbot {
 		return chatbotResponses;
 	}
 
+	/**
+	 * Handles the show past recommendation action
+	 * @param user
+	 * @param agentResponse
+	 * @return the chatbot responses
+	 */
 	private List<ChatbotResponse> handleShowPastRecommendations(User user, AgentResponse agentResponse) {
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		if (!user.getPositiveRecommendations().isEmpty()) {
@@ -214,11 +220,24 @@ public class TouristChatbot {
 		return chatbotResponses;
 	}
 
+	/**
+	 * Handles the presentation of recommendation results
+	 * @param user
+	 * @param agentResponse
+	 * @return the chatbot responses
+	 */
 	private List<ChatbotResponse> handlePresentRecommendationResult(User user, AgentResponse agentResponse) {
 		int ind = Integer.valueOf(((String) agentResponse.getParameters().get(Parameter.POI_INDEX.name()))) - 1;
 		return presentRecommendationResult(user, ind);
 	}
 
+	/**
+	 * Handles the first impression handling.
+	 * @param user
+	 * @param agentResponse
+	 * @param impression
+	 * @return the chatbot responses
+	 */
 	private List<ChatbotResponse> handleImpressionForPreviousPOI(User user, AgentResponse agentResponse,
 			boolean impression) {
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
@@ -232,6 +251,13 @@ public class TouristChatbot {
 		return chatbotResponses;
 	}
 
+	/**
+	 * Handles the recommendation process.
+	 * @param userInput
+	 * @param user
+	 * @param agentResponse
+	 * @return the chatbot responses
+	 */
 	private List<ChatbotResponse> handleRecommendation(Object userInput, User user, AgentResponse agentResponse) {
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		if (userInput instanceof Location) {
@@ -255,6 +281,12 @@ public class TouristChatbot {
 		return chatbotResponses;
 	}
 
+	/**
+	 * Handles the greeting.
+	 * @param user
+	 * @param agentResponse
+	 * @return the chatbot responses
+	 */
 	private List<ChatbotResponse> handleGreetings(User user, AgentResponse agentResponse) {
 		List<ChatbotResponse> chatbotResponses = new ArrayList<>();
 		chatbotResponses.add(new ChatbotResponse(agentResponse.getReply()));
@@ -267,6 +299,12 @@ public class TouristChatbot {
 		return chatbotResponses;
 	}
 
+	/**
+	 * Prepares the chatbot to save the radius and creates error messages if the process fails.
+	 * @param user
+	 * @param agentResponse
+	 * @return the chatbot responses
+	 */
 	private ChatbotResponse handleSaveRadius(User user, AgentResponse agentResponse) {
 		boolean successful = saveRadius(user, agentResponse);
 		ChatbotResponse chatbotResponse;
@@ -399,7 +437,6 @@ public class TouristChatbot {
 			ChatbotResponse rate = createRatePrompt(user, 0);
 			responses.add(rate);
 		} else {
-			// TODO check
 			agentHandler.resetContext(user.getId());
 		}
 		return responses;
@@ -635,7 +672,10 @@ public class TouristChatbot {
 		return new ChatbotResponse(message);
 	}
 
-	// public for JUnit testing
+	/**
+	 * Returns the chatbot's current active users (used for testing purposes)
+	 * @return a map including their current active users, using their id as key
+	 */
 	public Map<Long, User> getActiveUsers() {
 		return activeUsers;
 	}
