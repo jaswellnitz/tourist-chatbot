@@ -144,6 +144,7 @@ public class TouristChatbot {
 			break;
 		case SAVE_DISLIKE:
 			chatbotResponses.add(handleSavePreferences(user, agentResponse, "dislike", Preference.FALSE));
+			break;
 		case SHOW_INFORMATION:
 			chatbotResponses.add(getPersonalInformation(user));
 			break;
@@ -285,21 +286,22 @@ public class TouristChatbot {
 	 * @param agentResponse
 	 * @return the chatbot response
 	 */
-	private ChatbotResponse handleSavePreferences(User user, AgentResponse agentResponse, String contextName, Preference pref) {
+	private ChatbotResponse handleSavePreferences(User user, AgentResponse agentResponse, String contextName,
+			Preference pref) {
 		boolean successful = changeInterests(user, agentResponse, contextName, pref);
 		ChatbotResponse chatbotResponse;
 		if (successful) {
 			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
 			agentHandler.resetContext(user.getId());
 		} else {
-			chatbotResponse = new ChatbotResponse(
-					"Sorry, there was a mistake. The interest could not be saved. Please try again later.");
+			chatbotResponse = new ChatbotResponse("Sorry, the interest could not be saved. Please try again later.");
 		}
 		return chatbotResponse;
 	}
 
 	/**
 	 * Filters the user interests from the agent response and saves them.
+	 * 
 	 * @param user
 	 * @param response
 	 * @param contextName
@@ -314,17 +316,23 @@ public class TouristChatbot {
 		}
 		return false;
 	}
-	
+
 	private boolean changeProfile(User user, Context context, Preference pref) {
-		@SuppressWarnings("unchecked")
-		List<String> interests = (List<String>) context.getParameters().get(Parameter.INTEREST.name());
-		POIProfile profile = user.getProfile();
-		if (user.changeProfile(pref, interests.toArray(new String[interests.size()]))) {
-			if (userDB.changeProfileForUser(user.getId(), user.getProfile())) {
+		if (context.getParameters().containsKey(Parameter.INTEREST.name())) {
+			@SuppressWarnings("unchecked")
+			List<String> interests = (List<String>) context.getParameters().get(Parameter.INTEREST.name());
+			if (!interests.isEmpty()) {
+				POIProfile profile = user.getProfile();
+				if (user.changeProfile(pref, interests.toArray(new String[interests.size()]))) {
+					if (userDB.changeProfileForUser(user.getId(), user.getProfile())) {
+						return true;
+					} else {
+						// reset changes
+						user.setProfile(profile);
+					}
+				}
+			}else{
 				return true;
-			} else {
-				// reset changes
-				user.setProfile(profile);
 			}
 		}
 		return false;
@@ -390,7 +398,7 @@ public class TouristChatbot {
 		if (!user.getUnratedPOIs().isEmpty()) {
 			ChatbotResponse rate = createRatePrompt(user, 0);
 			responses.add(rate);
-		}else{
+		} else {
 			// TODO check
 			agentHandler.resetContext(user.getId());
 		}
@@ -581,7 +589,7 @@ public class TouristChatbot {
 			interestString = interestString.substring(0, interestString.length() - 2);
 			answer += "\n\nYou are interested in: " + interestString + ".";
 		}
-		
+
 		if (!dislikes.isEmpty()) {
 			String dislikeString = "";
 			for (String dislike : dislikes) {
