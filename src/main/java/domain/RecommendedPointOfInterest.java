@@ -152,7 +152,7 @@ public class RecommendedPointOfInterest implements ProfileItem {
 	public String getFormattedString(boolean showDistance){
 		String ret = name;
 		if(showDistance && distanceToUser != -1){
-			ret+="\nDistance " + distanceToUser + " m, ";
+			ret+="\nDistance - " + distanceToUser + " m, ";
 		}
 		if(!address.isEmpty()){
 			ret += "\n"+address + ", ";
