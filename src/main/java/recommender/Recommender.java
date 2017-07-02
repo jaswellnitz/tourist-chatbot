@@ -51,7 +51,7 @@ public class Recommender {
 	/**
 	 * Performs a category-specific recommendation, so only points of interest are returned that match the given tourist category
 	 * @param user 
-	 * @param categoryIndex index that specifies the tourist category
+	 * @param touristCategory 
 	 * @return Recommended points of interest
 	 */
 	public List<RecommendedPointOfInterest> recommendForCategory(User user, TouristCategory touristCategory) {
