@@ -579,6 +579,8 @@ public class TouristChatbot {
 			}
 			interestString = interestString.substring(0, interestString.length() - 2);
 			answer += "\n\nYou are interested in: " + interestString + ".";
+			
+			// TODO, not interested in
 		}
 
 		return new ChatbotResponse(answer);
