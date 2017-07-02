@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -15,6 +16,7 @@ import okhttp3.Response;
 
 /**
  * An abstract class that defines the API access.
+ * 
  * @author Jasmin Wellnitz
  *
  */
@@ -28,8 +30,11 @@ public abstract class ServiceRequester {
 
 	/**
 	 * Builds the HTTP query based on the query start and given parameters.
-	 * @param query - the query start
-	 * @param parameters Map with parameters in key value format
+	 * 
+	 * @param query
+	 *            - the query start
+	 * @param parameters
+	 *            Map with parameters in key value format
 	 * @return the complete query
 	 */
 	protected String buildQuery(String query, Map<String, String> parameters) {
@@ -42,9 +47,10 @@ public abstract class ServiceRequester {
 
 	/**
 	 * Sends the specified url by creating a HTTP request
+	 * 
 	 * @param header
 	 * @param headerValue
-	 * @param url 
+	 * @param url
 	 * @return the JSON response
 	 */
 	protected JsonObject sendQuery(String header, String headerValue, String url) {
@@ -62,8 +68,11 @@ public abstract class ServiceRequester {
 			logger.error(e);
 		}
 		JsonObject jsonObject = null;
-		if(jsonResponse != null){
-			jsonObject = new JsonParser().parse(jsonResponse).getAsJsonObject();
+		if (jsonResponse != null) {
+			JsonElement element = new JsonParser().parse(jsonResponse);
+			if (element.isJsonObject()) {
+				jsonObject = element.getAsJsonObject();
+			}
 		}
 		return jsonObject;
 	}
