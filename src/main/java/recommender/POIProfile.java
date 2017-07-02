@@ -179,7 +179,7 @@ public class POIProfile implements Serializable {
 	 * @param dislikes
 	 * @return indicates whether the action was successfull
 	 */
-	public boolean  deleteFromProfile(String... dislikes) {
+	public boolean deleteFromProfile(String... dislikes) {
 		return changeProfilePreference(Preference.FALSE, dislikes);
 	}
 	

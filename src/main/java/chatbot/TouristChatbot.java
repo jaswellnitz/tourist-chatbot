@@ -195,7 +195,7 @@ public class TouristChatbot {
 			chatbotResponse = new ChatbotResponse(agentResponse.getReply());
 		} else {
 			chatbotResponse = new ChatbotResponse(
-					"Sorry, there was a mistake. The rating could not be saved, please try again later.");
+					"Sorry, the rating could not be saved, please try again later.");
 		}
 		chatbotResponses.add(chatbotResponse);
 		return chatbotResponses;
@@ -528,7 +528,7 @@ public class TouristChatbot {
 			}
 			user.getUnratedPOIs().remove(rateIndex);
 		}
-		return true;
+		return rating != Rating.INVALID;
 	}
 
 	/**

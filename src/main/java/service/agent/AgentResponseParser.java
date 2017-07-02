@@ -39,9 +39,9 @@ public class AgentResponseParser {
 		return parameters;
 	}
 
-	private static int parseDistance(JsonElement value) {
-		JsonObject jsonObject = value.getAsJsonObject();
-		int amount = (int) jsonObject.get("amount").getAsDouble();
+	private static int parseDistance(JsonElement jsonElement) {
+		JsonObject jsonObject = jsonElement.getAsJsonObject();
+		double amount = (int) jsonObject.get("amount").getAsDouble();
 		String unit = jsonObject.get("unit").getAsString();
 		if (unit.equals("km")) {
 			amount *= 1000;
@@ -50,7 +50,7 @@ public class AgentResponseParser {
 		} else {
 			amount = -1;
 		}
-		if(amount < 0 ){
+		if(amount > Integer.MAX_VALUE || amount < 0){
 			amount = -1;
 		}
 		return (int) amount;
