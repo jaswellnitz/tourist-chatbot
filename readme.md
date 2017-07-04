@@ -11,7 +11,7 @@ Universidad de Burgos
  The chatbot takes a bit to respond if not accessed for a while, this
  can be explained by the Platform as a service running behaviour.
  
- [Demonstration Video](Documentation/demonstration.mp4)
+ [Demonstration Video](Documentation/demo.mp4)
 ----
 ## Description
 
