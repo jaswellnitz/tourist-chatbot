@@ -7,6 +7,11 @@ Universidad de Burgos
 
 ----
  Telegram Chatbot: @touristrecommenderbot
+ 
+ The chatbot takes a bit to respond if not accessed for a while, this
+ can be explained by the Platform as a service running behaviour.
+ 
+ [Demonstration Video](documentation/demonstration.mp4)
 ----
 ## Description
 
